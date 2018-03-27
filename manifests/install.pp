@@ -1,11 +1,11 @@
-# == Class: galera_maxscale::install
+# == Class: galera_proxysql::install
 #
 # This Class installs all the packages
 #
-class galera_maxscale::install (
-  $other_pkgs            = $::galera_maxscale::params::other_pkgs,
-  $percona_major_version = $::galera_maxscale::params::percona_major_version,
-  ) inherits galera_maxscale::params {
+class galera_proxysql::install (
+  $other_pkgs            = $::galera_proxysql::params::other_pkgs,
+  $percona_major_version = $::galera_proxysql::params::percona_major_version,
+  ) inherits galera_proxysql::params {
 
   package {
     $other_pkgs:

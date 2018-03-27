@@ -1,19 +1,19 @@
 
-# == Class: galera_maxscale::join
+# == Class: galera_proxysql::join
 #
 # This Class manages services
 #
-class galera_maxscale::join (
-  $percona_major_version = $::galera_maxscale::params::percona_major_version,
-  $monitor_password      = $::galera_maxscale::params::monitor_password,
-  $root_password         = $::galera_maxscale::params::root_password,
-  $sst_password          = $::galera_maxscale::params::sst_password,
-  $proxysql_password     = $::galera_maxscale::params::proxysql_password,
-  $galera_hosts          = $::galera_maxscale::params::galera_hosts,
-  $proxysql_hosts        = $::galera_maxscale::params::proxysql_hosts,
-  $proxysql_vip          = $::galera_maxscale::params::proxysql_vip,
-  $manage_lvm            = $::galera_maxscale::params::manage_lvm,
-  ) inherits galera_maxscale::params {
+class galera_proxysql::join (
+  $percona_major_version = $::galera_proxysql::params::percona_major_version,
+  $monitor_password      = $::galera_proxysql::params::monitor_password,
+  $root_password         = $::galera_proxysql::params::root_password,
+  $sst_password          = $::galera_proxysql::params::sst_password,
+  $proxysql_password     = $::galera_proxysql::params::proxysql_password,
+  $galera_hosts          = $::galera_proxysql::params::galera_hosts,
+  $proxysql_hosts        = $::galera_proxysql::params::proxysql_hosts,
+  $proxysql_vip          = $::galera_proxysql::params::proxysql_vip,
+  $manage_lvm            = $::galera_proxysql::params::manage_lvm,
+  ) inherits galera_proxysql::params {
 
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 
@@ -68,7 +68,7 @@ class galera_maxscale::join (
   }
 
   if ($::galera_joined_exist and $::galera_status == '200') {
-    galera_maxscale::create_user {
+    galera_proxysql::create_user {
       'sstuser':
         galera_hosts   => $galera_hosts,
         proxysql_hosts => $proxysql_hosts,
@@ -81,7 +81,7 @@ class galera_maxscale::join (
         dbpass         => $monitor_password;
     }
     if $proxysql_password {
-      galera_maxscale::create_user { 'proxysql':
+      galera_proxysql::create_user { 'proxysql':
         galera_hosts   => $galera_hosts,
         proxysql_hosts => $proxysql_hosts,
         proxysql_vip   => $proxysql_vip,

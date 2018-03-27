@@ -1,9 +1,9 @@
-# == Class: galera_maxscale::repo inherits galera
+# == Class: galera_proxysql::repo inherits galera
 #
-class galera_maxscale::repo (
-  $http_proxy            = $::galera_maxscale::params::http_proxy,
-  $manage_repo           = $::galera_maxscale::params::manage_repo
-  ) inherits galera_maxscale::params {
+class galera_proxysql::repo (
+  $http_proxy            = $::galera_proxysql::params::http_proxy,
+  $manage_repo           = $::galera_proxysql::params::manage_repo
+  ) inherits galera_proxysql::params {
 
   unless any2bool($manage_repo) == false {
     if ($http_proxy) { $proxy = $http_proxy } else { $proxy = absent }

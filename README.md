@@ -1,10 +1,10 @@
-# galera_maxscale
+# galera_proxysql
 
 #### Table of Contents
 
 1. [Description](#description)
-1. [Setup - The basics of getting started with galera_maxscale](#setup)
-    * [Beginning with galera_maxscale](#beginning-with-galera_maxscale)
+1. [Setup - The basics of getting started with galera_proxysql](#setup)
+    * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
 1. [Usage - Configuration options and additional functionality](#usage)
 1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 1. [Limitations - OS compatibility, etc.](#limitations)
@@ -33,12 +33,12 @@ Read at (actual) **limitations** in the paragraph below.
 
 ## Setup
 
-### Beginning with galera_maxscale
+### Beginning with galera_proxysql
 
 To setup Galera:
 
 ```puppet
-class { '::galera_maxscale':
+class { '::galera_proxysql':
   root_password    => $root_password,
   sst_password     => $sst_password,
   monitor_password => $monitor_password,
@@ -54,7 +54,7 @@ class { '::galera_maxscale':
 
 To setup MaxScale:
 ```puppet
-class { '::galera_maxscale::maxscale::maxscale':
+class { '::galera_proxysql::maxscale::maxscale':
   trusted_networks => $trusted_networks,
   maxscale_hosts   => $maxscale_hosts,
   maxscale_vip     => $maxscale_vip,
@@ -147,6 +147,6 @@ trusted_networks:
 
 ## Development
 
-Feel free to make pull requests and/or open issues on [my GitHub Repository](https://github.com/maxadamo/galera_maxscale)
+Feel free to make pull requests and/or open issues on [my GitHub Repository](https://github.com/maxadamo/galera_proxysql)
 
 ## Release Notes/Contributors/Etc. **Optional**

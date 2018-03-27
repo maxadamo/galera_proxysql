@@ -1,4 +1,4 @@
-# == Class: galera_maxscale::backup
+# == Class: galera_proxysql::backup
 #
 # This Class sets up a daily hot-backup
 # You may need to provide sufficient space in the mount point $backup_dir.
@@ -6,11 +6,11 @@
 # The backup will run only on one node: I decided to pick the 2nd node.
 #
 #
-class galera_maxscale::backup (
-  $galera_hosts        = $::galera_maxscale::params::galera_hosts,
-  $daily_hotbackup     = $::galera_maxscale::params::daily_hotbackup,
-  $galera_cluster_name = $::galera_maxscale::params::galera_cluster_name,
-  $backup_dir          = $::galera_maxscale::params::backup_dir,
+class galera_proxysql::backup (
+  $galera_hosts        = $::galera_proxysql::params::galera_hosts,
+  $daily_hotbackup     = $::galera_proxysql::params::daily_hotbackup,
+  $galera_cluster_name = $::galera_proxysql::params::galera_cluster_name,
+  $backup_dir          = $::galera_proxysql::params::backup_dir,
   ) {
 
   $nodes = keys($galera_hosts)

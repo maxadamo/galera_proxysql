@@ -1,11 +1,11 @@
-# == Class: galera_maxscale::lvm
+# == Class: galera_proxysql::lvm
 #
-class galera_maxscale::lvm (
-  $manage_lvm  = $::galera_maxscale::params::manage_lvm,
-  $lv_size     = $::galera_maxscale::params::lv_size,
-  $vg_name     = $::galera_maxscale::params::vg_name,
-  $galera_pkgs =  $::galera_maxscale::params::galera_pkgs,
-  ) inherits galera_maxscale::params {
+class galera_proxysql::lvm (
+  $manage_lvm  = $::galera_proxysql::params::manage_lvm,
+  $lv_size     = $::galera_proxysql::params::lv_size,
+  $vg_name     = $::galera_proxysql::params::vg_name,
+  $galera_pkgs =  $::galera_proxysql::params::galera_pkgs,
+  ) inherits galera_proxysql::params {
 
   if ($lv_size and $manage_lvm and $vg_name) {
     logical_volume { 'lv_galera':

@@ -1,9 +1,9 @@
 
-# == Class: galera_maxscale::services
+# == Class: galera_proxysql::services
 #
 # This Class manages services
 #
-class galera_maxscale::services {
+class galera_proxysql::services {
 
   xinetd::service { 'galerachk':
     server         => '/usr/bin/clustercheck',

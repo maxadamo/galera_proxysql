@@ -1,7 +1,7 @@
 
-# == Define: galera_maxscale::create_user
+# == Define: galera_proxysql::create_user
 #
-define galera_maxscale::create_user (
+define galera_proxysql::create_user (
   $dbpass,
   $galera_hosts,
   $proxysql_hosts,

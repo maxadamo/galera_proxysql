@@ -1,4 +1,4 @@
-# == Class: galera_maxscale::proxysql::proxysql
+# == Class: galera_proxysql::proxysql::proxysql
 #
 # === Parameters & Variables
 #
@@ -28,18 +28,18 @@
 #   Example: 'http://proxy.example.net:8080'
 #
 #
-class galera_maxscale::proxysql::proxysql (
-  $percona_major_version  = $::galera_maxscale::params::percona_major_version,
-  $galera_hosts           = $::galera_maxscale::params::galera_hosts,
-  $manage_repo            = $::galera_maxscale::params::manage_repo,
-  $proxysql_hosts         = $::galera_maxscale::params::proxysql_hosts,
-  $proxysql_vip           = $::galera_maxscale::params::proxysql_vip,
-  $proxysql_password      = $::galera_maxscale::params::proxysql_password,
-  $trusted_networks       = $::galera_maxscale::params::trusted_networks,
-  $http_proxy             = $::galera_maxscale::params::http_proxy,
-  $network_interface      = $::galera_maxscale::params::network_interface,
-  $proxysql_version       = $::galera_maxscale::params::proxysql_version
-  ) inherits galera_maxscale::params {
+class galera_proxysql::proxysql::proxysql (
+  $percona_major_version  = $::galera_proxysql::params::percona_major_version,
+  $galera_hosts           = $::galera_proxysql::params::galera_hosts,
+  $manage_repo            = $::galera_proxysql::params::manage_repo,
+  $proxysql_hosts         = $::galera_proxysql::params::proxysql_hosts,
+  $proxysql_vip           = $::galera_proxysql::params::proxysql_vip,
+  $proxysql_password      = $::galera_proxysql::params::proxysql_password,
+  $trusted_networks       = $::galera_proxysql::params::trusted_networks,
+  $http_proxy             = $::galera_proxysql::params::http_proxy,
+  $network_interface      = $::galera_proxysql::params::network_interface,
+  $proxysql_version       = $::galera_proxysql::params::proxysql_version
+  ) inherits galera_proxysql::params {
 
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
   $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
@@ -51,15 +51,15 @@ class galera_maxscale::proxysql::proxysql (
   }
 
   class {
-    '::galera_maxscale::repo':
+    '::galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
-    '::galera_maxscale::proxysql::keepalived':
+    '::galera_proxysql::proxysql::keepalived':
       manage_ipv6       => $ipv6_true,
       proxysql_hosts    => $proxysql_hosts,
       network_interface => $network_interface,
       proxysql_vip      => $proxysql_vip;
-    '::galera_maxscale::firewall':
+    '::galera_proxysql::firewall':
       manage_ipv6      => $ipv6_true,
       galera_hosts     => $galera_hosts,
       proxysql_hosts   => $proxysql_hosts,

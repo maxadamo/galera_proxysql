@@ -113,52 +113,52 @@
 #
 # 2018-Jan-15: Massimiliano Adamo <maxadamo@gmail.com>
 #
-class galera_maxscale (
+class galera_proxysql (
 
   # galera parameters
-  $backup_compress              = $::galera_maxscale::params::backup_compress,
-  $backup_dir                   = $::galera_maxscale::params::backup_dir,
-  $backup_retention             = $::galera_maxscale::params::backup_retention,
-  $daily_hotbackup              = $::galera_maxscale::params::daily_hotbackup,
-  $galera_cluster_name          = $::galera_maxscale::params::galera_cluster_name,
-  $galera_hosts                 = $::galera_maxscale::params::galera_hosts,
-  $innodb_buffer_pool_size      = $::galera_maxscale::params::innodb_buffer_pool_size,
-  $innodb_buffer_pool_instances = $::galera_maxscale::params::innodb_buffer_pool_instances,
-  $innodb_flush_method          = $::galera_maxscale::params::innodb_flush_method,
-  $innodb_io_capacity           = $::galera_maxscale::params::innodb_io_capacity,
-  $innodb_log_file_size         = $::galera_maxscale::params::innodb_log_file_size,
-  $logdir                       = $::galera_maxscale::params::logdir,
-  $lv_size                      = $::galera_maxscale::params::lv_size,
-  $percona_major_version        = $::galera_maxscale::params::percona_major_version,
-  $manage_lvm                   = $::galera_maxscale::params::manage_lvm,
-  $max_connections              = $::galera_maxscale::params::max_connections,
-  $monitor_password             = $::galera_maxscale::params::monitor_password,
-  $monitor_username             = $::galera_maxscale::params::monitor_username,
-  $other_pkgs                   = $::galera_maxscale::params::other_pkgs,
-  $query_cache                  = $::galera_maxscale::params::query_cache,
-  $root_password                = $::galera_maxscale::params::root_password,
-  $slow_query_time              = $::galera_maxscale::params::slow_query_time,
-  $sst_password                 = $::galera_maxscale::params::sst_password,
-  $thread_cache_size            = $::galera_maxscale::params::thread_cache_size,
-  $tmpdir                       = $::galera_maxscale::params::tmpdir,
-  $trusted_networks             = $::galera_maxscale::params::trusted_networks,
-  $vg_name                      = $::galera_maxscale::params::vg_name,
+  $backup_compress              = $::galera_proxysql::params::backup_compress,
+  $backup_dir                   = $::galera_proxysql::params::backup_dir,
+  $backup_retention             = $::galera_proxysql::params::backup_retention,
+  $daily_hotbackup              = $::galera_proxysql::params::daily_hotbackup,
+  $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
+  $galera_hosts                 = $::galera_proxysql::params::galera_hosts,
+  $innodb_buffer_pool_size      = $::galera_proxysql::params::innodb_buffer_pool_size,
+  $innodb_buffer_pool_instances = $::galera_proxysql::params::innodb_buffer_pool_instances,
+  $innodb_flush_method          = $::galera_proxysql::params::innodb_flush_method,
+  $innodb_io_capacity           = $::galera_proxysql::params::innodb_io_capacity,
+  $innodb_log_file_size         = $::galera_proxysql::params::innodb_log_file_size,
+  $logdir                       = $::galera_proxysql::params::logdir,
+  $lv_size                      = $::galera_proxysql::params::lv_size,
+  $percona_major_version        = $::galera_proxysql::params::percona_major_version,
+  $manage_lvm                   = $::galera_proxysql::params::manage_lvm,
+  $max_connections              = $::galera_proxysql::params::max_connections,
+  $monitor_password             = $::galera_proxysql::params::monitor_password,
+  $monitor_username             = $::galera_proxysql::params::monitor_username,
+  $other_pkgs                   = $::galera_proxysql::params::other_pkgs,
+  $query_cache                  = $::galera_proxysql::params::query_cache,
+  $root_password                = $::galera_proxysql::params::root_password,
+  $slow_query_time              = $::galera_proxysql::params::slow_query_time,
+  $sst_password                 = $::galera_proxysql::params::sst_password,
+  $thread_cache_size            = $::galera_proxysql::params::thread_cache_size,
+  $tmpdir                       = $::galera_proxysql::params::tmpdir,
+  $trusted_networks             = $::galera_proxysql::params::trusted_networks,
+  $vg_name                      = $::galera_proxysql::params::vg_name,
 
   # proxysql parameters
-  $proxysql_version             = $::galera_maxscale::params::proxysql_version,
-  $proxysql_vip                 = $::galera_maxscale::params::proxysql_vip,
-  $proxysql_password            = $::galera_maxscale::params::proxysql_password,
+  $proxysql_version             = $::galera_proxysql::params::proxysql_version,
+  $proxysql_vip                 = $::galera_proxysql::params::proxysql_vip,
+  $proxysql_password            = $::galera_proxysql::params::proxysql_password,
 
   # proxysql Keepalive configuration
-  $network_interface            = ::galera_maxscale::params::network_interface,
+  $network_interface            = ::galera_proxysql::params::network_interface,
 
   # common parameters
-  $http_proxy                   = $::galera_maxscale::params::http_proxy,
-  $manage_firewall              = $::galera_maxscale::params::manage_firewall,
-  $manage_repo                  = $::galera_maxscale::params::manage_repo,
-  $proxysql_hosts               = $::galera_maxscale::params::proxysql_hosts,
+  $http_proxy                   = $::galera_proxysql::params::http_proxy,
+  $manage_firewall              = $::galera_proxysql::params::manage_firewall,
+  $manage_repo                  = $::galera_proxysql::params::manage_repo,
+  $proxysql_hosts               = $::galera_proxysql::params::proxysql_hosts,
 
-) inherits galera_maxscale::params {
+) inherits galera_proxysql::params {
 
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
@@ -192,10 +192,10 @@ class galera_maxscale (
     $ipv6_true = undef
   }
 
-  galera_maxscale::root_password { $root_password:; }
+  galera_proxysql::root_password { $root_password:; }
 
   class {
-    '::galera_maxscale::files':
+    '::galera_proxysql::files':
       backup_compress              => $backup_compress,
       backup_dir                   => $backup_dir,
       backup_retention             => $backup_retention,
@@ -215,10 +215,10 @@ class galera_maxscale (
       tmpdir                       => $tmpdir,
       thread_cache_size            => $thread_cache_size,
       slow_query_time              => $slow_query_time;
-    '::galera_maxscale::install':
+    '::galera_proxysql::install':
       other_pkgs            => $other_pkgs,
       percona_major_version => $percona_major_version;
-    '::galera_maxscale::join':
+    '::galera_proxysql::join':
       percona_major_version => $percona_major_version,
       monitor_password      => $monitor_password,
       root_password         => $root_password,
@@ -228,23 +228,23 @@ class galera_maxscale (
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
       manage_lvm            => $manage_lvm;
-    '::galera_maxscale::backup':
+    '::galera_proxysql::backup':
       galera_hosts        => $galera_hosts,
       daily_hotbackup     => $daily_hotbackup,
       galera_cluster_name => $galera_cluster_name,
       backup_dir          => $backup_dir;
-    '::galera_maxscale::repo':
+    '::galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
-    '::galera_maxscale::lvm':
+    '::galera_proxysql::lvm':
       manage_lvm => $manage_lvm,
       vg_name    => $vg_name,
       lv_size    => $lv_size;
-    '::galera_maxscale::services':;
+    '::galera_proxysql::services':;
   }
 
   unless any2bool($manage_firewall) == false {
-    class { 'galera_maxscale::firewall':
+    class { 'galera_proxysql::firewall':
       manage_ipv6      => $ipv6_true,
       galera_hosts     => $galera_hosts,
       trusted_networks => $trusted_networks;

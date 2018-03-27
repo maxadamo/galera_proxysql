@@ -1,12 +1,12 @@
 {
-  "name": "maxadamo-galera_maxscale",
+  "name": "maxadamo-galera_proxysql",
   "version": "0.3.6",
   "author": "maxadamo",
   "summary": "Galera and MaxScale Cluster",
   "license": "GPL-3.0",
-  "source": "https://github.com/maxadamo/galera_maxscale",
-  "project_page": "https://github.com/maxadamo/galera_maxscale",
-  "issues_url": "https://github.com/maxadamo/galera_maxscale",
+  "source": "https://github.com/maxadamo/galera_proxysql",
+  "project_page": "https://github.com/maxadamo/galera_proxysql",
+  "issues_url": "https://github.com/maxadamo/galera_proxysql",
   "dependencies": [{
       "name": "arioch-keepalived",
       "version_requirement": ">= 1.2.5"

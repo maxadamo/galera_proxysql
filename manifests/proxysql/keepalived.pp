@@ -1,11 +1,11 @@
-# == Class: galera_maxscale::proxysql::keepalived
+# == Class: galera_proxysql::proxysql::keepalived
 #
-class galera_maxscale::proxysql::keepalived (
-  $proxysql_hosts    = $::galera_maxscale::params::proxysql_hosts,
-  $proxysql_vip      = $::galera_maxscale::params::proxysql_vip,
-  $network_interface = $::galera_maxscale::params::network_interface,
+class galera_proxysql::proxysql::keepalived (
+  $proxysql_hosts    = $::galera_proxysql::params::proxysql_hosts,
+  $proxysql_vip      = $::galera_proxysql::params::proxysql_vip,
+  $network_interface = $::galera_proxysql::params::network_interface,
   $manage_ipv6       = undef
-  ) inherits galera_maxscale::params {
+  ) inherits galera_proxysql::params {
 
   $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
@@ -16,7 +16,7 @@ class galera_maxscale::proxysql::keepalived (
   }
 
   include ::keepalived
-  class { '::galera_maxscale::proxysql::firewall': peer_ip => $peer_ip; }
+  class { '::galera_proxysql::proxysql::firewall': peer_ip => $peer_ip; }
 
   keepalived::vrrp::script { 'check_proxysql':
     script   => 'killall -0 proxysql',

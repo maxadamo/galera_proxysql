@@ -1,8 +1,8 @@
-# == Class: galera_maxscale::params
+# == Class: galera_proxysql::params
 #
 # Galera Parameters
 #
-class galera_maxscale::params {
+class galera_proxysql::params {
 
   # galera parameters
   $backup_compress = false

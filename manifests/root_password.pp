@@ -1,4 +1,4 @@
-# == Define: galera_maxscale::root_password
+# == Define: galera_proxysql::root_password
 #
 # == Overview
 #
@@ -8,7 +8,7 @@
 # the password will be change only if /root/.my.cnf is available, it the server
 # belonged to a cluster and if the cluster status is 200
 #
-define galera_maxscale::root_password () {
+define galera_proxysql::root_password () {
 
   $root_password = $name
   $root_cnf = '/root/.my.cnf'

@@ -1,15 +1,15 @@
-# == Class: galera_maxscale::firewall
+# == Class: galera_proxysql::firewall
 #
 # sets firewall up
 # We set inbound traffic only through the application manifest
 #
-class galera_maxscale::firewall (
+class galera_proxysql::firewall (
   $manage_ipv6      = undef,
-  $galera_hosts     = $::galera_maxscale::params::galera_hosts,
-  $proxysql_hosts   = $::galera_maxscale::params::proxysql_hosts,
-  $proxysql_vip     = $::galera_maxscale::params::proxysql_vip,
-  $trusted_networks = $::galera_maxscale::params::trusted_networks
-  ) inherits galera_maxscale::params {
+  $galera_hosts     = $::galera_proxysql::params::galera_hosts,
+  $proxysql_hosts   = $::galera_proxysql::params::proxysql_hosts,
+  $proxysql_vip     = $::galera_proxysql::params::proxysql_vip,
+  $trusted_networks = $::galera_proxysql::params::trusted_networks
+  ) inherits galera_proxysql::params {
 
   $trusted_networks.each | String $source | {
     if ':' in $source { $provider = 'ip6tables' } else { $provider = 'iptables' }
