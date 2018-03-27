@@ -1,0 +1,56 @@
+{
+  "name": "maxadamo-galera_maxscale",
+  "version": "0.3.6",
+  "author": "maxadamo",
+  "summary": "Galera and MaxScale Cluster",
+  "license": "GPL-3.0",
+  "source": "https://github.com/maxadamo/galera_maxscale",
+  "project_page": "https://github.com/maxadamo/galera_maxscale",
+  "issues_url": "https://github.com/maxadamo/galera_maxscale",
+  "dependencies": [{
+      "name": "arioch-keepalived",
+      "version_requirement": ">= 1.2.5"
+    },
+    {
+      "name": "puppetlabs-firewall",
+      "version_requirement": ">= 1.9.0"
+    },
+    {
+      "name": "puppetlabs-mysql",
+      "version_requirement": ">= 3.1.1"
+    },
+    {
+      "name": "stschulte-rpmkey",
+      "version_requirement": ">= 1.0.3"
+    },
+    {
+      "name": "puppetlabs-apt",
+      "version_requirement": ">= 4.5.0"
+    },
+    {
+      "name": "puppetlabs-xinetd",
+      "version_requirement": ">= 3.0.0"
+    }
+  ],
+  "data_provider": "hiera",
+  "operatingsystem_support": [{
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "16.04"
+      ]
+    }
+
+  ]
+}

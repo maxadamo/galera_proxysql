@@ -1,0 +1,11 @@
+# This file is managed by Puppet
+<%
+nodes_list = ''
+@galera_hosts.each do | key, values |
+  nodes_list = nodes_list + values['ipv4'] + '", "'
+end
+nodes_list = nodes_list.chomp('", "')
+-%>
+ALL_NODES = ["<%= nodes_list -%>"]
+CREDENTIALS = {"root": "<%= @root_password %>", "sstuser": "<%= @sst_password %>", "<%= @monitor_username %>": "<%= @monitor_password %>"}
+mydomain = "<%= @domain -%>"
