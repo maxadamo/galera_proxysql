@@ -13,9 +13,8 @@ list_bottom = '"
     max_replication_lag = 0
   },'
 @galera_hosts.each do | key, value |
-  server_list = server_list + list_top + value['ipv4'] + list_bottom
+  mysql_server_list = server_list + list_top + value['ipv4'] + list_bottom
 end
-mysql_server_list = server_list.chomp(",")
 -%>
 <%
 server_list_write = ''
