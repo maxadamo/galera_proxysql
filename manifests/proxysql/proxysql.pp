@@ -114,6 +114,10 @@ class galera_proxysql::proxysql::proxysql (
       mode    => '0640',
       before  => File['/etc/init.d/proxysql'],
       content => template("${module_name}/proxysql.cnf.erb");
+    '/etc/maxscale.cnf':
+      ensure  => file,
+      mode    => '0640',
+      content => template("${module_name}/maxscale.cnf.erb");
     '/etc/init.d/proxysql':
       ensure => file,
       source => "puppet:///modules/${module_name}/proxysql";
