@@ -37,9 +37,9 @@ class galera_proxysql::proxysql::proxysql (
   String $proxysql_password     = $::galera_proxysql::params::proxysql_password,
   Hash $sqlproxy_users          = $::galera_proxysql::params::sqlproxy_users,
   Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
-  Boolean $http_proxy           = $::galera_proxysql::params::http_proxy,
   String $network_interface     = $::galera_proxysql::params::network_interface,
   String $proxysql_version      = $::galera_proxysql::params::proxysql_version,
+  $http_proxy                   = $::galera_proxysql::params::http_proxy,
   ) inherits galera_proxysql::params {
 
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
