@@ -116,7 +116,8 @@ class galera_proxysql::proxysql::proxysql (
       notify  => Exec['service_purge'],
       content => template("${module_name}/proxysql.cnf.erb");
     '/etc/init.d/proxysql':
-      ensure => absent;
+      ensure => absent,
+      notify => Exec['kill_to_replace_init_script'];
     '/lib/systemd/system/proxysql.service':
       ensure => file,
       owner  => root,
