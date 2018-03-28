@@ -92,8 +92,8 @@ mysql_users:
     default_hostgroup = 0
     active = 1
   }<% @proxysql_users.each do |sqluser, sqlpass| %>,{
-    username = "<%= @sqluser %>"
-    password = "<%= @sqlpass %>"
+    username = "<%= sqluser %>"
+    password = "<%= sqlpass %>"
     default_hostgroup = 0
     active = 1
   }
