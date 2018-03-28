@@ -29,16 +29,17 @@
 #
 #
 class galera_proxysql::proxysql::proxysql (
-  $percona_major_version  = $::galera_proxysql::params::percona_major_version,
-  $galera_hosts           = $::galera_proxysql::params::galera_hosts,
-  $manage_repo            = $::galera_proxysql::params::manage_repo,
-  $proxysql_hosts         = $::galera_proxysql::params::proxysql_hosts,
-  $proxysql_vip           = $::galera_proxysql::params::proxysql_vip,
-  $proxysql_password      = $::galera_proxysql::params::proxysql_password,
-  $trusted_networks       = $::galera_proxysql::params::trusted_networks,
-  $http_proxy             = $::galera_proxysql::params::http_proxy,
-  $network_interface      = $::galera_proxysql::params::network_interface,
-  $proxysql_version       = $::galera_proxysql::params::proxysql_version
+  String $percona_major_version = $::galera_proxysql::params::percona_major_version,
+  Hash $galera_hosts            = $::galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo          = $::galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts          = $::galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip            = $::galera_proxysql::params::proxysql_vip,
+  String $proxysql_password     = $::galera_proxysql::params::proxysql_password,
+  Hash $sqlproxy_users          = $::galera_proxysql::params::sqlproxy_users,
+  Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
+  Boolean $http_proxy           = $::galera_proxysql::params::http_proxy,
+  String $network_interface     = $::galera_proxysql::params::network_interface,
+  String $proxysql_version      = $::galera_proxysql::params::proxysql_version,
   ) inherits galera_proxysql::params {
 
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')

@@ -38,6 +38,7 @@ class galera_proxysql::params {
   $proxysql_version  = 'latest'
   $proxysql_vip = undef
   $proxysql_password = undef
+  $sqlproxy_users = {}
 
   # proxysql Keepalive configuration
   $network_interface = 'eth0'

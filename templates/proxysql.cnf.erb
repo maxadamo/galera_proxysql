@@ -91,7 +91,13 @@ mysql_users:
     password = "<%= @proxysql_password %>"
     default_hostgroup = 0
     active = 1
+  }<% @sqlproxy_users.each do |sqluser, sqlpass| %>,{
+    username = "<%= @sqluser %>"
+    password = "<%= @sqlpass %>"
+    default_hostgroup = 0
+    active = 1
   }
+<% end %>
 )
 
 #defines MySQL Query Rules
