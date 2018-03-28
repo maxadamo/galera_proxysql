@@ -13,7 +13,7 @@ list_bottom = '"
     max_replication_lag = 0
   },'
 @galera_hosts.each do | key, value |
-  mysql_server_list = server_list + list_top + value['ipv4'] + list_bottom
+  server_list = server_list + list_top + value['ipv4'] + list_bottom
 end
 -%>
 <%
@@ -29,7 +29,7 @@ list_bottom_write = '"
 @galera_hosts.each do | key, value |
   server_list_write = server_list_write + list_top + value['ipv4'] + list_bottom_write
 end
-mysql_server_list_write = server_list_write.chomp(",")
+server_list_write = server_list_write.chomp(",")
 -%>
 #file proxysql.cfg
 #
@@ -80,7 +80,7 @@ mysql_variables=
 # defines all the MySQL servers
 mysql_servers =
 (
-<%= mysql_server_list -%><%= mysql_server_list_write %>
+<%= server_list -%><%= server_list_write %>
 )
 
 # defines all the MySQL users
