@@ -1,7 +1,9 @@
 <%
-server_list = '  '
 list_top = '{
     address = "'
+-%>
+<%
+server_list = '  '
 list_bottom = '"
     port = 3306
     hostgroup = 0
@@ -11,9 +13,24 @@ list_bottom = '"
     max_replication_lag = 0
   },'
 @galera_hosts.each do | key, value |
-  server_list = server_list + list_top + value['ipv4'] + list_bottom
+  mysql_server_list = server_list + list_top + value['ipv4'] + list_bottom
 end
 mysql_server_list = server_list.chomp(",")
+-%>
+<%
+server_write_list = ''
+list_bottom_write = '"
+    port = 3306
+    hostgroup = 1
+    status = "ONLINE"
+    weight = 1
+    compression = 0
+    max_replication_lag = 0
+  },'
+@galera_hosts.each do | key, value |
+  server_list_write = server_list_write + list_top + value['ipv4'] + list_bottom_write
+end
+mysql_server_list_write = server_list.chomp(",")
 -%>
 #file proxysql.cfg
 #
@@ -64,7 +81,7 @@ mysql_variables=
 # defines all the MySQL servers
 mysql_servers =
 (
-<%= mysql_server_list %>
+<%= mysql_server_list -%><%= mysql_server_list_write %>
 )
 
 # defines all the MySQL users
@@ -81,35 +98,35 @@ mysql_users:
 #defines MySQL Query Rules
 mysql_query_rules:
 (
-#  {
-#    rule_id=1
-#    active=1
-#    match_pattern="^SELECT .* FOR UPDATE$"
-#    destination_hostgroup=0
-#    apply=1
-#  },
-#  {
-#    rule_id=2
-#    active=1
-#    match_pattern="^SELECT"
-#    destination_hostgroup=1
-#    apply=1
-#  }
+  {
+    rule_id=1
+    active=1
+    match_pattern="^SELECT .* FOR UPDATE$"
+    destination_hostgroup=1
+    apply=1
+  },
+  {
+    rule_id=2
+    active=1
+    match_pattern="^SELECT"
+    destination_hostgroup=0
+    apply=1
+  }
 )
 
 scheduler=
 (
-#  {
-#    id=1
-#    active=0
-#    interval_ms=10000
-#    filename="/var/lib/proxysql/proxysql_galera_checker.sh"
-#    arg1="0"
-#    arg2="0"
-#    arg3="0"
-#    arg4="1"
-#    arg5="/var/lib/proxysql/proxysql_galera_checker.log"
-#  }
+  {
+    id=1
+    active=1
+    interval_ms=10000
+    filename="/usr/bin/proxysql_galera_checker"
+    arg1="1"
+    arg2="0"
+    arg3="1"
+    arg4="1"
+    arg5="/var/lib/proxysql/proxysql_galera_checker.log"
+  }
 )
 
 
