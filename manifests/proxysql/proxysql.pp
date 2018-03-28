@@ -113,16 +113,33 @@ class galera_proxysql::proxysql::proxysql (
       ensure  => file,
       mode    => '0640',
       before  => File['/etc/init.d/proxysql'],
+      notify  => Exec['service_purge'],
       content => template("${module_name}/proxysql.cnf.erb");
     '/etc/init.d/proxysql':
+      ensure => absent;
+    '/lib/systemd/system/proxysql.service':
       ensure => file,
-      source => "puppet:///modules/${module_name}/proxysql";
+      owner  => root,
+      group  => root,
+      notify => Exec['proxysql_daemon_reload'],
+      source => "puppet:///modules/${module_name}/proxysql.service";
     '/var/lib/mysql':
       ensure => directory;
     '/root/.my.cnf':
       owner   => root,
       group   => root,
       content => "[client]\nuser=proxysql\npassword=${proxysql_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
+  }
+
+  exec {
+    'service_purge':
+      command     => 'systemctl stop proxysql; rm -f /var/lib/proxysql/proxysql.db; systemctl start proxysql',
+      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
+      refreshonly => true;
+    'proxysql_daemon_reload':
+      command     => 'systemctl daemon-reload',
+      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
+      refreshonly => true;
   }
 
   # we need a fake exec in common with galera nodes to let

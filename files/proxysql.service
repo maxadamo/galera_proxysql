@@ -1,0 +1,24 @@
+[Unit]
+Description=MySQL Database Proxy
+After=network.target
+
+[Service]
+Restart=on-abort
+
+# Make sure /var/lib/proxysql exists
+PermissionsStartOnly=true
+ExecStartPre=/usr/bin/install -d /var/run/proxysql -d /var/lib/proxysql -o proxysql -g proxysql
+
+PIDFile=/var/run/proxysql/proxysql.pid
+
+# Use the default user and group
+User=proxysql
+Group=proxysql
+
+ExecStart=/usr/bin/proxysql -f -c /etc/proxysql.cnf -D /var/lib/proxysql
+#TimeoutStartSec=120
+#LimitNOFILE=65535
+#StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target
