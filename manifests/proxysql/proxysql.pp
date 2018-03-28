@@ -132,13 +132,17 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   exec {
+    default:
+      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin';
     'service_purge':
       command     => 'systemctl stop proxysql; rm -f /var/lib/proxysql/proxysql.db; systemctl start proxysql',
-      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
       refreshonly => true;
     'proxysql_daemon_reload':
       command     => 'systemctl daemon-reload',
-      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
+      refreshonly => true;
+    'kill_to_replace_init_script':
+      command     => 'pkill -f -9 proxysql',
+      returns     => [0, 1],
       refreshonly => true;
   }
 
