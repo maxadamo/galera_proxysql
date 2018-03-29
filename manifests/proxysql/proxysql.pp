@@ -73,8 +73,8 @@ class galera_proxysql::proxysql::proxysql (
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    provider   => 'systemd',
-    require    => File['/lib/systemd/system/proxysql.service'];
+    provider   => 'redhat',
+    require    => Package['proxysql'];
   }
 
   unless any2bool($manage_repo) == false {
@@ -110,12 +110,12 @@ class galera_proxysql::proxysql::proxysql (
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'];
-    #'/etc/proxysql.cnf':
-    #  ensure  => file,
-    #  mode    => '0640',
-    #  before  => File['/etc/init.d/proxysql'],
-    #  notify  => Exec['service_purge'],
-    #  content => template("${module_name}/proxysql.cnf.erb");
+    '/etc/proxysql.cnf':
+      ensure  => file,
+      mode    => '0640',
+      before  => File['/etc/init.d/proxysql'],
+      notify  => Exec['service_purge'],
+      content => template("${module_name}/proxysql.cnf.erb");
     '/etc/init.d/proxysql':
       ensure => absent,
       notify => Exec['kill_to_replace_init_script'];
@@ -133,35 +133,12 @@ class galera_proxysql::proxysql::proxysql (
       content => "[client]\nuser=proxysql\npassword=${proxysql_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
   }
 
-  concat { '/etc/proxysql.cnf':
-    owner  => 'proxysql',
-    group  => 'proxysql',
-    mode   => '0644',
-    notify => Service['proxysql'];
-  }
-
-  concat::fragment {
-    'proxysql_cnf_header':
-      target  => '/etc/proxysql.cnf',
-      content => template("${module_name}/proxysql_cnf/header.cnf.erb"),
-      order   => '1';
-    'proxysql_cnf_footer':
-      target  => '/etc/proxysql.cnf',
-      content => template("${module_name}/proxysql_cnf/footer.cnf.erb"),
-      order   => '99999999';
-  }
-
-  $proxysql_users.each | $sqluser, $sqlpass | {
-    concat::fragment { $sqluser:
-      target  => '/etc/proxysql.cnf',
-      content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
-      order   => fqdn_rand(99999998, "${sqluser}${sqlpass}")+1;
-    }
-  }
-
   exec {
     default:
       path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin';
+    'service_purge':
+      command     => 'systemctl stop proxysql; rm -f /var/lib/proxysql/proxysql.db; systemctl start proxysql',
+      refreshonly => true;
     'proxysql_daemon_reload':
       command     => 'systemctl daemon-reload',
       refreshonly => true;
