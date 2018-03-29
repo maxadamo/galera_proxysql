@@ -1,0 +1,150 @@
+<%
+list_top = '{
+    address = "'
+-%>
+<%
+server_list = '  '
+list_bottom = '"
+    port = 3306
+    hostgroup = 0
+    status = "ONLINE"
+    weight = 1
+    compression = 0
+    max_replication_lag = 0
+  },'
+@galera_hosts.each do | key, value |
+  server_list = server_list + list_top + value['ipv4'] + list_bottom
+end
+-%>
+<%
+server_list_write = ''
+list_bottom_write = '"
+    port = 3306
+    hostgroup = 1
+    status = "ONLINE"
+    weight = 1
+    compression = 0
+    max_replication_lag = 0
+  },'
+@galera_hosts.each do | key, value |
+  server_list_write = server_list_write + list_top + value['ipv4'] + list_bottom_write
+end
+server_list_write = server_list_write.chomp(",")
+-%>
+#file proxysql.cfg
+#
+# This config file is parsed using libconfig , and its grammar is described in:
+# http://www.hyperrealm.com/libconfig/libconfig_manual.html#Configuration-File-Grammar
+# Grammar is also copied at the end of this file
+
+datadir="/var/lib/proxysql"
+
+admin_variables=
+{
+  admin_credentials="admin:admin"
+  mysql_ifaces="127.0.0.1:3307;/var/lib/mysql/mysql_admin.sock"
+  # refresh_interval=2000
+  # debug=true
+}
+
+mysql_variables=
+{
+  threads=<%= @processorcount %>
+  max_connections=2048
+  default_query_delay=0
+  default_query_timeout=36000000
+  have_compress=true
+  poll_timeout=2000
+  interfaces="0.0.0.0:3306;/var/lib/mysql/mysql.sock"
+  default_schema="information_schema"
+  stacksize=1048576
+  server_version="5.5.30"
+  connect_timeout_server=3000
+  # make sure to configure monitor username and password
+  # https://github.com/sysown/proxysql/wiki/Global-variables#mysql-monitor_username-mysql-monitor_password
+  monitor_username="proxysql"
+  monitor_password="<%= @proxysql_password %>"
+  monitor_history=600000
+  monitor_connect_interval=60000
+  monitor_ping_interval=10000
+  monitor_read_only_interval=1500
+  monitor_read_only_timeout=500
+  ping_interval_server_msec=120000
+  ping_timeout_server=500
+  commands_stats=true
+  sessions_sort=true
+  connect_retries_on_failure=10
+}
+
+
+# defines all the MySQL servers
+mysql_servers =
+(
+<%= server_list -%><%= server_list_write %>
+)
+
+# defines all the MySQL users
+mysql_users:
+(
+  {
+    username = "proxysql"
+    password = "<%= @proxysql_password %>"
+    default_hostgroup = 0
+    active = 1
+  }<% @proxysql_users.each do |sqluser, sqlpass| %>,{
+    username = "<%= sqluser %>"
+    password = "<%= sqlpass %>"
+    default_hostgroup = 0
+    active = 1
+  }
+<% end %>
+)
+
+#defines MySQL Query Rules
+mysql_query_rules:
+(
+  {
+    rule_id=1
+    active=1
+    match_pattern="^SELECT .* FOR UPDATE$"
+    destination_hostgroup=1
+    apply=1
+  },
+  {
+    rule_id=2
+    active=1
+    match_pattern="^SELECT"
+    destination_hostgroup=0
+    apply=1
+  }
+)
+
+scheduler=
+(
+  {
+    id=1
+    active=1
+    interval_ms=10000
+    filename="/usr/bin/proxysql_galera_checker"
+    arg1="1"
+    arg2="0"
+    arg3="1"
+    arg4="1"
+    arg5="/var/lib/proxysql/proxysql_galera_checker.log"
+  }
+)
+
+
+mysql_replication_hostgroups=
+(
+#  {
+#    writer_hostgroup=30
+#    reader_hostgroup=40
+#    comment="test repl 1"
+#  },
+#  {
+#    writer_hostgroup=50
+#    reader_hostgroup=60
+#    comment="test repl 2"
+#  }
+)

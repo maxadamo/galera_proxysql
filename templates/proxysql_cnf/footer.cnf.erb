@@ -1,0 +1,49 @@
+)
+
+#defines MySQL Query Rules
+mysql_query_rules:
+(
+  {
+    rule_id=1
+    active=1
+    match_pattern="^SELECT .* FOR UPDATE$"
+    destination_hostgroup=1
+    apply=1
+  },
+  {
+    rule_id=2
+    active=1
+    match_pattern="^SELECT"
+    destination_hostgroup=0
+    apply=1
+  }
+)
+
+scheduler=
+(
+  {
+    id=1
+    active=1
+    interval_ms=10000
+    filename="/usr/bin/proxysql_galera_checker"
+    arg1="1"
+    arg2="0"
+    arg3="1"
+    arg4="1"
+    arg5="/var/lib/proxysql/proxysql_galera_checker.log"
+  }
+)
+
+mysql_replication_hostgroups=
+(
+#  {
+#    writer_hostgroup=30
+#    reader_hostgroup=40
+#    comment="test repl 1"
+#  },
+#  {
+#    writer_hostgroup=50
+#    reader_hostgroup=60
+#    comment="test repl 2"
+#  }
+)
