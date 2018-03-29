@@ -8,6 +8,7 @@ Restart=on-abort
 # Make sure /var/lib/proxysql exists
 PermissionsStartOnly=true
 ExecStartPre=/usr/bin/install -d /var/run/proxysql -d /var/lib/proxysql -o proxysql -g proxysql
+ExecStartPre=rm -f /var/lib/proxysql/proxysql.db
 
 PIDFile=/var/run/proxysql/proxysql.pid
 

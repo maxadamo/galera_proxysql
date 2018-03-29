@@ -137,7 +137,7 @@ class galera_proxysql::proxysql::proxysql (
     owner  => 'proxysql',
     group  => 'proxysql',
     mode   => '0644',
-    notify => Exec['service_purge'];
+    notify => Service['proxysql'];
   }
 
   concat::fragment {
@@ -155,17 +155,13 @@ class galera_proxysql::proxysql::proxysql (
     concat::fragment { $sqluser:
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
-      order   => fqdn_rand(99999998, "${sqluser}${sqlpass}")+1,
-      notify  => Exec['service_purge'];
+      order   => fqdn_rand(99999998, "${sqluser}${sqlpass}")+1;
     }
   }
 
   exec {
     default:
       path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin';
-    'service_purge':
-      command     => 'systemctl stop proxysql; rm -f /var/lib/proxysql/proxysql.db; systemctl start proxysql',
-      refreshonly => true;
     'proxysql_daemon_reload':
       command     => 'systemctl daemon-reload',
       refreshonly => true;
