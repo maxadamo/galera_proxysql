@@ -88,7 +88,7 @@ mysql_users:
 (
   {
     username = "proxysql"
-    password = "<%= @proxysql_password %>"
+    password = "<%= @monitor_password %>"
     default_hostgroup = 0
     active = 1
   }<% @proxysql_users.each do |sqluser, sqlpass| %>,{
