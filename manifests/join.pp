@@ -8,7 +8,6 @@ class galera_proxysql::join (
   $monitor_password      = $::galera_proxysql::params::monitor_password,
   $root_password         = $::galera_proxysql::params::root_password,
   $sst_password          = $::galera_proxysql::params::sst_password,
-  $proxysql_password     = $::galera_proxysql::params::proxysql_password,
   $galera_hosts          = $::galera_proxysql::params::galera_hosts,
   $proxysql_hosts        = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip          = $::galera_proxysql::params::proxysql_vip,
