@@ -114,7 +114,7 @@ class galera_proxysql::proxysql::proxysql (
       ensure  => file,
       mode    => '0640',
       before  => File['/etc/init.d/proxysql'],
-      notify  => Exec['service_purge'],
+      notify  => Service['proxysql'],
       content => template("${module_name}/proxysql.cnf.erb");
     '/etc/init.d/proxysql':
       ensure => absent,
@@ -136,9 +136,6 @@ class galera_proxysql::proxysql::proxysql (
   exec {
     default:
       path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin';
-    'service_purge':
-      command     => 'systemctl stop proxysql; rm -f /var/lib/proxysql/proxysql.db; systemctl start proxysql',
-      refreshonly => true;
     'proxysql_daemon_reload':
       command     => 'systemctl daemon-reload',
       refreshonly => true;
