@@ -223,7 +223,6 @@ class galera_proxysql (
       monitor_password      => $monitor_password,
       root_password         => $root_password,
       sst_password          => $sst_password,
-      proxysql_password     => $proxysql_password,
       galera_hosts          => $galera_hosts,
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
