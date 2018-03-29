@@ -134,9 +134,10 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   concat { '/etc/proxysql.cnf':
-    owner => 'proxysql',
-    group => 'proxysql',
-    mode  => '0644';
+    owner  => 'proxysql',
+    group  => 'proxysql',
+    mode   => '0644',
+    notify => Exec['service_purge'];
   }
 
   concat::fragment {
