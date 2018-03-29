@@ -34,7 +34,8 @@ class galera_proxysql::proxysql::proxysql (
   Boolean $manage_repo          = $::galera_proxysql::params::manage_repo,
   Hash $proxysql_hosts          = $::galera_proxysql::params::proxysql_hosts,
   Hash $proxysql_vip            = $::galera_proxysql::params::proxysql_vip,
-  String $proxysql_password     = $::galera_proxysql::params::proxysql_password,
+  String $monitor_password      = $::galera_proxysql::params::monitor_password,
+  String $admin_password        = $::galera_proxysql::params::admin_password,
   Hash $proxysql_users          = $::galera_proxysql::params::sqlproxy_users,
   Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
   String $network_interface     = $::galera_proxysql::params::network_interface,
@@ -130,7 +131,7 @@ class galera_proxysql::proxysql::proxysql (
     '/root/.my.cnf':
       owner   => root,
       group   => root,
-      content => "[client]\nuser=proxysql\npassword=${proxysql_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
+      content => "[client]\nuser=proxysql\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
   }
 
   exec {

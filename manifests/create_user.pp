@@ -4,12 +4,12 @@
 define galera_proxysql::create_user (
   $dbpass,
   $galera_hosts,
-  $proxysql_hosts,
-  $proxysql_vip,
-  $dbuser = $name
+  $proxysql_hosts = {},
+  $proxysql_vip   = {},
+  $dbuser         = $name
   ) {
 
-  if $dbuser == 'proxysql' {
+  if $dbuser == 'monitor' {
     if ($proxysql_hosts) {
       $host_hash = deep_merge($galera_hosts, $proxysql_hosts, $proxysql_vip)
     } else {

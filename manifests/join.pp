@@ -80,14 +80,6 @@ class galera_proxysql::join (
         proxysql_vip   => $proxysql_vip,
         dbpass         => $monitor_password;
     }
-    if $proxysql_password {
-      galera_proxysql::create_user { 'proxysql':
-        galera_hosts   => $galera_hosts,
-        proxysql_hosts => $proxysql_hosts,
-        proxysql_vip   => $proxysql_vip,
-        dbpass         => $proxysql_password;
-      }
-    }
   }
 
 }
