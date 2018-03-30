@@ -37,7 +37,7 @@ class galera_proxysql::proxysql::service {
       path        => '/usr/bin:/usr/sbin:/bin';
     "${module_name}_daemon_reload":
       command => 'systemctl daemon-reload',
-      before  => Service['mysql_forwarder', 'proxysql'];
+      before  => Service['proxysql'];
     'kill_to_replace_init_script':
       command => 'pkill -f -9 proxysql',
       returns => [0, 1];
