@@ -67,7 +67,7 @@ class galera_proxysql::join (
   }
 
   if ($::galera_joined_exist and $::galera_status == '200') {
-    galera_proxysql::create_user {
+    galera_proxysql::create_sys_user {
       'sstuser':
         galera_hosts   => $galera_hosts,
         proxysql_hosts => $proxysql_hosts,
