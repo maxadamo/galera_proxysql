@@ -20,7 +20,11 @@ define galera_proxysql::create::user (
   $_schema = split($table, '.')
   $schema = $_schema[0]
 
-  mysql::db { $schema:
+  notify { 'this is %{schema}':
+    message => "schema is ${schema} and ${_schema}";
+  }
+
+  mysql::db { 'zabbix':
     user     => $dbuser,
     password => $dbpass,
     grant    => $privileges,
