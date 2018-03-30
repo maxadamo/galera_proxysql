@@ -139,6 +139,10 @@ class galera_proxysql::proxysql::proxysql (
       target  => '/etc/proxysql.cnf',
       content => template("${module_name}/proxysql_cnf/header.cnf.erb"),
       order   => '1';
+    'proxysql_cnf_second':
+      target  => '/etc/proxysql.cnf',
+      content => "{\n    username = \"monitor\"\n    password = \"${monitor_password}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
       content => template("${module_name}/proxysql_cnf/footer.cnf.erb"),
@@ -149,7 +153,7 @@ class galera_proxysql::proxysql::proxysql (
     concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
-      order   => fqdn_rand(999999998, "${sqluser}${sqlpass}")+1;
+      order   => fqdn_rand(999999997, "${sqluser}${sqlpass}")+2;
     }
   }
 
