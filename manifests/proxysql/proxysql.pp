@@ -131,7 +131,7 @@ class galera_proxysql::proxysql::proxysql (
     '/root/.my.cnf':
       owner   => root,
       group   => root,
-      content => "[client]\nuser=proxysql\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
+      content => "[client]\nuser=monitor\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
   }
 
   exec {
