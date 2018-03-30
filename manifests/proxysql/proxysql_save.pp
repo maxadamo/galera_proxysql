@@ -109,6 +109,12 @@ class galera_proxysql::proxysql::proxysql (
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'];
+    '/etc/proxysql.cnf':
+      ensure  => file,
+      mode    => '0640',
+      before  => File['/etc/init.d/proxysql'],
+      notify  => Service['proxysql'],
+      content => template("${module_name}/proxysql.cnf.erb");
     '/etc/init.d/proxysql':
       ensure => absent,
       notify => Exec['kill_to_replace_init_script'];
@@ -127,11 +133,10 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   concat { '/etc/proxysql.cnf':
-    owner   => 'proxysql',
-    group   => 'proxysql',
-    mode    => '0640',
-    require => Package['proxysql'],
-    notify  => Service['proxysql'];
+    owner  => 'proxysql',
+    group  => 'proxysql',
+    mode   => '0644',
+    notify => Service['proxysql'];
   }
 
   concat::fragment {
@@ -146,12 +151,13 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   $proxysql_users.each | $sqluser, $sqlpass | {
-    concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
+    concat::fragment { $sqluser:
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
       order   => fqdn_rand(999999998, "${sqluser}${sqlpass}")+1;
     }
   }
+
 
   exec {
     default:
