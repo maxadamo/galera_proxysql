@@ -141,7 +141,7 @@ class galera_proxysql::proxysql::proxysql (
       order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
-      content => "{\n    username = \"monitor\"\n    password = \"${monitor_password}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => "  {\n    username = \"monitor\"\n    password = \"${monitor_password}\"\n    default_hostgroup = 0\n    active = 1\n  }",
       order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
