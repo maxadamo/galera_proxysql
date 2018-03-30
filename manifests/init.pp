@@ -240,6 +240,8 @@ class galera_proxysql (
       vg_name    => $vg_name,
       lv_size    => $lv_size;
     '::galera_proxysql::services':;
+    '::mysql::client':
+      package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
   unless any2bool($manage_firewall) == false {
