@@ -52,6 +52,8 @@ class galera_proxysql::proxysql::proxysql (
     $ipv6_true = undef
   }
 
+  include ::galera_proxysql::proxysql::service
+
   class {
     '::galera_proxysql::repo':
       http_proxy  => $http_proxy,
@@ -71,25 +73,15 @@ class galera_proxysql::proxysql::proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
-  service { 'proxysql':
-    ensure     => running,
-    enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
-    provider   => 'systemd',
-    require    => Package['proxysql'];
-  }
-
   unless any2bool($manage_repo) == false {
     package {
-      default:
-        require => Yumrepo['Percona'];
-      '::mysql::client':
-        ensure => installed,
-        before => Class['::mysql::client'];
+      "Percona-Server-shared-compat-${percona_major_version}":
+        ensure  => installed,
+        require => Yumrepo['Percona'],
+        before  => Class['::mysql::client'];
       'proxysql':
         ensure  => $proxysql_version,
-        require => Class['::mysql::client'];
+        require => [Class['::mysql::client'], Yumrepo['Percona']];
     }
   } else {
     package {
@@ -103,23 +95,12 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   file {
-    default:
-      mode    => '0755',
+    '/var/lib/mysql':
+      ensure  => directory,
       owner   => proxysql,
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'];
-    '/etc/init.d/proxysql':
-      ensure => absent,
-      notify => Exec['kill_to_replace_init_script'];
-    '/lib/systemd/system/proxysql.service':
-      ensure => file,
-      owner  => root,
-      group  => root,
-      notify => Exec['proxysql_daemon_reload'],
-      source => "puppet:///modules/${module_name}/proxysql.service";
-    '/var/lib/mysql':
-      ensure => directory;
     '/root/.my.cnf':
       owner   => root,
       group   => root,
