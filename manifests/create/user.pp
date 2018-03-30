@@ -3,7 +3,7 @@
 #
 define galera_proxysql::create::user (
   $dbpass,
-  $galera_hosts,
+  $galera_hosts   = undef,
   $proxysql_hosts = {},
   $proxysql_vip   = {},
   $privileges     = ['SELECT', 'SHOW DATABASES'],
@@ -16,54 +16,50 @@ define galera_proxysql::create::user (
   } else {
     $host_hash = $galera_hosts
   }
-
-  # there seems to be a problem with puppet split fucntion or it might be
-  # an issue with the string containing a star
   $schema_name = inline_template('<%= @table.split(".")[0] %>')
-  #$_schema = split($table, '.')
-  #$schema = $_schema[0]
 
-  notify { 'this is %{schema}':
-    message => "schema is ${schema_name} and table is ${table}";
-  }
-
-  $schema = 'zabbix'
-
-  mysql::db { $schema:
-    user     => $dbuser,
-    password => $dbpass,
-    grant    => $privileges,
-    charset  => 'utf8',
-    collate  => 'utf8_bin';
-  }
-
-  $host_hash.each | $host_name, $host_ips | {
-    mysql_user {
-      "${dbuser}@${host_ips['ipv4']}":
-        ensure        => present,
-        password_hash => mysql_password($dbpass),
-        provider      => 'mysql',
-        require       => Mysql::Db[$schema];
-      "${dbuser}@${host_name}":
-        ensure        => present,
-        password_hash => mysql_password($dbpass),
-        provider      => 'mysql',
-        require       => Mysql::Db[$schema];
-    }
-    mysql_grant {
-      "${dbuser}@${host_ips['ipv4']}/${table}":
-        ensure     => present,
-        user       => "${dbuser}@${host_ips['ipv4']}",
-        table      => $table,
-        privileges => $privileges,
-        require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
-      "${dbuser}@${host_name}/${table}":
-        ensure     => present,
-        user       => "${dbuser}@${host_name}",
-        table      => $table,
-        privileges => $privileges,
-        require    => Mysql_user["${dbuser}@${host_name}"];
+  if defined(Class['::galera_proxysql::join']) {
+    if ($galera_hosts) {
+      mysql::db { $schema_name:
+        user     => $dbuser,
+        password => $dbpass,
+        grant    => $privileges,
+        charset  => 'utf8',
+        collate  => 'utf8_bin';
+      }
+      $host_hash.each | $host_name, $host_ips | {
+        mysql_user {
+          "${dbuser}@${host_ips['ipv4']}":
+            ensure        => present,
+            password_hash => mysql_password($dbpass),
+            provider      => 'mysql',
+            require       => Mysql::Db[$schema_name];
+          "${dbuser}@${host_name}":
+            ensure        => present,
+            password_hash => mysql_password($dbpass),
+            provider      => 'mysql',
+            require       => Mysql::Db[$schema_name];
+        }
+        mysql_grant {
+          "${dbuser}@${host_ips['ipv4']}/${table}":
+            ensure     => present,
+            user       => "${dbuser}@${host_ips['ipv4']}",
+            table      => $table,
+            privileges => $privileges,
+            require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
+          "${dbuser}@${host_name}/${table}":
+            ensure     => present,
+            user       => "${dbuser}@${host_name}",
+            table      => $table,
+            privileges => $privileges,
+            require    => Mysql_user["${dbuser}@${host_name}"];
+        }
+      }
+    } else {
+      fail('hash galera_hosts not defined')
     }
   }
+
+
 
 }
