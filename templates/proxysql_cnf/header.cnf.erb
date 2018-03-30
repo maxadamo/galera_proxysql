@@ -62,7 +62,7 @@ mysql_variables=
   connect_timeout_server=3000
   # make sure to configure monitor username and password
   # https://github.com/sysown/proxysql/wiki/Global-variables#mysql-monitor_username-mysql-monitor_password
-  monitor_username="proxysql"
+  monitor_username="monitor"
   monitor_password="<%= @proxysql_password %>"
   monitor_history=600000
   monitor_connect_interval=60000
@@ -87,7 +87,7 @@ mysql_servers =
 mysql_users:
 (
   {
-    username = "proxysql"
+    username = "monitor"
     password = "<%= @proxysql_password %>"
     default_hostgroup = 0
     active = 1
