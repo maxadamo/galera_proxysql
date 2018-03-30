@@ -37,7 +37,7 @@ class galera_proxysql::proxysql::service {
       owner   => root,
       group   => root,
       notify  => Exec["${module_name}_daemon_reload"],
-      content => template("${module_name}/mysql_forwarder.service");
+      content => template("${module_name}/mysql_forwarder.service.erb");
     }
     -> service { 'mysql_forwarder':
       ensure     => running,
