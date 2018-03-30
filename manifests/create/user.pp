@@ -17,11 +17,14 @@ define galera_proxysql::create::user (
     $host_hash = $galera_hosts
   }
 
-  $_schema = split($table, '.')
-  $schema = $_schema[0]
+  # there seems to be a problem with puppet split fucntion or it might be
+  # an issue with the string containing a star
+  $schema = inline_template('<% @table.split(".")[0] -%>')
+  #$_schema = split($table, '.')
+  #$schema = $_schema[0]
 
   notify { 'this is %{schema}':
-    message => "schema is ${schema} and ${_schema} and table is ${table}";
+    message => "schema is ${schema} and table is ${table}";
   }
 
   mysql::db { 'zabbix':
