@@ -21,7 +21,7 @@ define galera_proxysql::create::user (
   $schema = $_schema[0]
 
   notify { 'this is %{schema}':
-    message => "schema is ${schema} and ${_schema}";
+    message => "schema is ${schema} and ${_schema} and table is ${table}";
   }
 
   mysql::db { 'zabbix':

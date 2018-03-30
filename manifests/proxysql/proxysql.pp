@@ -67,6 +67,8 @@ class galera_proxysql::proxysql::proxysql (
       proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
+    '::mysql::client':
+      package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
   service { 'proxysql':
@@ -84,8 +86,8 @@ class galera_proxysql::proxysql::proxysql (
         require => Yumrepo['Percona'];
       "Percona-Server-shared-compat-${percona_major_version}":
         ensure => installed,
-        before => Package["Percona-Server-client-${percona_major_version}"];
-      "Percona-Server-client-${percona_major_version}":
+        before => Package["Percona-XtraDB-Cluster-client-${percona_major_version}"];
+      "Percona-XtraDB-Cluster-client-${percona_major_version}":
         ensure => installed,
         before => Package['proxysql'];
       'proxysql':
