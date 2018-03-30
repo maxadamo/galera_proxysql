@@ -95,12 +95,10 @@ class galera_proxysql::proxysql::proxysql (
     package {
       "Percona-Server-shared-compat-${percona_major_version}":
         ensure => installed,
-        before => Package["Percona-Server-client-${percona_major_version}"];
-      "Percona-Server-client-${percona_major_version}":
-        ensure => installed,
-        before => Package['proxysql'];
+        before => Class['::mysql::client'];
       'proxysql':
-        ensure  => $proxysql_version;
+        ensure  => $proxysql_version,
+        require => Class['::mysql::client'];
     }
   }
 
