@@ -138,18 +138,6 @@ class galera_proxysql::proxysql::proxysql (
     }
   }
 
-  exec {
-    default:
-      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin';
-    'proxysql_daemon_reload':
-      command     => 'systemctl daemon-reload',
-      refreshonly => true;
-    'kill_to_replace_init_script':
-      command     => 'pkill -f -9 proxysql',
-      returns     => [0, 1],
-      refreshonly => true;
-  }
-
   # we need a fake exec in common with galera nodes to let
   # galera use the `before` statement in the same firewall
   unless defined(Exec['bootstrap_or_join']) {
