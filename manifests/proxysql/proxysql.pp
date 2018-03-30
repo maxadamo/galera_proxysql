@@ -74,7 +74,7 @@ class galera_proxysql::proxysql::proxysql (
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    provider   => 'redhat',
+    provider   => 'systemd',
     require    => Package['proxysql'];
   }
 
