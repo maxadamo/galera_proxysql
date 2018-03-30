@@ -31,23 +31,6 @@ class galera_proxysql::proxysql::service {
     require    => File['/lib/systemd/system/proxysql.service'];
   }
 
-  if ($::ipaddress6) {
-    package { 'socat': ensure => installed; }
-    -> file { '/lib/systemd/system/mysql_forwarder.service':
-      owner   => root,
-      group   => root,
-      notify  => Exec["${module_name}_daemon_reload"],
-      content => template("${module_name}/mysql_forwarder.service.erb");
-    }
-    -> service { 'mysql_forwarder':
-      ensure     => running,
-      enable     => true,
-      hasrestart => true,
-      hasstatus  => true,
-      provider   => 'systemd';
-    }
-  }
-
   exec {
     default:
       refreshonly => true,
