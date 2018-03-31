@@ -16,7 +16,8 @@ class galera_proxysql::services {
     log_on_failure => 'HOST',
     require        => [
       File['/root/.my.cnf', '/etc/sysconfig/clustercheck'],
-      File_line['clustercheck_two'];
+      File_line['clustercheck_two']
+    ];
   }
 
   # mysql and mysql@bootstrap are mutual exclusives.
