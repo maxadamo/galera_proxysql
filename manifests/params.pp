@@ -22,7 +22,6 @@ class galera_proxysql::params {
   $manage_lvm = undef
   $max_connections = 1024
   $monitor_password = undef
-  $monitor_username = 'monitor'
   $other_pkgs = [
     'percona-xtrabackup-24', 'percona-toolkit', 'python-paramiko',
     'MySQL-python', 'qpress', 'nc', 'socat'

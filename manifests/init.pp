@@ -81,10 +81,7 @@
 #   proxysql user password
 #
 # [*monitor_password*] <String>
-#   proxysql monitor password
-#
-# [*monitor_username*] <String>
-#   default: monitor
+#   galera and proxysql monitor password
 #
 # [*other_pkgs*] <Array>
 #   list of packages needed by Percona Cluster
@@ -133,7 +130,6 @@ class galera_proxysql (
   $manage_lvm                   = $::galera_proxysql::params::manage_lvm,
   $max_connections              = $::galera_proxysql::params::max_connections,
   $monitor_password             = $::galera_proxysql::params::monitor_password,
-  $monitor_username             = $::galera_proxysql::params::monitor_username,
   $other_pkgs                   = $::galera_proxysql::params::other_pkgs,
   $query_cache                  = $::galera_proxysql::params::query_cache,
   $root_password                = $::galera_proxysql::params::root_password,
@@ -208,7 +204,6 @@ class galera_proxysql (
       logdir                       => $logdir,
       max_connections              => $max_connections,
       monitor_password             => $monitor_password,
-      monitor_username             => $monitor_username,
       query_cache                  => $query_cache,
       root_password                => $root_password,
       sst_password                 => $sst_password,

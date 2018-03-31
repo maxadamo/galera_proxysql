@@ -17,7 +17,6 @@ class galera_proxysql::files (
   $logdir                       = $::galera_proxysql::params::logdir,
   $max_connections              = $::galera_proxysql::params::max_connections,
   $monitor_password             = $::galera_proxysql::params::monitor_password,
-  $monitor_username             = $::galera_proxysql::params::monitor_username,
   $query_cache                  = $::galera_proxysql::params::query_cache,
   $root_password                = $::galera_proxysql::params::root_password,
   $sst_password                 = $::galera_proxysql::params::sst_password,

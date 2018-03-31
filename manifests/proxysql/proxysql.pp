@@ -118,7 +118,7 @@ class galera_proxysql::proxysql::proxysql (
   concat::fragment {
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
-      content => template("${module_name}/proxysql_cnf/header.cnf.erb"),
+      content => template("${module_name}/proxysql_header.cnf.erb"),
       order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
@@ -126,7 +126,7 @@ class galera_proxysql::proxysql::proxysql (
       order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
-      content => template("${module_name}/proxysql_cnf/footer.cnf.erb"),
+      content => template("${module_name}/proxysql_footer.cnf.erb"),
       order   => '999999999';
   }
 

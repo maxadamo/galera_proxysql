@@ -7,5 +7,5 @@ end
 nodes_list = nodes_list.chomp('", "')
 -%>
 ALL_NODES = ["<%= nodes_list -%>"]
-CREDENTIALS = {"root": "<%= @root_password %>", "sstuser": "<%= @sst_password %>", "<%= @monitor_username %>": "<%= @monitor_password %>"}
+CREDENTIALS = {"root": "<%= @root_password %>", "sstuser": "<%= @sst_password %>", "monitor": "<%= @monitor_password %>"}
 mydomain = "<%= @domain -%>"
