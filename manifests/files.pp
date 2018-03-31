@@ -68,10 +68,10 @@ class galera_proxysql::files (
     '/etc/sysconfig/clustercheck':
       notify  => Xinetd::Service['galerachk'],
       content => template("${module_name}/clustercheck.erb");
-    '/usr/bin/clustercheck':
-      mode   => '0755',
-      notify => Xinetd::Service['galerachk'],
-      source => "puppet:///modules/${module_name}/clustercheck";
+    #'/usr/bin/clustercheck':
+    #  mode   => '0755',
+    #  notify => Xinetd::Service['galerachk'],
+    #  source => "puppet:///modules/${module_name}/clustercheck";
     '/etc/my.cnf.d/client.cnf':
       source  => "puppet:///modules/${module_name}/client.cnf";
     '/etc/my.cnf.d/mysql-clients.cnf':
@@ -85,13 +85,23 @@ class galera_proxysql::files (
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
   }
 
-  file_line { 'mysql_systemd':
-    ensure             => present,
-    path               => '/usr/bin/mysql-systemd',
-    line               => '    /usr/sbin/mysqld --initialize-insecure --datadir="$datadir" --user=mysql',
-    match              => '/usr/sbin/mysqld --initialize --datadir',
-    append_on_no_match => false,
-    require            => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
+  file_line {
+    default:
+      ensure             => present,
+      append_on_no_match => false,
+      require            => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
+    'mysql_systemd':
+      path  => '/usr/bin/mysql-systemd',
+      line  => '    /usr/sbin/mysqld --initialize-insecure --datadir="$datadir" --user=mysql',
+      match => '/usr/sbin/mysqld --initialize --datadir';
+    'clustercheck_one':
+      path  => '/usr/bin/clustercheck',
+      line  => "source /etc/sysconfig/clustercheck\n#MYSQL_USERNAME=\"\${1-clustercheckuser}\"",
+      match => '^MYSQL_USERNAME=';
+    'clustercheck_two':
+      path  => '/usr/bin/clustercheck',
+      line  => "#MYSQL_PASSWORD=\"\${2-clustercheckpassword!}\"",
+      match => '^MYSQL_PASSWORD=';
   }
 
 }
