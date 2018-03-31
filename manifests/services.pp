@@ -14,13 +14,13 @@ class galera_proxysql::services {
     flags          => 'REUSE',
     log_on_success => '',
     log_on_failure => 'HOST',
-    require        => File[
-      '/usr/bin/clustercheck', '/root/.my.cnf', '/etc/sysconfig/clustercheck'
-    ];
+    require        => [
+      File['/root/.my.cnf', '/etc/sysconfig/clustercheck'],
+      File_line['clustercheck_two'];
   }
 
   # mysql and mysql@bootstrap are mutual exclusives.
-  # A proper way to deal with both services must be found. 
+  # A proper way to deal with both services must be found.
   # service { 'mysql':
   #   ensure   => running,
   #   provider => 'systemd',
