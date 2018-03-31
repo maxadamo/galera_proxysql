@@ -64,7 +64,7 @@ class galera_proxysql::files (
     '/root/.my.cnf':
       mode    => '0660',
       notify  => Xinetd::Service['galerachk'],
-      content => template("${module_name}/root_my.cnf.erb");
+      content => "[client]\nuser=root\npassword=${root_password}\n";
     '/etc/sysconfig/clustercheck':
       notify  => Xinetd::Service['galerachk'],
       content => template("${module_name}/clustercheck.erb");
@@ -77,30 +77,21 @@ class galera_proxysql::files (
     '/etc/my.cnf.d/mysql-clients.cnf':
       source  => "puppet:///modules/${module_name}/mysql-clients.cnf";
     '/etc/my.cnf.d/server.cnf':
-      mode    => '0640',
       content => template("${module_name}/server.cnf.erb");
     '/etc/my.cnf.d/wsrep.cnf':
       mode    => '0640',
       content => template("${module_name}/wsrep.cnf.erb");
     '/etc/my.cnf.d/mysqld_safe.cnf':
-      mode   => '0644',
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
   }
 
   file_line { 'mysql_systemd':
     ensure             => present,
     path               => '/usr/bin/mysql-systemd',
-    line               => 'export HTTP_PROXY=http://squid.puppetlabs.vm:3128',
+    line               => '    /usr/sbin/mysqld --initialize-insecure --datadir="$datadir" --user=mysql',
     match              => '/usr/sbin/mysqld --initialize --datadir',
     append_on_no_match => false,
     require            => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
-  }
-
-  exec { 'galera_systemctl_daemon_reload':
-    command     => 'systemctl daemon-reload',
-    path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
-    onlyif      => 'which systemctl',
-    refreshonly => true;
   }
 
 }
