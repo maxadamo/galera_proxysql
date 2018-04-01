@@ -165,6 +165,7 @@ galera_proxysql::create::user { 'zabbix':
 - missing SSL support
 - init script management needs to be improved
 - not yet tested on ipv4 only (it should work)
+- I removed support to Ubuntu (I rather concentrate on improving the quality of this module first)
 
 ## Development
 
