@@ -1,8 +1,8 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "0.3.6",
+  "version": "0.1.0",
   "author": "maxadamo",
-  "summary": "Galera and MaxScale Cluster",
+  "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
   "source": "https://github.com/maxadamo/galera_proxysql",
   "project_page": "https://github.com/maxadamo/galera_proxysql",
@@ -22,10 +22,6 @@
     {
       "name": "stschulte-rpmkey",
       "version_requirement": ">= 1.0.3"
-    },
-    {
-      "name": "puppetlabs-apt",
-      "version_requirement": ">= 4.5.0"
     },
     {
       "name": "puppetlabs-xinetd",
