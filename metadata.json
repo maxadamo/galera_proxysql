@@ -1,12 +1,12 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
   "source": "https://github.com/maxadamo/galera_proxysql",
   "project_page": "https://github.com/maxadamo/galera_proxysql",
-  "issues_url": "https://github.com/maxadamo/galera_proxysql",
+  "issues_url": "https://github.com/maxadamo/galera_proxysql/issues",
   "dependencies": [{
       "name": "arioch-keepalived",
       "version_requirement": ">= 1.2.5"
