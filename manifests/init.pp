@@ -156,8 +156,6 @@ class galera_proxysql (
 
 ) inherits galera_proxysql::params {
 
-  fail('DEPRECATION NOTICE: please consider using the new module `galera_proxysql`')
-
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
   # checking cluster status through the facter galera_status
