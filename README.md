@@ -136,7 +136,7 @@ trusted_networks:
 ```
 
 Create a new DB user:
-you could also use the puppetlabs/mysql define and class, but with this define you can create DB and user either on the nodes and on proxysql. 
+you could also use the puppetlabs/mysql define and class, but with this define you can create DB and user either on the nodes and on proxysql.
 
 On Galera, to create user Zabbix and DB Zabbix:
 ```puppet
@@ -159,8 +159,6 @@ galera_proxysql::create::user { 'zabbix':
 ```
 
 ## Reference
-
-
 
 ## Limitations
 
