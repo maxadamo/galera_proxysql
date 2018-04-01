@@ -4,11 +4,13 @@
 #
 class galera_proxysql::params {
 
-  # galera parameters
+  # backup parameters (this funcionality is not yet properly implemented)
   $backup_compress = false
   $backup_retention = 3
   $backup_dir = '/mnt/galera'
   $daily_hotbackup = undef
+
+  # galera parameters
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef
   $innodb_buffer_pool_size = '0.7'
@@ -43,7 +45,7 @@ class galera_proxysql::params {
   $network_interface = 'eth0'
 
   # Common Parameters
-  $http_proxy = undef # example: 'http://proxy.example.net:8080'
+  $http_proxy = absent # example: 'http://proxy.example.net:8080'
   $manage_firewall = true
   $manage_repo = true
   $proxysql_hosts = undef

@@ -6,15 +6,14 @@ class galera_proxysql::repo (
   ) inherits galera_proxysql::params {
 
   unless any2bool($manage_repo) == false {
-    if ($http_proxy) { $proxy = $http_proxy } else { $proxy = absent }
     rpmkey { 'CD2EFD2A':
       ensure => present,
       source => 'http://www.percona.com/downloads/RPM-GPG-KEY-percona';
     }
-    yumrepo { 'Percona':
+    yumrepo { 'percona':
       enabled    => '1',
       gpgcheck   => '1',
-      proxy      => $proxy,
+      proxy      => $http_proxy,
       mirrorlist => absent,
       baseurl    => "http://repo.percona.com/release/\$releasever/RPMS/\$basearch",
       descr      => 'Percona',

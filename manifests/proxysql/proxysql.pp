@@ -138,8 +138,8 @@ class galera_proxysql::proxysql::proxysql (
     }
   }
 
-  # we need a fake exec in common with galera nodes to let
-  # galera use the `before` statement in the same firewall
+  # we need a fake exec in common with galera nodes to let galera
+  # use the `before` statement defined in the same firewall class
   unless defined(Exec['bootstrap_or_join']) {
     exec { 'bootstrap_or_join':
       command     => 'echo',
