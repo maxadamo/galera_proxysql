@@ -17,8 +17,8 @@ The status of the cluster is checked at run time through the fact `galera_status
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
 ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floating IP.
 
-- if you want only the Galera cluster you need _at least_ 3 servers and 3 ipv4 (and optionally 3 ipv6)
-- if you want the full stack you need _at least_ 5 servers and 6 IPv4 (and optionally 6 IPv6)
+* if you want only the Galera cluster you need _at least_ 3 servers and 3 ipv4 (and optionally 3 ipv6)
+* if you want the full stack you need _at least_ 5 servers and 6 IPv4 (and optionally 6 IPv6)
 
 Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` and `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
 The backup provided with this modules is indeed poor, but it can be considered as an example if you want to start using Percona XtraBackup.
@@ -27,9 +27,7 @@ The backup provided with this modules is indeed poor, but it can be considered a
 
 **stay tuned:** since the module is at an early stage, for the time being it will receive frequent updates.
 
-
 Read at (actual) **limitations** in the paragraph below.
-
 
 ## Setup
 
@@ -53,6 +51,7 @@ class { '::galera_proxysql':
 ```
 
 To setup ProxySQL:
+
 ```puppet
 class { '::galera_proxysql::proxysql::proxysql':
   trusted_networks => $trusted_networks,
@@ -63,6 +62,7 @@ class { '::galera_proxysql::proxysql::proxysql':
 ```
 
 Once you have run puppet on every node, you can manage or check the cluster using the script:
+
 ```
 [root@test-galera01 ~]# galera_wizard.py -h
 usage: galera_wizard.py [-h] [-cg] [-dr] [-je] [-be] [-jn] [-bn]
@@ -116,6 +116,7 @@ proxysql_vip:
 ```
 
 If you do not use ipv6, just skip the `ipv6` keys as following:
+
 ```yaml
 galera_hosts:
   test-galera01.example.net:
@@ -127,6 +128,7 @@ galera_hosts:
 ```
 
 you need an array of trusted networks/hosts (a list of ipv4/ipv6 networks/hosts allowed to connect to MySQL socket):
+
 ```yaml
 trusted_networks:
   - 192.168.0.1/24
@@ -139,6 +141,7 @@ Create a new DB user:
 you could also use the puppetlabs/mysql define and class, but with this define you can create DB and user either on the nodes and on proxysql.
 
 On Galera, to create user Zabbix and DB Zabbix:
+
 ```puppet
 galera_proxysql::create::user { 'zabbix':
   dbpass         => lookup('zabbix_db_pass', String, 'first', 'default_pass'),
@@ -148,10 +151,10 @@ galera_proxysql::create::user { 'zabbix':
   privileges     => ['ALL'],
   table          => 'zabbix.*';
 }
-
 ```
 
 On ProxySQL:
+
 ```puppet
 galera_proxysql::create::user { 'zabbix':
   dbpass => lookup('zabbix_db_pass', String, 'first', 'zabbix');
@@ -162,10 +165,10 @@ galera_proxysql::create::user { 'zabbix':
 
 ## Limitations
 
-- missing SSL support
-- init script management needs to be improved
-- not yet tested on ipv4 only (it should work)
-- I removed support to Ubuntu (I rather concentrate on improving the quality of this module first)
+* missing SSL support
+* init script management needs to be improved
+* not yet tested on ipv4 only (it should work)
+* I removed support to Ubuntu (I rather concentrate on improving the quality of this module first)
 
 ## Development
 
