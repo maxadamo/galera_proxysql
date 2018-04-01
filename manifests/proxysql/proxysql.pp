@@ -77,11 +77,11 @@ class galera_proxysql::proxysql::proxysql (
     package {
       "Percona-Server-shared-compat-${percona_major_version}":
         ensure  => installed,
-        require => Yumrepo['Percona'],
+        require => Yumrepo['percona'],
         before  => Class['::mysql::client'];
       'proxysql':
         ensure  => $proxysql_version,
-        require => [Class['::mysql::client'], Yumrepo['Percona']];
+        require => [Class['::mysql::client'], Yumrepo['percona']];
     }
   } else {
     package {
