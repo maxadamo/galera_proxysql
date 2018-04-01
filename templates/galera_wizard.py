@@ -599,7 +599,7 @@ def parse():
         dest='Cluster(None, "new").createcluster()', required=False)
     parser.add_argument(
         '-f', '--force', action='store_true',
-        help='force bootstrap new or join new Cluster', required=False)
+        help='force bootstrap-new or join-new Cluster', required=False)
 
     return parser.parse_args()
 

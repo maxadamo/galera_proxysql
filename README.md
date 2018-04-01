@@ -12,10 +12,10 @@
 
 ## Description
 
-This module sets up and bootstrap Galera cluster and optionally MaxScale Proxy.
+This module sets up and bootstrap Galera cluster and ProxySQL.
 The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
-MaxScale Proxy will be set up on 2 nodes (no more, no less) with Keepalived.
+ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floating IP.
 
 - if you want only the Galera cluster you need _at least_ 3 servers and 3 ipv4 (and optionally 3 ipv6)
 - if you want the full stack you need _at least_ 5 servers and 6 IPv4 (and optionally 6 IPv6)
@@ -42,8 +42,8 @@ class { '::galera_proxysql':
   root_password    => $root_password,
   sst_password     => $sst_password,
   monitor_password => $monitor_password,
-  maxscale_hosts   => $maxscale_hosts,
-  maxscale_vip     => $maxscale_hosts,
+  proxysql_hosts   => $proxysql_hosts,
+  proxysql_vip     => $proxysql_hosts,
   galera_hosts     => $galera_hosts,
   trusted_networks => $trusted_networks,
   manage_lvm       => true,
@@ -52,12 +52,12 @@ class { '::galera_proxysql':
 }
 ```
 
-To setup MaxScale:
+To setup ProxySQL:
 ```puppet
-class { '::galera_proxysql::maxscale::maxscale':
+class { '::galera_proxysql::proxysql::proxysql':
   trusted_networks => $trusted_networks,
-  maxscale_hosts   => $maxscale_hosts,
-  maxscale_vip     => $maxscale_vip,
+  proxysql_hosts   => $proxysql_hosts,
+  proxysql_vip     => $proxysql_vip,
   galera_hosts     => $galera_hosts;
 }
 ```
@@ -79,7 +79,7 @@ optional arguments:
   -be, --bootstrap-existing  bootstrap existing Cluster
   -jn, --join-new            join existing Cluster
   -bn, --bootstrap-new       bootstrap new Cluster
-  -f, --force                force bootstrap new or join new Cluster
+  -f, --force                force bootstrap-new or join-new Cluster
 
 Author: Massimiliano Adamo <maxadamo@gmail.com>
 ```
@@ -88,7 +88,7 @@ Author: Massimiliano Adamo <maxadamo@gmail.com>
 
 The module will fail on Galera with an even number of nodes and with a number of nodes lower than 3.
 
-To setup a Galera Cluster (and optionally a MaxScale cluster with Keepalived) we need a hash. If you use hiera it will be like this:
+To setup a Galera Cluster (and optionally a ProxySQL cluster with Keepalived) we need a hash. If you use hiera it will be like this:
 
 ```yaml
 galera_hosts:
@@ -101,15 +101,15 @@ galera_hosts:
   test-galera03.example.net:
     ipv4: '192.168.0.85'
     ipv6: '2001:123:4::6d'
-maxscale_hosts:
-  test-maxscale01.example.net:
+proxysql_hosts:
+  test-proxysql01.example.net:
     ipv4: '192.168.0.86'
     ipv6: '2001:123:4::6e'
-  test-maxscale02.example.net:
+  test-proxysql02.example.net:
     ipv4: '192.168.0.87'
     ipv6: '2001:123:4::6f'
-maxscale_vip:
-  test-maxscale.example.net:
+proxysql_vip:
+  test-proxysql.example.net:
     ipv4: '192.168.0.88'
     ipv4_subnet: '22'
     ipv6: '2001:123:4::70'
@@ -141,8 +141,8 @@ trusted_networks:
 
 ## Limitations
 
-- minor version supports only latest and installed (in other words, only major versions are supported)
-- init script management can be improved
+- missing SSL support
+- init script management needs to be improved
 - not yet tested on ipv4 only (it should work)
 
 ## Development
