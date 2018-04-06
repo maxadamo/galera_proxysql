@@ -127,17 +127,17 @@ class galera_proxysql::proxysql::proxysql (
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
       content => template("${module_name}/proxysql_footer.cnf.erb"),
-      order   => '99999999';
+      order   => '999999999';
   }
 
   $proxysql_users.each | $sqluser, $sqlpass | {
     notify { "test ${sqluser}":
-      message => fqdn_rand(99999997, "${sqluser}${sqlpass}")+2;
+      message => fqdn_rand(999999997, "${sqluser}${sqlpass}")+2;
     }
     concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
-      order   => fqdn_rand(99999997, "${sqluser}${sqlpass}")+2;
+      order   => fqdn_rand(999999997, "${sqluser}${sqlpass}")+2;
     }
   }
 
