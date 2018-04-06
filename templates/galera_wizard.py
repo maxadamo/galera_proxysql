@@ -155,7 +155,7 @@ def initialize_mysql(datadirectory):
             '--initialize-insecure',
             '--datadir={}'.format(datadirectory),
             '--user=mysql'],
-                        stdout=fnull)
+            stdout=fnull)
     except Exception as err:
         print "Error initializing DB: {}".format(err)
         sys.exit(1)
@@ -173,7 +173,8 @@ def check_leader(leader=None):
         print 'It may not be safe to bootstrap the cluster from this node.'
         print 'It was not the last one to leave the cluster and may not contain all the updates.'
         print 'To force cluster bootstrap with this node, edit the ' \
-        '{} file manually and set safe_to_bootstrap to 1'.format(grastate_dat)
+            '{} file manually and set safe_to_bootstrap to 1'.format(
+                grastate_dat)
 
         os.sys.exit(1)
 
@@ -205,7 +206,7 @@ def bootstrap_mysql(boot):
                 "--socket=/var/lib/mysql/mysql.sock",
                 "-u", "root", "password",
                 CREDENTIALS["root"]],
-                            stdout=fnull, stderr=subprocess.STDOUT)
+                stdout=fnull, stderr=subprocess.STDOUT)
         except Exception as err:
             print "Error setting root password: {}".format(err)
         restore_mycnf()
@@ -260,7 +261,7 @@ def checkwsrep(sqlhost):
                 passwd=CREDENTIALS["sstuser"],
                 unix_socket='/var/lib/mysql/mysql.sock',
                 host=sqlhost
-                )
+            )
             cursor = cnx_sqlhost.cursor()
             wsrep_status = cursor.execute("""show variables LIKE 'wsrep_on'""")
         except Exception:
@@ -466,6 +467,7 @@ class Cluster(object):
       - check cluster status
       - show SQL statements
     """
+
     def __init__(self, manner, mode, datadir='/var/lib/mysql', force=FORCE):
         self.manner = manner
         self.mode = mode
