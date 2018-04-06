@@ -6,26 +6,29 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to the cluster: not less than 3, not even.
 #   check examples on README.md
 #
-# [*proxysql_hosts*] <Hash>
-#   list of hosts, ipv4 (optionally ipv6) belonging to ProxySQL cluster.
-#   Currently only 2 hosts are supported. Check examples on README.md
+# [*http_proxy*] <String>
+#   default: undef  http proxy used for instance by gpg key
+#   Example: 'http://proxy.example.net:8080'
 #
-# [*proxysql_vip*] <Hash>
-#   host, ipv4 (optionally ipv6) for the VIP
-#
-# [*proxysql_password*] <String>
-#   proxysql user password
-#
-# [*trusted_networks*] <Array>
-#   default: undef => List of IPv4 and/or IPv6 host and or networks.
-#            It's used by iptables to determine from where to allow access to MySQL
+# [*limitnofile*] <String>
+#   default: undef (number of open files)
 #
 # [*manage_repo*] <Bool>
 #   default: true => please check repo.pp to understand what repos are neeeded
 #
-# [*http_proxy*] <String>
-#   default: undef  http proxy used for instance by gpg key
-#   Example: 'http://proxy.example.net:8080'
+# [*proxysql_hosts*] <Hash>
+#   list of hosts, ipv4 (optionally ipv6) belonging to ProxySQL cluster.
+#   Currently only 2 hosts are supported. Check examples on README.md
+#
+# [*proxysql_password*] <String>
+#   proxysql user password
+#
+# [*proxysql_vip*] <Hash>
+#   host, ipv4 (optionally ipv6) for the VIP
+#
+# [*trusted_networks*] <Array>
+#   default: undef => List of IPv4 and/or IPv6 host and or networks.
+#            It's used by iptables to determine from where to allow access to MySQL
 #
 #
 class galera_proxysql::proxysql::proxysql (
@@ -40,6 +43,7 @@ class galera_proxysql::proxysql::proxysql (
   Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
   String $network_interface     = $::galera_proxysql::params::network_interface,
   String $proxysql_version      = $::galera_proxysql::params::proxysql_version,
+  $limitnofile                  = $::galera_proxysql::params::limitnofile,
   $http_proxy                   = $::galera_proxysql::params::http_proxy,
   ) inherits galera_proxysql::params {
 
@@ -52,12 +56,12 @@ class galera_proxysql::proxysql::proxysql (
     $ipv6_true = undef
   }
 
-  include ::galera_proxysql::proxysql::service
-
   class {
     '::galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
+    '::galera_proxysql::proxysql::service':
+      limitnofile => $limitnofile;
     '::galera_proxysql::proxysql::keepalived':
       manage_ipv6       => $ipv6_true,
       proxysql_hosts    => $proxysql_hosts,
