@@ -154,8 +154,7 @@ def initialize_mysql(datadirectory):
             '/usr/sbin/mysqld',
             '--initialize-insecure',
             '--datadir={}'.format(datadirectory),
-            '--user=mysql'],
-            stdout=fnull)
+            '--user=mysql'], stdout=fnull)
     except Exception as err:
         print "Error initializing DB: {}".format(err)
         sys.exit(1)
@@ -171,7 +170,8 @@ def check_leader(leader=None):
             leader = True
     if not leader:
         print 'It may not be safe to bootstrap the cluster from this node.'
-        print 'It was not the last one to leave the cluster and may not contain all the updates.'
+        print 'It was not the last one to leave the cluster and may not' \
+            ' contain all the updates.'
         print 'To force cluster bootstrap with this node, edit the ' \
             '{} file manually and set safe_to_bootstrap to 1'.format(
                 grastate_dat)
@@ -204,9 +204,10 @@ def bootstrap_mysql(boot):
                 "/usr/bin/mysqladmin",
                 "--no-defaults",
                 "--socket=/var/lib/mysql/mysql.sock",
-                "-u", "root", "password",
-                CREDENTIALS["root"]],
-                stdout=fnull, stderr=subprocess.STDOUT)
+                "-u", "root",
+                "password",
+                CREDENTIALS["root"]
+            ], stdout=fnull, stderr=subprocess.STDOUT)
         except Exception as err:
             print "Error setting root password: {}".format(err)
         restore_mycnf()
