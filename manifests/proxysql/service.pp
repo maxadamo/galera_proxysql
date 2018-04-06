@@ -41,7 +41,7 @@ class galera_proxysql::proxysql::service (
       owner        => proxysql,
       group        => proxysql,
       recurse      => true,
-      recurselimit => 0,
+      recurselimit => 1,
       require      => Package['proxysql'];
   }
 
