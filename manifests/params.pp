@@ -43,6 +43,7 @@ class galera_proxysql::params {
 
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
+  $limitnofile = undef  # limit file numbder. Example: 65535
 
   # Common Parameters
   $http_proxy = absent # example: 'http://proxy.example.net:8080'

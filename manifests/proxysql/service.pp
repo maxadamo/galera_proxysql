@@ -9,7 +9,9 @@
 # None
 #
 #
-class galera_proxysql::proxysql::service {
+class galera_proxysql::proxysql::service (
+  $limitnofile = $::galera_proxysql::params::limitnofile,
+  ) {
 
   file {
     '/etc/init.d/proxysql':
@@ -20,8 +22,27 @@ class galera_proxysql::proxysql::service {
       owner   => root,
       group   => root,
       require => File['/etc/init.d/proxysql'],
-      notify  => [Exec["${module_name}_daemon_reload"], Service['proxysql']],
+      notify  => [
+        Exec["${module_name}_daemon_reload"],
+        Service['proxysql']
+      ],
       source  => "puppet:///modules/${module_name}/proxysql.service";
+    '/etc/systemd/system/proxysql.service.d':
+      ensure => directory;
+    '/etc/systemd/system/proxysql.service.d/file_limit.conf':
+      content => template("${module_name}/file_limit.conf.erb"),
+      require => File['/etc/systemd/system/proxysql.service.d'],
+      notify  => [
+        Exec["${module_name}_daemon_reload"],
+        Service['proxysql']
+      ];
+    '/var/lib/proxysql':
+      ensure       => directory,
+      owner        => proxysql,
+      group        => proxysql,
+      recurse      => true,
+      recurselimit => false,
+      require      => Package['proxysql'];
   }
 
   service { 'proxysql':
@@ -30,7 +51,10 @@ class galera_proxysql::proxysql::service {
     hasrestart => true,
     hasstatus  => true,
     provider   => 'systemd',
-    require    => File['/lib/systemd/system/proxysql.service'];
+    require    => File[
+      '/lib/systemd/system/proxysql.service',
+      '/etc/systemd/system/proxysql.service.d/file_limit.conf'
+    ];
   }
 
   exec {

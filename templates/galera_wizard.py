@@ -172,7 +172,9 @@ def check_leader(leader=None):
     if not leader:
         print 'It may not be safe to bootstrap the cluster from this node.'
         print 'It was not the last one to leave the cluster and may not contain all the updates.'
-        print 'To force cluster bootstrap with this node, edit the {} file manually and set safe_to_bootstrap to 1'.format(grastate_dat)
+        print 'To force cluster bootstrap with this node, edit the ' \
+        '{} file manually and set safe_to_bootstrap to 1'.format(grastate_dat)
+
         os.sys.exit(1)
 
 
@@ -539,7 +541,8 @@ class Cluster(object):
         print "\n# remove anonymous user\nDROP USER ''@'localhost'"
         print "DROP USER ''@'{}'".format(socket.gethostbyname(socket.gethostname()))
         print "\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;"
-        print "CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+        print "CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL )' \
+        ' ENGINE=InnoDB DEFAULT CHARSET=utf8;"
         print 'INSERT INTO test.monitor SET id=("placeholder");'
         for thisuser in ['root', 'sstuser', 'monitor']:
             print "\n# define user {}".format(thisuser)
