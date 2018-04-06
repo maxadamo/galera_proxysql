@@ -60,7 +60,7 @@ define galera_proxysql::create::user (
     }
   } else {
     $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass}")+2
-    notify { "test ${dbuser}": order => $concat_order; }
+    notify { "test ${dbuser}": message => $concat_order; }
     concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass}":
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${dbuser}\"\n    password = \"${dbpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
