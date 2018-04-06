@@ -131,9 +131,6 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   $proxysql_users.each | $sqluser, $sqlpass | {
-    notify { "test ${sqluser}":
-      message => fqdn_rand(999999997, "${sqluser}${sqlpass}")+2;
-    }
     concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
       target  => '/etc/proxysql.cnf',
       content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
