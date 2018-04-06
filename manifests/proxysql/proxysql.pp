@@ -111,6 +111,7 @@ class galera_proxysql::proxysql::proxysql (
     owner   => 'proxysql',
     group   => 'proxysql',
     mode    => '0640',
+    order   => 'numeric',
     require => Package['proxysql'],
     notify  => Service['proxysql'];
   }
@@ -119,11 +120,11 @@ class galera_proxysql::proxysql::proxysql (
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
       content => template("${module_name}/proxysql_header.cnf.erb"),
-      order   => '000000001';
+      order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
       content => "  {\n    username = \"monitor\"\n    password = \"${monitor_password}\"\n    default_hostgroup = 0\n    active = 1\n  }",
-      order   => '000000002';
+      order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
       content => template("${module_name}/proxysql_footer.cnf.erb"),
