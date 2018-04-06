@@ -104,7 +104,14 @@ class galera_proxysql::proxysql::proxysql (
     '/root/.my.cnf':
       owner   => root,
       group   => root,
-      content => "[client]\nuser=monitor\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n"
+      content => "[client]\nuser=monitor\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n";
+    '/etc/proxysql-admin.cnf':
+      mode    => '0640',
+      owner   => root,
+      group   => proxysql,
+      require => Package['proxysql'],
+      notify  => Service['proxysql'],
+      content => template("${module_name}/proxysql-admin.cnf.erb");
   }
 
   concat { '/etc/proxysql.cnf':
