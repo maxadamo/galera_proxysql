@@ -21,6 +21,7 @@ class galera_proxysql::params {
   $logdir = undef
   $lv_size = undef
   $percona_major_version = '57'
+  $percona_minor_version = 'installed'
   $manage_lvm = undef
   $max_connections = 1024
   $monitor_password = undef

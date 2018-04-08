@@ -127,6 +127,7 @@ class galera_proxysql (
   $logdir                       = $::galera_proxysql::params::logdir,
   $lv_size                      = $::galera_proxysql::params::lv_size,
   $percona_major_version        = $::galera_proxysql::params::percona_major_version,
+  $percona_minor_version        = $::galera_proxysql::params::percona_minor_version,
   $manage_lvm                   = $::galera_proxysql::params::manage_lvm,
   $max_connections              = $::galera_proxysql::params::max_connections,
   $monitor_password             = $::galera_proxysql::params::monitor_password,
@@ -212,7 +213,8 @@ class galera_proxysql (
       slow_query_time              => $slow_query_time;
     '::galera_proxysql::install':
       other_pkgs            => $other_pkgs,
-      percona_major_version => $percona_major_version;
+      percona_major_version => $percona_major_version,
+      percona_minor_version => $percona_minor_version;
     '::galera_proxysql::join':
       percona_major_version => $percona_major_version,
       monitor_password      => $monitor_password,
