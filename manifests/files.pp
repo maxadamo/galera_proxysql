@@ -54,12 +54,12 @@ class galera_proxysql::files (
       content => template("${module_name}/galera_wizard.py");
     '/root/galera_params.py':
       content => template("${module_name}/galera_params.py.erb"),
-      notify  => Service['xinetd'];
+      notify  => Xinetd::Service['galerachk'];
     '/root/bin/hotbackup.sh':
       mode    => '0755',
       content => template("${module_name}/hotbackup.sh.erb"),
       require => File['/root/bin'],
-      notify  => Service['xinetd'];
+      notify  => Xinetd::Service['galerachk'];
     '/etc/xinetd.d/mysqlchk':
       ensure => absent,
       notify => Xinetd::Service['galerachk'];
