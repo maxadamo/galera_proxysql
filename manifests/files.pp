@@ -60,6 +60,9 @@ class galera_proxysql::files (
       content => template("${module_name}/hotbackup.sh.erb"),
       require => File['/root/bin'],
       notify  => Service['xinetd'];
+    '/etc/xinetd.d/mysqlchk':
+      ensure => absent,
+      notify => Xinetd::Service['galerachk'];
     '/root/.my.cnf':
       mode    => '0660',
       notify  => Xinetd::Service['galerachk'],
