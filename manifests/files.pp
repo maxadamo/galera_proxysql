@@ -62,10 +62,10 @@ class galera_proxysql::files (
       notify  => Service['xinetd'];
     '/root/.my.cnf':
       mode    => '0660',
-      notify  => Xinetd::Service['galerachk'],
+      notify  => Service['xinetd'],
       content => "[client]\nuser=root\npassword=${root_password}\n";
     '/etc/sysconfig/clustercheck':
-      notify  => Xinetd::Service['galerachk'],
+      notify  => Service['xinetd'],
       content => template("${module_name}/clustercheck.erb");
     '/etc/my.cnf.d/client.cnf':
       source  => "puppet:///modules/${module_name}/client.cnf";
@@ -93,12 +93,12 @@ class galera_proxysql::files (
       path   => '/usr/bin/clustercheck',
       line   => "source /etc/sysconfig/clustercheck\n#MYSQL_USERNAME=\"\${1-clustercheckuser}\"",
       match  => '^MYSQL_USERNAME=',
-      notify => Xinetd::Service['galerachk'];
+      notify => Service['xinetd'];
     'clustercheck_two':
       path   => '/usr/bin/clustercheck',
       line   => "#MYSQL_PASSWORD=\"\${2-clustercheckpassword!}\"",
       match  => '^MYSQL_PASSWORD=',
-      notify => Xinetd::Service['galerachk'];
+      notify => Service['xinetd'];
   }
 
 }
