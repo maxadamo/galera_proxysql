@@ -22,6 +22,10 @@
     {
       "name": "stschulte-rpmkey",
       "version_requirement": ">= 1.0.3"
+    },
+    {
+      "name": "puppetlabs-xinetd",
+      "version_requirement": ">= 3.0.0"
     }
   ],
   "data_provider": "hiera",

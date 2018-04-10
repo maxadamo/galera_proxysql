@@ -27,7 +27,7 @@ class galera_proxysql::params {
   $monitor_password = undef
   $other_pkgs = [
     'percona-xtrabackup-24', 'percona-toolkit', 'python-paramiko',
-    'MySQL-python', 'qpress', 'nc', 'socat', 'xinetd'
+    'MySQL-python', 'qpress', 'nc', 'socat'
   ]
   $root_password = undef
   $sst_password = undef
