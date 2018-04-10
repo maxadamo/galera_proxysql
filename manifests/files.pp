@@ -1,4 +1,3 @@
-
 # == Class: galera_proxysql::files
 #
 # This Class provides files

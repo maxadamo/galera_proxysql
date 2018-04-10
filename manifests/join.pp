@@ -1,4 +1,3 @@
-
 # == Class: galera_proxysql::join
 #
 # This Class manages services

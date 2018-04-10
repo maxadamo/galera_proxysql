@@ -1,4 +1,3 @@
-
 # == Define: galera_proxysql::create_sys_user
 #
 define galera_proxysql::create_sys_user (
