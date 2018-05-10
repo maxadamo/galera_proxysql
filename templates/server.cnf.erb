@@ -39,7 +39,7 @@ memlock                        = 0
 sysdate-is-now                 = 1
 max-connections                = <%= @max_connections %>
 thread-cache-size              = <%= @thread_cache_size %>
-query-cache-type               = 0
-query-cache-size               = 0
+query-cache-type               = <%= @query_cache_type %>
+query-cache-size               = <%= @query_cache_size %>
 table-open_cache               = 1024
 lower-case-table-names         = 0
