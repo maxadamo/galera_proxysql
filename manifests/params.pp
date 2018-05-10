@@ -29,8 +29,8 @@ class galera_proxysql::params {
     'percona-xtrabackup-24', 'percona-toolkit', 'python-paramiko',
     'MySQL-python', 'qpress', 'nc', 'socat'
   ]
-  $query_cache_type = 0
   $query_cache_size = 0
+  $query_cache_type = 0
   $root_password = undef
   $sst_password = undef
   $thread_cache_size = 16
