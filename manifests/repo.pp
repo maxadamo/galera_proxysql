@@ -1,8 +1,8 @@
 # == Class: galera_proxysql::repo inherits galera
 #
 class galera_proxysql::repo (
-  $http_proxy            = $::galera_proxysql::params::http_proxy,
-  $manage_repo           = $::galera_proxysql::params::manage_repo
+  $http_proxy  = $::galera_proxysql::params::http_proxy,
+  $manage_repo = $::galera_proxysql::params::manage_repo
   ) inherits galera_proxysql::params {
 
   unless any2bool($manage_repo) == false {

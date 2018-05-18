@@ -4,7 +4,7 @@ class galera_proxysql::lvm (
   $manage_lvm  = $::galera_proxysql::params::manage_lvm,
   $lv_size     = $::galera_proxysql::params::lv_size,
   $vg_name     = $::galera_proxysql::params::vg_name,
-  $galera_pkgs =  $::galera_proxysql::params::galera_pkgs,
+  $galera_pkgs = $::galera_proxysql::params::galera_pkgs,
   ) inherits galera_proxysql::params {
 
   if ($lv_size and $manage_lvm and $vg_name) {
