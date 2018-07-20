@@ -8,6 +8,10 @@
 #
 # === Parameters & Variables
 #
+#
+# [*galera_debug*] <Bool>
+#   default: false (whether to print or not cluster status)
+#
 # [*backup_compress*] <Bool>
 #   default: false (whether to compress or not backup)
 #
@@ -112,6 +116,9 @@
 #
 class galera_proxysql (
 
+  # print debug messages
+  $galera_debug                 = $::galera_proxysql::params::galera_debug,
+
   # galera parameters
   $backup_compress              = $::galera_proxysql::params::backup_compress,
   $backup_dir                   = $::galera_proxysql::params::backup_dir,
@@ -160,15 +167,17 @@ class galera_proxysql (
 
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
-  # checking cluster status through the facter galera_status
-  if $::galera_status == '200' {
-    $msg = "HTTP/1.1 ${::galera_status}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
-  } elsif $::galera_status == 'UNKNOWN' {
-    $msg = "HTTP/1.1 ${::galera_status}: could not determine the status of the cluster. Most likely xinetd is not running yet"
-  } else {
-    $msg = "HTTP/1.1 ${::galera_status}: the node is disconnected from the cluster ${galera_cluster_name}"
+  unless any2bool($galera_debug) == false {
+    # checking cluster status through the facter galera_status
+    if $::galera_status == '200' {
+      $msg = "HTTP/1.1 ${::galera_status}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
+    } elsif $::galera_status == 'UNKNOWN' {
+      $msg = "HTTP/1.1 ${::galera_status}: could not determine the status of the cluster. Most likely xinetd is not running yet"
+    } else {
+      $msg = "HTTP/1.1 ${::galera_status}: the node is disconnected from the cluster ${galera_cluster_name}"
+    }
+    notify { 'Cluster status': message => $msg; }
   }
-  notify { 'Cluster status': message => $msg; }
 
   $cluster_size = inline_template('<%= @galera_hosts.keys.count %>')
   $cluster_size_odd = inline_template('<% if @galera_hosts.keys.count.to_i.odd? -%>true<% end -%>')
