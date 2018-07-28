@@ -1,0 +1,14 @@
+---
+base_os::centos::files::spacewalk_server: "spacewalk01.geant.net"
+geant_ntp_servers:
+  - "ntp4.geant.net"
+  - "ntp5.geant.net"
+ssh_root_keys:
+  rspec.user:
+    ensure: present
+    key: 'just_a_fake_ssh_key=='
+salt_repo: "salt_2017_07"
+pbis_version: '1.0.0'
+ad_domain: 'GEANT.LOCAL'
+domain_password: 'blahblah'
+ad_user_domain_prefix: 'GEANT'

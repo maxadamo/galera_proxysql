@@ -1,10 +1,10 @@
 # == Class: galera_proxysql::lvm
 #
 class galera_proxysql::lvm (
-  $manage_lvm  = $::galera_proxysql::params::manage_lvm,
-  $lv_size     = $::galera_proxysql::params::lv_size,
-  $vg_name     = $::galera_proxysql::params::vg_name,
-  $galera_pkgs = $::galera_proxysql::params::galera_pkgs,
+  $manage_lvm            = $::galera_proxysql::params::manage_lvm,
+  $lv_size               = $::galera_proxysql::params::lv_size,
+  $vg_name               = $::galera_proxysql::params::vg_name,
+  $percona_major_version = $::galera_proxysql::params::percona_major_version,
   ) inherits galera_proxysql::params {
 
   if ($lv_size and $manage_lvm and $vg_name) {
@@ -25,7 +25,7 @@ class galera_proxysql::lvm (
       mode    => '0755',
       owner   => mysql,
       group   => mysql,
-      require => Package[$galera_pkgs];
+      require => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
     }
 
     mount { '/var/lib/mysql':

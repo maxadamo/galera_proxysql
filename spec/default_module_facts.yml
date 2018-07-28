@@ -1,0 +1,9 @@
+---
+ipaddress6: "2a00:1450:400e:808::2004"
+apt_update_last_success: "1526848610"
+sudoversion: "1.8.10p3"
+hostgroup: "fake"
+galera_joined_exist: true
+galera_status: "200"
+galera_rootcnf_exist: true
+

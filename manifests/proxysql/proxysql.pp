@@ -20,7 +20,7 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to ProxySQL cluster.
 #   Currently only 2 hosts are supported. Check examples on README.md
 #
-# [*proxysql_password*] <String>
+# [*proxysql_admin_password*] <String>
 #   proxysql user password
 #
 # [*proxysql_vip*] <Hash>
@@ -38,7 +38,7 @@ class galera_proxysql::proxysql::proxysql (
   Hash $proxysql_hosts          = $::galera_proxysql::params::proxysql_hosts,
   Hash $proxysql_vip            = $::galera_proxysql::params::proxysql_vip,
   String $monitor_password      = $::galera_proxysql::params::monitor_password,
-  String $proxy_admin_password  = $::galera_proxysql::params::proxy_admin_password,
+  String $proxysql_admin_password  = $::galera_proxysql::params::proxysql_admin_password,
   Hash $proxysql_users          = $::galera_proxysql::params::sqlproxy_users,
   Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
   String $network_interface     = $::galera_proxysql::params::network_interface,

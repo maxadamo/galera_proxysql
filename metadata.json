@@ -7,7 +7,8 @@
   "source": "https://github.com/maxadamo/galera_proxysql",
   "project_page": "https://github.com/maxadamo/galera_proxysql",
   "issues_url": "https://github.com/maxadamo/galera_proxysql/issues",
-  "dependencies": [{
+  "dependencies": [
+    {
       "name": "arioch-keepalived",
       "version_requirement": ">= 1.2.5"
     },
@@ -29,7 +30,8 @@
     }
   ],
   "data_provider": "hiera",
-  "operatingsystem_support": [{
+  "operatingsystem_support": [
+    {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         "7"
@@ -41,5 +43,14 @@
         "7"
       ]
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.7.0 < 6.0.0"
+    }
+  ],
+  "pdk-version": "1.6.1",
+  "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
+  "template-ref": "1.6.1-0-g6b0d497"
 }

@@ -1,0 +1,19 @@
+---
+fixtures:
+  forge_modules:
+    rpmkey:
+      repo: 'stschulte/rpmkey'
+      ref: '1.0.3'
+    xinetd:
+      repo: 'puppetlabs/xinetd'
+      ref: '3.0.0'
+    stdlib:
+      repo: 'puppetlabs/stdlib'
+      ref: '4.24.0'
+      # flags: "--module_repository https://my_repo.com"
+    mysql:
+      repo: 'puppetlabs/mysql'
+      ref: '5.3.0'
+    firewall:
+      repo: 'puppetlabs/firewall'
+      ref: '1.12.0'

@@ -81,7 +81,7 @@
 # [*proxysql_vip*] <Hash>
 #   host, ipv4 (optionally ipv6) for the VIP
 #
-# [*proxysql_password*] <String>
+# [*proxysql_admin_password*] <String>
 #   proxysql user password
 #
 # [*monitor_password*] <String>
@@ -142,7 +142,6 @@ class galera_proxysql (
   $query_cache_size             = $::galera_proxysql::params::query_cache_size,
   $query_cache_type             = $::galera_proxysql::params::query_cache_type,
   $root_password                = $::galera_proxysql::params::root_password,
-  $slow_query_time              = $::galera_proxysql::params::slow_query_time,
   $sst_password                 = $::galera_proxysql::params::sst_password,
   $thread_cache_size            = $::galera_proxysql::params::thread_cache_size,
   $tmpdir                       = $::galera_proxysql::params::tmpdir,
@@ -152,7 +151,7 @@ class galera_proxysql (
   # proxysql parameters
   $proxysql_version             = $::galera_proxysql::params::proxysql_version,
   $proxysql_vip                 = $::galera_proxysql::params::proxysql_vip,
-  $proxysql_password            = $::galera_proxysql::params::proxysql_password,
+  $proxysql_admin_password      = $::galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration
   $network_interface            = ::galera_proxysql::params::network_interface,
@@ -182,7 +181,7 @@ class galera_proxysql (
   $cluster_size = inline_template('<%= @galera_hosts.keys.count %>')
   $cluster_size_odd = inline_template('<% if @galera_hosts.keys.count.to_i.odd? -%>true<% end -%>')
 
-  if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
+  #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
   unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd')}
   unless $root_password { fail('parameter "root_password" is missing') }
   unless $sst_password { fail('parameter "sst_password" is missing') }
@@ -220,8 +219,7 @@ class galera_proxysql (
       root_password                => $root_password,
       sst_password                 => $sst_password,
       tmpdir                       => $tmpdir,
-      thread_cache_size            => $thread_cache_size,
-      slow_query_time              => $slow_query_time;
+      thread_cache_size            => $thread_cache_size;
     '::galera_proxysql::install':
       other_pkgs            => $other_pkgs,
       percona_major_version => $percona_major_version,
