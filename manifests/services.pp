@@ -10,7 +10,7 @@ class galera_proxysql::services {
     user           => 'root',
     group          => 'root',
     groups         => 'yes',
-    flags          => 'REUSE',
+    flags          => 'REUSE NOLIBWRAP',
     log_on_success => '',
     log_on_failure => 'HOST',
     require        => [
