@@ -6,7 +6,7 @@ define galera_proxysql::create_sys_user (
   $proxysql_hosts = {},
   $proxysql_vip   = {},
   $dbuser         = $name
-  ) {
+) {
 
   if $caller_module_name != $module_name {
     fail("this define is intended to be called only within ${module_name}")

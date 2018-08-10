@@ -11,7 +11,7 @@
 #
 class galera_proxysql::proxysql::service (
   $limitnofile = $::galera_proxysql::params::limitnofile,
-  ) {
+) {
 
   file {
     '/etc/init.d/proxysql':

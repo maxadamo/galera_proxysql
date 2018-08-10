@@ -11,7 +11,7 @@ class galera_proxysql::backup (
   $daily_hotbackup     = $::galera_proxysql::params::daily_hotbackup,
   $galera_cluster_name = $::galera_proxysql::params::galera_cluster_name,
   $backup_dir          = $::galera_proxysql::params::backup_dir,
-  ) {
+) {
 
   $nodes = keys($galera_hosts)
 

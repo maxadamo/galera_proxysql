@@ -9,7 +9,7 @@ class galera_proxysql::firewall (
   $proxysql_hosts   = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip     = $::galera_proxysql::params::proxysql_vip,
   $trusted_networks = $::galera_proxysql::params::trusted_networks
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   $trusted_networks.each | String $source | {
     if ':' in $source { $provider = 'ip6tables' } else { $provider = 'iptables' }

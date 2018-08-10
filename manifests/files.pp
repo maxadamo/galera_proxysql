@@ -22,7 +22,7 @@ class galera_proxysql::files (
   $sst_password                 = $::galera_proxysql::params::sst_password,
   $thread_cache_size            = $::galera_proxysql::params::thread_cache_size,
   $tmpdir                       = $::galera_proxysql::params::tmpdir,
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   unless defined( File['/root/bin'] ) {
     file { '/root/bin':

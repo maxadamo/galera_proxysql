@@ -45,7 +45,7 @@ class galera_proxysql::proxysql::proxysql (
   String $proxysql_version      = $::galera_proxysql::params::proxysql_version,
   $limitnofile                  = $::galera_proxysql::params::limitnofile,
   $http_proxy                   = $::galera_proxysql::params::http_proxy,
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
   $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')

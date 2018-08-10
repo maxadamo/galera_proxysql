@@ -5,7 +5,7 @@ class galera_proxysql::proxysql::keepalived (
   $proxysql_vip      = $::galera_proxysql::params::proxysql_vip,
   $network_interface = $::galera_proxysql::params::network_interface,
   $manage_ipv6       = undef
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')

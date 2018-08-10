@@ -3,7 +3,7 @@
 class galera_proxysql::repo (
   $http_proxy  = $::galera_proxysql::params::http_proxy,
   $manage_repo = $::galera_proxysql::params::manage_repo
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   unless any2bool($manage_repo) == false {
     rpmkey { 'CD2EFD2A':

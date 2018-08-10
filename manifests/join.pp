@@ -11,7 +11,7 @@ class galera_proxysql::join (
   $proxysql_hosts        = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip          = $::galera_proxysql::params::proxysql_vip,
   $manage_lvm            = $::galera_proxysql::params::manage_lvm,
-  ) inherits galera_proxysql::params {
+) inherits galera_proxysql::params {
 
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 
