@@ -62,7 +62,7 @@ mysql_variables=
 <% end -%>
   default_schema="information_schema"
   stacksize=1048576
-  server_version="5.5.30"
+  server_version="<%= @proxysql_mysql_version %>"
   connect_timeout_server=3000
   # make sure to configure monitor username and password
   # https://github.com/sysown/proxysql/wiki/Global-variables#mysql-monitor_username-mysql-monitor_password

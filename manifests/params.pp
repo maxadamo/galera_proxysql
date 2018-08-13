@@ -43,6 +43,7 @@ class galera_proxysql::params {
 
   # proxysql configuration
   $proxysql_version  = 'latest'
+  $proxysql_mysql_version = '5.7.22-22-57'
   $proxysql_vip = undef
   $proxysql_admin_password = 'admin'
   $proxysql_users = {}

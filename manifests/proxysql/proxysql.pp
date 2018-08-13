@@ -32,19 +32,20 @@
 #
 #
 class galera_proxysql::proxysql::proxysql (
-  String $percona_major_version = $::galera_proxysql::params::percona_major_version,
-  Hash $galera_hosts            = $::galera_proxysql::params::galera_hosts,
-  Boolean $manage_repo          = $::galera_proxysql::params::manage_repo,
-  Hash $proxysql_hosts          = $::galera_proxysql::params::proxysql_hosts,
-  Hash $proxysql_vip            = $::galera_proxysql::params::proxysql_vip,
-  String $monitor_password      = $::galera_proxysql::params::monitor_password,
-  String $proxysql_admin_password  = $::galera_proxysql::params::proxysql_admin_password,
-  Hash $proxysql_users          = $::galera_proxysql::params::sqlproxy_users,
-  Array $trusted_networks       = $::galera_proxysql::params::trusted_networks,
-  String $network_interface     = $::galera_proxysql::params::network_interface,
-  String $proxysql_version      = $::galera_proxysql::params::proxysql_version,
-  $limitnofile                  = $::galera_proxysql::params::limitnofile,
-  $http_proxy                   = $::galera_proxysql::params::http_proxy,
+  String $percona_major_version   = $::galera_proxysql::params::percona_major_version,
+  Hash $galera_hosts              = $::galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo            = $::galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts            = $::galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip              = $::galera_proxysql::params::proxysql_vip,
+  String $monitor_password        = $::galera_proxysql::params::monitor_password,
+  String $proxysql_admin_password = $::galera_proxysql::params::proxysql_admin_password,
+  Hash $proxysql_users            = $::galera_proxysql::params::sqlproxy_users,
+  Array $trusted_networks         = $::galera_proxysql::params::trusted_networks,
+  String $network_interface       = $::galera_proxysql::params::network_interface,
+  String $proxysql_version        = $::galera_proxysql::params::proxysql_version,
+  String $proxysql_mysql_version  = $::galera_proxysql::params::proxysql_mysql_version,
+  $limitnofile                    = $::galera_proxysql::params::limitnofile,
+  $http_proxy                     = $::galera_proxysql::params::http_proxy,
 ) inherits galera_proxysql::params {
 
   $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
