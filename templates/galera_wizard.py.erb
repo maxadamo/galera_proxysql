@@ -58,8 +58,10 @@ OTHER_NODES = list(ALL_NODES)
 <%
 if @force_ipv6
   my_ip = 'socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET6)[0][4][0]'
+  my_ping = '/bin/ping6'
 else
   my_ip = 'socket.gethostbyname(socket.gethostname())'
+  my_ping = '/bin/ping'
 end
 -%>
 OTHER_NODES.remove(<%= my_ip %>)
@@ -225,7 +227,7 @@ def checkhost(sqlhost):
     """check the socket on the other nodes"""
     print "\nChecking socket on {} ...".format(sqlhost)
     fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen(["/bin/ping", "-w2", "-c2", sqlhost],
+    ping = subprocess.Popen(["<%= my_ping %>", "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
     _, __ = ping.communicate()
     retcode = ping.poll()
@@ -255,7 +257,7 @@ def checkhost(sqlhost):
 def checkwsrep(sqlhost):
     """check if the other nodes belong to the cluster"""
     fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen(["/bin/ping", "-w2", "-c2", sqlhost],
+    ping = subprocess.Popen(["<%= my_ping %>", "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
     _, __ = ping.communicate()
     retcode = ping.poll()
