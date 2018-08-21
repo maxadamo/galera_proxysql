@@ -65,7 +65,6 @@ else
 end
 -%>
 OTHER_NODES.remove(<%= my_ip %>)
-OTHER_NODES.remove()
 OTHER_WSREP = []
 REMAINING_NODES = []
 LASTCHECK_NODES = []
@@ -503,8 +502,8 @@ class Cluster(object):
         else:
             if self.mode == "new" and not self.force:
                 ask('\nThis operation will destroy the local data')
-            clean_dir(self.datadir)
-            initialize_mysql(self.datadir)
+                clean_dir(self.datadir)
+                initialize_mysql(self.datadir)
             bootstrap_mysql(self.mode)
             if self.mode == "new":
                 create_monitor_table()

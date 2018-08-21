@@ -11,12 +11,14 @@ wsrep_on                       = ON
 <%
 gcomm_list = 'gcomm://'
 if @force_ipv6
-  myip = @ipaddress6
+  myip = "[" + @ipaddress6 + "]"
+  anyip = "[::]"
   @galera_hosts.each do | key, values |
-    gcomm_list = gcomm_list + values['ipv6'] + ","
+    gcomm_list = gcomm_list + "[" + values['ipv6'] + "],"
   end
 else
-  myip = @ipaddress6
+  myip = @ipaddress
+  anyip = "0.0.0.0"
   @galera_hosts.each do | key, values |
     gcomm_list = gcomm_list + values['ipv4'] + ","
   end
@@ -32,13 +34,13 @@ wsrep_provider                 = /usr/lib64/galera3/libgalera_smm.so
 pxc_strict_mode                = DISABLED
 
 # node IP address
-wsrep_node_address             = "<%= myip %>"
+wsrep_node_address             = "<%= myip %>:4567"
 
 #If wsrep_node_name is not specified,  then system hostname will be used
 wsrep_node_name                = <%= @hostname %>
 
 # Provider specific configuration options
-wsrep_provider_options         = "gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://<%= anyip -%>:4567;ist.recv_addr=<%= myip -%>:4568; gcache.size=1170M; gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
 
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name             = "<%= @galera_cluster_name %>"
@@ -80,7 +82,7 @@ wsrep_sst_method               = xtrabackup-v2
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
-wsrep_sst_receive_address      = <%= myip %>
+wsrep_sst_receive_address      = "<%= myip %>:4444"
 
 # SST authentication string. This will be used to send SST to joining nodes.
 # Depends on SST method. For mysqldump method it is root:<root password>

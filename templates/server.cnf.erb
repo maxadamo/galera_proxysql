@@ -4,7 +4,11 @@
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
 #
+<% if @force_ipv6 -%>
+[sst]
+  sockopt                      = "pf=ip6"
 
+<% end -%>
 [mysqld]
 default_storage_engine         = InnoDB
 user                           = mysql
