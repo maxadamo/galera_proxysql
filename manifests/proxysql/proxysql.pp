@@ -33,6 +33,7 @@
 #
 class galera_proxysql::proxysql::proxysql (
   String $percona_major_version   = $::galera_proxysql::params::percona_major_version,
+  Boolean $force_ipv6             = $::galera_proxysql::params::force_ipv6,
   Hash $galera_hosts              = $::galera_proxysql::params::galera_hosts,
   Boolean $manage_repo            = $::galera_proxysql::params::manage_repo,
   Hash $proxysql_hosts            = $::galera_proxysql::params::proxysql_hosts,

@@ -55,7 +55,16 @@ except IOError:
     sys.exit(1)
 
 OTHER_NODES = list(ALL_NODES)
-OTHER_NODES.remove(socket.gethostbyname(socket.gethostname()))
+<%
+if @force_ipv6
+  my_ip = 'socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET6)[0][4][0]'
+else
+  my_ip = 'socket.gethostbyname(socket.gethostname())'
+end
+nodes_list = nodes_list.chomp('", "')
+-%>
+OTHER_NODES.remove(<%= my_ip %>)
+OTHER_NODES.remove()
 OTHER_WSREP = []
 REMAINING_NODES = []
 LASTCHECK_NODES = []
@@ -375,7 +384,7 @@ def drop_anonymous():
     """drop anonymous user"""
     all_localhosts = [
         "localhost", "127.0.0.1", "::1",
-        socket.gethostbyname(socket.gethostname())
+        <%= my_ip %>
     ]
     cnx_local = MySQLdb.connect(
         user='root',
@@ -526,7 +535,7 @@ class Cluster(object):
 
     def checkonly(self):
         """runs a cluster check"""
-        OTHER_WSREP.append(socket.gethostbyname(socket.gethostname()))
+        OTHER_WSREP.append(<%= my_ip %>)
         for hostitem in ALL_NODES:
             checkhost(hostitem)
         if OTHER_WSREP:
@@ -542,7 +551,7 @@ class Cluster(object):
         os.system('clear')
         ALL_NODES.append("localhost")
         print "\n# remove anonymous user\nDROP USER ''@'localhost'"
-        print "DROP USER ''@'{}'".format(socket.gethostbyname(socket.gethostname()))
+        print "DROP USER ''@'{}'".format(<%= my_ip %>)
         print "\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;"
         print "CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL )' \
         ' ENGINE=InnoDB DEFAULT CHARSET=utf8;"

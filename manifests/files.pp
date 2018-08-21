@@ -51,7 +51,7 @@ class galera_proxysql::files (
       force   => true;
     '/usr/bin/galera_wizard.py':
       mode    => '0755',
-      content => template("${module_name}/galera_wizard.py");
+      content => template("${module_name}/galera_wizard.py.erb");
     '/root/galera_params.py':
       content => template("${module_name}/galera_params.py.erb"),
       notify  => Xinetd::Service['galerachk'];
