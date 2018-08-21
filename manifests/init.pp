@@ -209,6 +209,7 @@ class galera_proxysql (
       backup_compress              => $backup_compress,
       backup_dir                   => $backup_dir,
       backup_retention             => $backup_retention,
+      force_ipv6                   => $force_ipv6,
       galera_cluster_name          => $galera_cluster_name,
       galera_hosts                 => $galera_hosts,
       innodb_buffer_pool_instances => $innodb_buffer_pool_instances,
