@@ -13,6 +13,9 @@ class galera_proxysql::params {
   $backup_dir = '/mnt/galera'
   $daily_hotbackup = undef
 
+  #network parameters
+  $force_ipv6 = false
+
   # galera parameters
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef

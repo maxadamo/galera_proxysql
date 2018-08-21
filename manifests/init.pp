@@ -25,6 +25,9 @@
 # [*daily_hotbackup*] <Bool>
 #   WIP: not yet in use
 #
+# [*force_ipv6*] <Bool>
+#   default: false (whether to use IPv6 on cluster communication)
+#
 # [*galera_cluster_name*] <String>
 #   default: ${::environment}_${::hostgroup} (if you don't have $::hostgroup I'll throw a fail)
 #
@@ -124,6 +127,7 @@ class galera_proxysql (
   $backup_dir                   = $::galera_proxysql::params::backup_dir,
   $backup_retention             = $::galera_proxysql::params::backup_retention,
   $daily_hotbackup              = $::galera_proxysql::params::daily_hotbackup,
+  $force_ipv6                   = $::galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $::galera_proxysql::params::galera_hosts,
   $innodb_buffer_pool_size      = $::galera_proxysql::params::innodb_buffer_pool_size,
