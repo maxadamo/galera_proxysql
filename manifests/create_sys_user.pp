@@ -56,17 +56,17 @@ define galera_proxysql::create_sys_user (
         require    => Mysql_user["${dbuser}@${host_name}"];
     }
     if has_key($host_ips, 'ipv6') {
-      mysql_user { "${dbuser}@${host_ips['ipv4']}":
+      mysql_user { "${dbuser}@${host_ips['ipv6']}":
         ensure        => present,
         password_hash => mysql_password($dbpass),
         provider      => 'mysql';
       }
-      mysql_grant { "${dbuser}@${host_ips['ipv4']}/${table}":
+      mysql_grant { "${dbuser}@${host_ips['ipv6']}/${table}":
         ensure     => present,
-        user       => "${dbuser}@${host_ips['ipv4']}",
+        user       => "${dbuser}@${host_ips['ipv6']}",
         table      => $table,
         privileges => $privileges,
-        require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
+        require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
       }
     }
   }
