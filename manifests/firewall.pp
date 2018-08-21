@@ -27,18 +27,17 @@ class galera_proxysql::firewall (
   $galera_hosts.each | $name, $node | {
     firewall {
       default:
-        dport  => [4444, 4567, 4568],
-        proto  => tcp,
-        action => accept,
-        before => Exec['bootstrap_or_join', 'join_existing'];
+        dport    => [4444, 4567, 4568],
+        proto    => tcp,
+        action   => accept,
+        provider => 'iptables',
+        before   => Exec['bootstrap_or_join', 'join_existing'];
       "200 Allow outbound Galera ports ipv4 to ${name}":
         chain       => 'OUTPUT',
-        destination => $node['ipv4'],
-        provider    => 'iptables';
+        destination => $node['ipv4'];
       "200 Allow inbound Galera ports ipv4 from ${name}":
-        chain    => 'INPUT',
-        source   => $node['ipv4'],
-        provider => 'iptables';
+        chain  => 'INPUT',
+        source => $node['ipv4'];
     }
   }
 
@@ -56,18 +55,17 @@ class galera_proxysql::firewall (
     $galera_hosts.each | $name, $node | {
       firewall {
         default:
-          dport  => [4444, 4567, 4568],
-          proto  => tcp,
-          action => accept,
-          before => Exec['bootstrap_or_join', 'join_existing'];
+          dport    => [4444, 4567, 4568],
+          proto    => tcp,
+          action   => accept,
+          provider => 'ip6tables',
+          before   => Exec['bootstrap_or_join', 'join_existing'];
         "200 Allow outbound Galera ports ipv6 to ${name}":
           chain       => 'OUTPUT',
-          destination => $node['ipv6'],
-          provider    => 'ip6tables';
+          destination => $node['ipv6'];
         "200 Allow inbound Galera ports ipv6 from ${name}":
-          chain    => 'INPUT',
-          source   => $node['ipv6'],
-          provider => 'ip6tables';
+          chain  => 'INPUT',
+          source => $node['ipv6'];
       }
     }
   }
