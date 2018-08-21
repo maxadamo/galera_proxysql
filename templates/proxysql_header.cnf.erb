@@ -14,11 +14,11 @@ list_bottom = '"
   },'
 if @force_ipv6
   @galera_hosts.each do | key, value |
-    server_list = server_list + list_top + value['ipv4'] + list_bottom
+    server_list = server_list + list_top + value['ipv6'] + list_bottom
   end
 else
   @galera_hosts.each do | key, value |
-    server_list = server_list + list_top + value['ipv6'] + list_bottom
+    server_list = server_list + list_top + value['ipv4'] + list_bottom
   end
 end
 -%>
@@ -34,11 +34,11 @@ list_bottom_write = '"
   },'
 if @force_ipv6
   @galera_hosts.each do | key, value |
-    server_list_write = server_list_write + list_top + value['ipv4'] + list_bottom_write
+    server_list_write = server_list_write + list_top + value['ipv6'] + list_bottom_write
   end
 else
   @galera_hosts.each do | key, value |
-    server_list_write = server_list_write + list_top + value['ipv6'] + list_bottom_write
+    server_list_write = server_list_write + list_top + value['ipv4'] + list_bottom_write
   end
 end
 server_list_write = server_list_write.chomp(",")
