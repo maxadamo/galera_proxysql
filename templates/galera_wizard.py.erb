@@ -61,7 +61,6 @@ if @force_ipv6
 else
   my_ip = 'socket.gethostbyname(socket.gethostname())'
 end
-nodes_list = nodes_list.chomp('", "')
 -%>
 OTHER_NODES.remove(<%= my_ip %>)
 OTHER_NODES.remove()
