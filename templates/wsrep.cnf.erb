@@ -40,7 +40,7 @@ wsrep_node_address             = "<%= myip %>:4567"
 wsrep_node_name                = <%= @hostname %>
 
 # Provider specific configuration options
-wsrep_provider_options         = "gmcast.listen_addr=tcp://<%= anyip -%>:4567;ist.recv_addr=<%= myip -%>:4568; gcache.size=1170M; gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://<%= anyip -%>:4567;ist.recv_addr=<%= myip -%>:4568; gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
 
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name             = "<%= @galera_cluster_name %>"
