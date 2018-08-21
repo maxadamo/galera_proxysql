@@ -3,11 +3,11 @@
 nodes_list = ''
 if @force_ipv6
   @galera_hosts.each do | key, values |
-    nodes_list = nodes_list + values['ipv4'] + '", "'
+    nodes_list = nodes_list + values['ipv6'] + '", "'
   end
 else
   @galera_hosts.each do | key, values |
-    nodes_list = nodes_list + values['ipv6'] + '", "'
+    nodes_list = nodes_list + values['ipv4'] + '", "'
   end
 end
 nodes_list = nodes_list.chomp('", "')
