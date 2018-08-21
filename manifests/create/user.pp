@@ -54,6 +54,21 @@ define galera_proxysql::create::user (
             privileges => $privileges,
             require    => Mysql_user["${dbuser}@${host_name}"];
         }
+        if has_key($host_ips, 'ipv6') {
+          mysql_user { "${dbuser}@${host_ips['ipv6']}":
+            ensure        => present,
+            password_hash => mysql_password($dbpass),
+            provider      => 'mysql',
+            require       => Mysql::Db[$schema_name];
+          }
+          mysql_grant { "${dbuser}@${host_ips['ipv6']}/${table}":
+            ensure     => present,
+            user       => "${dbuser}@${host_ips['ipv6']}",
+            table      => $table,
+            privileges => $privileges,
+            require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
+          }
+        }
       }
     } else {
       fail('hash galera_hosts not defined')
