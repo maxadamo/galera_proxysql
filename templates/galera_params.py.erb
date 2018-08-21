@@ -1,8 +1,14 @@
 # This file is managed by Puppet
 <%
 nodes_list = ''
-@galera_hosts.each do | key, values |
-  nodes_list = nodes_list + values['ipv4'] + '", "'
+if @force_ipv6
+  @galera_hosts.each do | key, values |
+    nodes_list = nodes_list + values['ipv4'] + '", "'
+  end
+else
+  @galera_hosts.each do | key, values |
+    nodes_list = nodes_list + values['ipv6'] + '", "'
+  end
 end
 nodes_list = nodes_list.chomp('", "')
 -%>
