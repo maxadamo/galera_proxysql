@@ -119,6 +119,9 @@
 #
 class galera_proxysql (
 
+  # temporary parameter
+  $manage_ipv6 = 'do_not_use',
+
   # print debug messages
   $puppet_debug                 = $::galera_proxysql::params::puppet_debug,
 
@@ -168,6 +171,8 @@ class galera_proxysql (
 
 ) inherits galera_proxysql::params {
 
+  if $manage_ipv6 != 'do_not_use' { fail('please remove the parameter "manage_ipv6". IPv6 is now auto-detected') }
+
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
   unless any2bool($puppet_debug) == false {
@@ -202,7 +207,7 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
-  galera_proxysql::root_password { $root_password:; }
+  galera_proxysql::create::root_password { $root_password:; }
 
   class {
     '::galera_proxysql::files':
@@ -258,7 +263,7 @@ class galera_proxysql (
   unless any2bool($manage_firewall) == false {
     class { 'galera_proxysql::firewall':
       galera_hosts     => $galera_hosts,
-      proxysql_vip          => $proxysql_vip,
+      proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
     }
   }
