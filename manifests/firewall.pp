@@ -39,20 +39,7 @@ class galera_proxysql::firewall (
         chain  => 'INPUT',
         source => $node['ipv4'];
     }
-  }
-
-  if $manage_ipv6 {
-    ['iptables', 'ip6tables'].each | String $myprovider | {
-      firewall { "200 Allow outbound Galera ports (v4/v6) for ${myprovider}":
-        chain    => 'OUTPUT',
-        dport    => [3306, 9200],
-        proto    => tcp,
-        action   => accept,
-        provider => $myprovider,
-        before   => Exec['bootstrap_or_join', 'join_existing'];
-      }
-    }
-    $galera_hosts.each | $name, $node | {
+    if has_key($node, 'ipv6') {
       firewall {
         default:
           dport    => [4444, 4567, 4568],
@@ -67,6 +54,28 @@ class galera_proxysql::firewall (
           chain  => 'INPUT',
           source => $node['ipv6'];
       }
+    }
+  }
+
+  if $manage_ipv6 {
+    ['iptables', 'ip6tables'].each | String $myprovider | {
+      firewall { "200 Allow outbound Galera ports (v4/v6) for ${myprovider}":
+        chain    => 'OUTPUT',
+        dport    => [3306, 9200],
+        proto    => tcp,
+        action   => accept,
+        provider => $myprovider,
+        before   => Exec['bootstrap_or_join', 'join_existing'];
+      }
+    }
+  } else {
+    firewall { '200 Allow outbound Galera ports for IPv4':
+      chain    => 'OUTPUT',
+      dport    => [3306, 9200],
+      proto    => tcp,
+      action   => accept,
+      provider => 'iptables',
+      before   => Exec['bootstrap_or_join', 'join_existing'];
     }
   }
 
@@ -95,10 +104,7 @@ class galera_proxysql::firewall (
         destination => $node['ipv4'],
         proto       => udp;
     }
-  }
-
-  if $manage_ipv6 {
-    $proxysql_cluster.each | $name, $node | {
+    if has_key($node, 'ipv6') {
       firewall {
         default:
           action   => accept,
@@ -122,16 +128,6 @@ class galera_proxysql::firewall (
           proto       => udp;
       }
     }
-  } else {
-    firewall { '200 Allow outbound Galera ports for IPv4':
-      chain    => 'OUTPUT',
-      dport    => [3306, 9200],
-      proto    => tcp,
-      action   => accept,
-      provider => 'iptables',
-      before   => Exec['bootstrap_or_join', 'join_existing'];
-    }
   }
-
 
 }
