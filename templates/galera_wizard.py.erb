@@ -207,6 +207,7 @@ def bootstrap_mysql(boot):
     except Exception as err:
         print "Error bootstrapping the cluster: {}".format(err)
         sys.exit(1)
+    print '\nsuccessfully bootstrapped the cluster\n'
     if boot == "new":
         try:
             subprocess.call([
