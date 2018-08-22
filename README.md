@@ -41,7 +41,7 @@ class { '::galera_proxysql':
   sst_password     => $sst_password,
   monitor_password => $monitor_password,
   proxysql_hosts   => $proxysql_hosts,
-  proxysql_vip     => $proxysql_hosts,
+  proxysql_vip     => $proxysql_vip,
   galera_hosts     => $galera_hosts,
   trusted_networks => $trusted_networks,
   manage_lvm       => true,
@@ -165,10 +165,9 @@ galera_proxysql::create::user { 'zabbix':
 
 ## Limitations
 
-* missing SSL support
-* init script management needs to be improved
+* missing SSL support (ProxySQL 1.4.xx support SSL only to the backends. ProxySQL 2. is still beta)
 * not yet tested on ipv4 only (it should work)
-* I removed support to Ubuntu (I rather concentrate on improving the quality of this module first)
+* there are too many moving parts and I decided to temporarily remove support to Ubuntu.
 
 ## Development
 
