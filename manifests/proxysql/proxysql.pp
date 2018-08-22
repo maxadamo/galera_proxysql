@@ -65,12 +65,12 @@ class galera_proxysql::proxysql::proxysql (
     '::galera_proxysql::proxysql::service':
       limitnofile => $limitnofile;
     '::galera_proxysql::proxysql::keepalived':
-      manage_ipv6       => $ipv6_true,
+      use_ipv6       => $ipv6_true,
       proxysql_hosts    => $proxysql_hosts,
       network_interface => $network_interface,
       proxysql_vip      => $proxysql_vip;
     '::galera_proxysql::firewall':
-      manage_ipv6      => $ipv6_true,
+      use_ipv6      => $ipv6_true,
       galera_hosts     => $galera_hosts,
       proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,

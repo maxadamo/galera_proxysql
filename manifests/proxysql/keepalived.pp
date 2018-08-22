@@ -4,7 +4,7 @@ class galera_proxysql::proxysql::keepalived (
   $proxysql_hosts    = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip      = $::galera_proxysql::params::proxysql_vip,
   $network_interface = $::galera_proxysql::params::network_interface,
-  $manage_ipv6       = undef
+  $use_ipv6       = undef
 ) inherits galera_proxysql::params {
 
   $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
@@ -24,7 +24,7 @@ class galera_proxysql::proxysql::keepalived (
     weight   => '2';
   }
 
-  if ($manage_ipv6) {
+  if ($use_ipv6) {
     keepalived::vrrp::instance { 'ProxySQL':
       interface                  => $network_interface,
       state                      => 'BACKUP',

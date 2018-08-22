@@ -10,7 +10,7 @@ class galera_proxysql::firewall (
   $trusted_networks = $::galera_proxysql::params::trusted_networks
 ) inherits galera_proxysql::params {
 
-  $manage_ipv6 = 'ipv6' in $galera_hosts[$galera_hosts.keys[0]]
+  $use_ipv6 = 'ipv6' in $galera_hosts[$galera_hosts.keys[0]]
 
   $trusted_networks.each | String $source | {
     if ':' in $source { $provider = 'ip6tables' } else { $provider = 'iptables' }
@@ -58,7 +58,7 @@ class galera_proxysql::firewall (
     }
   }
 
-  unless any2bool($manage_ipv6) == false {
+  unless any2bool($use_ipv6) == false {
     ['iptables', 'ip6tables'].each | String $myprovider | {
       firewall { "200 Allow outbound Galera ports (v4/v6) for ${myprovider}":
         chain    => 'OUTPUT',
