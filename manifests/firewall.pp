@@ -4,12 +4,13 @@
 # We set inbound traffic only through the application manifest
 #
 class galera_proxysql::firewall (
-  $manage_ipv6      = undef,
   $galera_hosts     = $::galera_proxysql::params::galera_hosts,
   $proxysql_hosts   = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip     = $::galera_proxysql::params::proxysql_vip,
   $trusted_networks = $::galera_proxysql::params::trusted_networks
 ) inherits galera_proxysql::params {
+
+  $check_ipv6 = inline_template('<% @galera_hosts.each_with_index do |(mykey, value), index| %><% if index == 0 %><% if value.key?("ipv6") %><%= true %><% else -%><%= false %><% end -%><% end -%><% end -%>')
 
   $trusted_networks.each | String $source | {
     if ':' in $source { $provider = 'ip6tables' } else { $provider = 'iptables' }
@@ -57,7 +58,7 @@ class galera_proxysql::firewall (
     }
   }
 
-  if $manage_ipv6 {
+  unless any2bool($check_ipv6) == false {
     ['iptables', 'ip6tables'].each | String $myprovider | {
       firewall { "200 Allow outbound Galera ports (v4/v6) for ${myprovider}":
         chain    => 'OUTPUT',
