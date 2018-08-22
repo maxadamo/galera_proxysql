@@ -262,6 +262,7 @@ class galera_proxysql (
 
   unless any2bool($manage_firewall) == false {
     class { 'galera_proxysql::firewall':
+      use_ipv6         => $ipv6_true,
       galera_hosts     => $galera_hosts,
       proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
