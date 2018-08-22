@@ -5,7 +5,7 @@
 class galera_proxysql::params {
 
   # print debug messages
-  $galera_debug = undef
+  $puppet_debug = undef
 
   # backup parameters (this funcionality is not yet properly implemented)
   $backup_compress = false

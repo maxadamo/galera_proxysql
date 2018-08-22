@@ -9,7 +9,7 @@
 # === Parameters & Variables
 #
 #
-# [*galera_debug*] <Bool>
+# [*puppet_debug*] <Bool>
 #   default: false (whether to print or not cluster status)
 #
 # [*backup_compress*] <Bool>
@@ -120,7 +120,7 @@
 class galera_proxysql (
 
   # print debug messages
-  $galera_debug                 = $::galera_proxysql::params::galera_debug,
+  $puppet_debug                 = $::galera_proxysql::params::puppet_debug,
 
   # galera parameters
   $backup_compress              = $::galera_proxysql::params::backup_compress,
@@ -170,7 +170,7 @@ class galera_proxysql (
 
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
-  unless any2bool($galera_debug) == false {
+  unless any2bool($puppet_debug) == false {
     # checking cluster status through the facter galera_status
     if $::galera_status == '200' {
       $msg = "HTTP/1.1 ${::galera_status}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
