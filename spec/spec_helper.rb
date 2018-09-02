@@ -1,4 +1,3 @@
-
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'rspec-puppet-facts'
 
@@ -26,11 +25,9 @@ if File.exist?(default_module_facts_path) && File.readable?(default_module_facts
   default_facts.merge!(YAML.safe_load(File.read(default_module_facts_path)))
 end
 
-default_hiera = File.expand_path(File.join(File.dirname(__FILE__), 'hiera.yaml'))
-
 RSpec.configure do |c|
   c.default_facts = default_facts
-  c.hiera_config = default_hiera
+  c.hiera_config = 'spec/hiera.yaml'
   c.before :each do
     # set to strictest setting for testing
     # by default Puppet runs at warning level
