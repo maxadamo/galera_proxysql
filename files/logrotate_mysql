@@ -27,11 +27,11 @@
         missingok
         compress
     postrotate
-	# just if mysqld is really running
-	if test -x /usr/bin/mysqladmin && \
-	   /usr/bin/mysqladmin ping &>/dev/null
-	then
-	   /usr/bin/mysqladmin flush-logs
-	fi
+	    # just if mysqld is really running
+	    if test -x /usr/bin/mysqladmin && \
+	       /usr/bin/mysqladmin ping &>/dev/null
+	    then
+	       /usr/bin/mysqladmin flush-logs
+	    fi
     endscript
 }
