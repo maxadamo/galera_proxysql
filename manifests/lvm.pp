@@ -22,7 +22,7 @@ class galera_proxysql::lvm (
 
     file { '/var/lib/mysql':
       ensure  => directory,
-      mode    => '0755',
+      mode    => '0751',
       owner   => mysql,
       group   => mysql,
       require => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
