@@ -49,6 +49,9 @@ class galera_proxysql::files (
       purge   => true,
       recurse => true,
       force   => true;
+    '/etc/logrotate.d/mysql':
+      mode   => '0644',
+      source => "puppet:///modules/${module_name}/logrotate_mysql";
     '/usr/bin/galera_wizard.py':
       mode    => '0755',
       content => template("${module_name}/galera_wizard.py.erb");
