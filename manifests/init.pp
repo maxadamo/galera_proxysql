@@ -8,7 +8,6 @@
 #
 # === Parameters & Variables
 #
-#
 # [*puppet_debug*] <Bool>
 #   default: false (whether to print or not cluster status)
 #
