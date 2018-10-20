@@ -1,0 +1,606 @@
+#!/bin/bash
+## inspired by Percona clustercheck.sh
+
+ERR_FILE="${5:-/dev/null}"
+echoit(){
+  echo "[$(date +%Y-%m-%d\ %H:%M:%S)] $1" >> $ERR_FILE
+}
+if [[ -f /etc/proxysql-admin.cnf ]]; then
+  source /etc/proxysql-admin.cnf
+else
+  echo "Assert! proxysql-admin configuration file :/etc/proxysql-admin.cnf does not exists, Terminating!"
+  exit 1
+fi
+#
+
+if [[ -z "$PROXYSQL_DATADIR" ]]; then
+  PROXYSQL_DATADIR='/var/lib/proxysql'
+fi
+
+#Timeout exists for instances where mysqld/proxysql may be hung
+TIMEOUT=5
+
+function usage()
+{
+  cat << EOF
+
+Usage: $0 <hostgroup_id write> [hostgroup_id read] [number writers] [writers are readers 0|1] [log_file]
+
+- HOSTGROUP WRITERS   (required)  (0..)   The hostgroup_id that contains nodes that will server 'writes'
+- HOSTGROUP READERS   (optional)  (0..)   The hostgroup_id that contains nodes that will server 'reads'
+- NUMBER WRITERS      (optional)  (0..)   Maximum number of write hostgroup_id node that can be marked ONLINE
+                                          When 0 (default), all nodes can be marked ONLINE
+- WRITERS ARE READERS (optional)  (0|1)   When 1 (default), ONLINE nodes in write hostgroup_id will prefer not
+                                          to be ONLINE in read hostgroup_id
+- LOG_FILE            (optional)  file    logfile where node state checks & changes are written to (verbose)
+
+
+Notes about the mysql_servers in ProxySQL:
+
+- WEIGHT           Hosts with a higher weight will be prefered to be put ONLINE
+- NODE STATUS      * Nodes that are in status OFFLINE_HARD will not be checked nor will their status be changed
+                   * SHUNNED nodes are not to be used with Galera based systems, they will be checked and status
+                     will be changed to either ONLINE or OFFLINE_SOFT.
+
+
+When no nodes were found to be in wsrep_local_state=4 (SYNCED) for either
+read or write nodes, then the script will try 5 times for each node to try
+to find nodes wsrep_local_state=4 (SYNCED) or wsrep_local_state=2 (DONOR/DESYNC)
+
+This is to avoid $0 to mark all nodes as OFFLINE_SOFT
+
+EOF
+}
+
+
+# DEFAULTS
+HOSTGROUP_WRITER_ID="${1}"
+HOSTGROUP_READER_ID="${2:--1}"
+NUMBER_WRITERS="${3:-0}"
+WRITER_IS_READER="${4:-1}"
+#Timeout exists for instances where mysqld may be hung
+TIMEOUT=10
+
+proxysql_exec() {
+  local query="$1"
+  printf "%s\n" \
+      "[client]" \
+      "user='${PROXYSQL_USERNAME}'" \
+      "password='${PROXYSQL_PASSWORD}'" \
+      "host=${PROXYSQL_HOSTNAME}" \
+      "port=${PROXYSQL_PORT}"  \
+      | timeout $TIMEOUT mysql --defaults-file=/dev/stdin --protocol=tcp -Nse "${query}"
+  if [ "$?" == "124" ]; then
+    echoit "TIMEOUT ERROR: Connection terminated due to timeout."
+  fi
+}
+
+mysql_exec() {
+  local query="$1"
+  printf "%s\n" \
+      "[client]" \
+      "user='${MYSQL_USERNAME}'" \
+      "password='${MYSQL_PASSWORD}'" \
+      "host=${server}" \
+      "port=${port}"  \
+      | timeout $TIMEOUT mysql --defaults-file=/dev/stdin --protocol=tcp -nNE -e "${query}"
+  if [ "$?" == "124" ]; then
+    echoit "TIMEOUT ERROR: Connection terminated due to timeout."
+  fi
+}
+
+MYSQL_CREDENTIALS=$(proxysql_exec "SELECT variable_value FROM global_variables WHERE variable_name IN ('mysql-monitor_username','mysql-monitor_password') ORDER BY variable_name DESC")
+MYSQL_USERNAME=$(echo $MYSQL_CREDENTIALS | awk '{print $1}')
+MYSQL_PASSWORD=$(echo $MYSQL_CREDENTIALS | awk '{print $2}')
+AVAILABLE_HOST=$(proxysql_exec "SELECT hostname,port FROM mysql_servers where hostgroup_id in ($HOSTGROUP_WRITER_ID, $HOSTGROUP_READER_ID) and status='ONLINE' limit 1")
+server=$(echo $AVAILABLE_HOST | awk '{print $1}')
+port=$(echo $AVAILABLE_HOST | awk '{print $2}')
+
+
+CLUSTER_NAME=$(proxysql_exec "select comment from scheduler where arg1=$HOSTGROUP_WRITER_ID")
+if [[ -z $CLUSTER_NAME ]]; then
+  CLUSTER_NAME=$(mysql_exec "select @@wsrep_cluster_name" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+  if [[ ! -z $CLUSTER_NAME ]]; then  
+    proxysql_exec "update scheduler set comment='$CLUSTER_NAME',arg5='${PROXYSQL_DATADIR}/${CLUSTER_NAME}_proxysql_galera_check.log' where arg1=$HOSTGROUP_WRITER_ID;load scheduler to runtime;"
+  fi
+fi
+
+if [[ -z $CLUSTER_NAME ]]; then
+  RELOAD_CHECK_FILE="${PROXYSQL_DATADIR}/reload"
+else
+  RELOAD_CHECK_FILE="${PROXYSQL_DATADIR}/${CLUSTER_NAME}_reload"
+fi
+
+if [[ ! -f ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_mode ]] ; then
+  MODE_CHECK=$(proxysql_exec "select comment from mysql_servers where comment='WRITE' and hostgroup_id in ($WRITE_HOSTGROUP_ID, $READ_HOSTGROUP_ID)")
+  if [[ "$MODE_CHECK" == "WRITE" ]]; then
+    if [[ -z $CLUSTER_NAME ]]; then 
+      echo "singlewrite" > ${PROXYSQL_DATADIR}/mode
+	else
+      echo "singlewrite" > ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_mode
+	fi
+  else
+    if [[ -z $CLUSTER_NAME ]]; then 
+      echo "loadbal" > ${PROXYSQL_DATADIR}/mode
+	else
+      echo "loadbal" > ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_mode
+	fi
+  fi
+  if [[ -z $CLUSTER_NAME ]]; then 
+    MODE=$(cat ${PROXYSQL_DATADIR}/mode)
+  else
+    MODE=$(cat ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_mode)  
+  fi
+else
+  MODE=$(cat ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_mode)
+fi
+
+# With thanks, http://bencane.com/2015/09/22/preventing-duplicate-cron-job-executions/
+if [[ -z $CLUSTER_NAME ]]; then 
+  CHECKER_PIDFILE=${PROXYSQL_DATADIR}/galera_checker.pid
+else
+  CHECKER_PIDFILE=${PROXYSQL_DATADIR}/${CLUSTER_NAME}_galera_checker.pid
+fi
+
+if [ -f $CHECKER_PIDFILE ] ; then
+  GPID=$(cat $CHECKER_PIDFILE)
+  if ps -p $GPID -o args=ARGS | grep $ERR_FILE | grep -o proxysql_galera_check > /dev/null 2>&1 ; then
+    ps -p $GPID > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+      echoit "ProxySQL galera checker process already running."
+      exit 1
+    else
+      echo $$ > $CHECKER_PIDFILE
+      if [[ $? -ne 0 ]] ; then
+        echoit "Could not create galera checker PID file"
+        exit 1
+      fi
+    fi
+  else
+    echoit "Warning! Existing PID($GPID) belongs to some other process. Creating new PID file."
+    echo $$ > $CHECKER_PIDFILE
+    if [[ $? -ne 0 ]] ; then
+      echoit "Could not create galera checker PID file"
+      exit 1
+    fi
+  fi
+else
+  echo $$ > $CHECKER_PIDFILE
+  if [[ $? -ne 0 ]]; then
+    echoit "Could not create galera checker PID file"
+    exit 1
+  fi
+fi
+
+echo "0" > ${RELOAD_CHECK_FILE}
+
+#Running proxysql_node_monitor script.
+if [[ ! -f /usr/bin/proxysql_node_monitor ]] ;then
+  echoit "ERROR! Could not run /usr/bin/proxysql_node_monitor. Monitoring script does not exists in default location. Terminating"
+  exit 1
+else
+  if [[ -z $CLUSTER_NAME ]]; then
+    /usr/bin/proxysql_node_monitor $HOSTGROUP_WRITER_ID $HOSTGROUP_READER_ID ${PROXYSQL_DATADIR}/proxysql_node_monitor.log
+  else
+    /usr/bin/proxysql_node_monitor $HOSTGROUP_WRITER_ID $HOSTGROUP_READER_ID ${PROXYSQL_DATADIR}/${CLUSTER_NAME}_proxysql_node_monitor.log
+  fi
+fi
+
+if [[ "$1" = '-h' || "$1" = '--help'  || -z "$1" ]]
+then
+  usage
+  exit 0
+fi
+
+test $HOSTGROUP_WRITER_ID -ge 0 &> /dev/null
+if [[ $? -ne 0 ]]; then
+  echo "ERROR: writer hostgroup_id is not an integer"
+  usage
+  exit 1
+fi
+
+test $HOSTGROUP_READER_ID -ge -1 &> /dev/null
+if [[ $? -ne 0 ]]; then
+  echo "ERROR: reader hostgroup_id is not an integer"
+  usage
+  exit 1
+fi
+
+if [[ $# -lt 1 || $# -gt 5 ]]; then
+  echo "ERROR: Invalid number of arguments"
+  usage
+  exit 1
+fi
+
+if [[ $NUMBER_WRITERS -lt 0 ]]; then
+  echo "ERROR: The number of writers should either be 0 to enable all possible nodes ONLINE"
+  echo "       or be larger than 0 to limit the number of writers"
+  usage
+  exit 1
+fi
+
+if [[ $WRITER_IS_READER -ne 0 && $WRITER_IS_READER -ne 1 ]]; then
+  echo "ERROR: Writers are readers requires a boolean argument (0|1)"
+  usage
+  exit 1
+fi
+
+
+# print information prior to a run if ${ERR_FILE} is defined
+echoit "###### proxysql_galera_checker.sh SUMMARY ######"
+echoit "Hostgroup writers $HOSTGROUP_WRITER_ID"
+echoit "Hostgroup readers $HOSTGROUP_READER_ID"
+echoit "Number of writers $NUMBER_WRITERS"
+echoit "Writers are readers $WRITER_IS_READER"
+echoit "log file $ERR_FILE"
+
+
+
+function change_server_status() {
+  echoit "Changing server $1:$2:$3 to status $4. Reason: $5"
+  proxysql_exec "UPDATE mysql_servers set status = '$4' WHERE hostgroup_id = $1 AND hostname = '$2' AND port = $3;" 2>> ${ERR_FILE}
+}
+
+
+echoit "###### HANDLE WRITER NODES ######"
+NUMBER_WRITERS_ONLINE=0
+proxysql_exec "SELECT hostgroup_id, hostname, port, status FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_WRITER_ID) AND status <> 'OFFLINE_HARD' AND comment <> 'SLAVEREAD' ORDER BY hostgroup_id, weight DESC, hostname, port" | while read hostgroup server port stat
+do
+  WSREP_STATUS=$(mysql_exec "SHOW STATUS LIKE 'wsrep_local_state'" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+  PXC_MAIN_MODE=$(mysql_exec "SHOW VARIABLES LIKE 'pxc_maint_mode'" 2>>${ERR_FILE} | tail -1 2>>${ERR_FILE})
+
+  echoit "--> Checking WRITE server $hostgroup:$server:$port, current status $stat, wsrep_local_state $WSREP_STATUS"
+
+  # we have to limit amount of writers, WSREP status OK, AND node is not marked ONLINE
+  if [[ -z "$PXC_MAIN_MODE" ]]; then
+    if [ $NUMBER_WRITERS -gt 0 -a "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" ] ; then
+        if [[ $NUMBER_WRITERS_ONLINE -lt $NUMBER_WRITERS ]]; then
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          echoit "server $hostgroup:$server:$port is already ONLINE: ${NUMBER_WRITERS_ONLINE} of ${NUMBER_WRITERS} write nodes"
+        else
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "max write nodes reached (${NUMBER_WRITERS})"
+          echo "1" > ${RELOAD_CHECK_FILE}
+        fi
+    fi
+  else
+    if [[ $NUMBER_WRITERS -gt 0 && "${WSREP_STATUS}" = "4" && "$stat" == "ONLINE" ]] ; then
+        if [ $NUMBER_WRITERS_ONLINE -lt $NUMBER_WRITERS ]; then
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          echoit "server $hostgroup:$server:$port is already ONLINE: ${NUMBER_WRITERS_ONLINE} of ${NUMBER_WRITERS} write nodes"
+        else
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "max write nodes reached (${NUMBER_WRITERS})"
+          echo "1" > ${RELOAD_CHECK_FILE}
+        fi
+    elif [ $NUMBER_WRITERS -gt 0 -a "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE"  -a "${PXC_MAIN_MODE}" != "DISABLED" ] ; then
+      NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+      echoit "server $hostgroup:$server:$port is $stat : ${NUMBER_WRITERS_ONLINE} of ${NUMBER_WRITERS} write nodes"
+    fi
+  fi
+
+  # WSREP status OK, but node is not marked ONLINE
+  if [[ -z "$PXC_MAIN_MODE" ]]; then
+    if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" ] ; then
+      # we have to limit amount of writers
+      if [[ $NUMBER_WRITERS -gt 0 ]] ; then
+        if [[ $NUMBER_WRITERS_ONLINE -lt $NUMBER_WRITERS ]]; then
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "{NUMBER_WRITERS_ONLINE} of ${NUMBER_WRITERS} write nodes"
+          echo "1" > ${RELOAD_CHECK_FILE}
+        else
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          if [ "$stat" != "OFFLINE_SOFT" ]; then
+            change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "max write nodes reached (${NUMBER_WRITERS})"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          else
+             echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, max write nodes reached (${NUMBER_WRITERS})"
+          fi
+        fi
+      # we do not have to limit
+      elif [[ $NUMBER_WRITERS -eq 0 ]] ; then
+        change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "Changed state, marking write node ONLINE"
+        echo "1" > ${RELOAD_CHECK_FILE}
+      fi
+    fi
+  else
+    if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+      # we have to limit amount of writers
+      if [[ $NUMBER_WRITERS -gt 0 ]] ; then
+        if [[ $NUMBER_WRITERS_ONLINE -lt $NUMBER_WRITERS ]]; then
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "{NUMBER_WRITERS_ONLINE} of ${NUMBER_WRITERS} write nodes"
+          echo "1" > ${RELOAD_CHECK_FILE}
+        else
+          NUMBER_WRITERS_ONLINE=$(( $NUMBER_WRITERS_ONLINE + 1 ))
+          if [ "$stat" != "OFFLINE_SOFT" ]; then
+            change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "max write nodes reached (${NUMBER_WRITERS})"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          else
+             echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, max write nodes reached (${NUMBER_WRITERS})"
+          fi
+        fi
+      # we do not have to limit
+      elif [[ $NUMBER_WRITERS -eq 0 ]] ; then
+        change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "Changed state, marking write node ONLINE"
+        echo "1" > ${RELOAD_CHECK_FILE}
+      fi
+    fi
+  fi
+  # WSREP status is not ok, but the node is marked online, we should put it offline
+  if [[ -z "$PXC_MAIN_MODE" ]]; then
+    if [ "${WSREP_STATUS}" != "4" -a "$stat" = "ONLINE" ]; then
+      change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "WSREP status is ${WSREP_STATUS} which is not ok"
+      echo "1" > ${RELOAD_CHECK_FILE}
+    elif [ "${WSREP_STATUS}" != "4" -a "$stat" = "OFFLINE_SOFT" ]; then
+      echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, WSREP status is ${WSREP_STATUS} which is not ok"
+    fi
+  else
+    if [ "${WSREP_STATUS}" != "4" -a "$stat" = "ONLINE" ]; then
+      change_server_status $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "WSREP status is ${WSREP_STATUS} which is not ok"
+      echo "1" > ${RELOAD_CHECK_FILE}
+    elif [ "${PXC_MAIN_MODE}" != "DISABLED" -a "$stat" = "ONLINE" ];then
+      echoit "Changing server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE"
+      change_server_status  $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "Changed  server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE" 2>> ${ERR_FILE}
+      echo "1" > ${RELOAD_CHECK_FILE}
+    elif [ "${WSREP_STATUS}" != "4" -a "$stat" = "OFFLINE_SOFT" ]; then
+      echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, WSREP status is ${WSREP_STATUS} which is not ok"
+    fi
+
+  fi
+done
+
+# NUMBER_WRITERS_ONLINE is lost after loop
+NUMBER_WRITERS_ONLINE=$(proxysql_exec "SELECT count(*) FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_WRITER_ID) AND status = 'ONLINE' AND comment <> 'SLAVEREAD'" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+
+
+NUMBER_READERS_ONLINE=0
+if [ ${HOSTGROUP_READER_ID} -ne -1 ]; then
+
+  echoit "###### HANDLE READER NODES ######"
+  if [ $WRITER_IS_READER -eq 1 ]; then
+    READER_PROXYSQL_QUERY="SELECT hostgroup_id, hostname, port, status, 'NULL' FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_READER_ID) AND status <> 'OFFLINE_HARD' AND comment <> 'SLAVEREAD' ORDER BY weight DESC, hostname, port"
+  elif [ $WRITER_IS_READER -eq 0 ]; then
+    # We will not try to change reader state of nodes that are writer ONLINE, so what we do is we ORDER BY writer.status ASC because by accident ONLINE is last in the line
+    READER_PROXYSQL_QUERY="SELECT reader.hostgroup_id,
+         reader.hostname,
+         reader.port,
+         reader.status,
+         writer.status
+  FROM mysql_servers as reader
+  LEFT JOIN mysql_servers as writer
+    ON writer.hostgroup_id = $HOSTGROUP_WRITER_ID
+    AND writer.hostname = reader.hostname
+    AND writer.port = reader.port
+  WHERE reader.hostgroup_id = $HOSTGROUP_READER_ID
+    AND reader.status <> 'OFFLINE_HARD'
+        AND reader.comment <> 'SLAVEREAD'
+  ORDER BY writer.status ASC,
+           reader.weight DESC,
+           reader.hostname,
+           reader.port"
+  fi
+
+  OFFLINE_READERS_FOUND=0
+  proxysql_exec "$READER_PROXYSQL_QUERY" | while read hostgroup server port stat writer_stat
+  do
+    PXC_MAIN_MODE=$(mysql_exec "SHOW VARIABLES LIKE 'pxc_maint_mode'" 2>>${ERR_FILE} | tail -1 2>>${ERR_FILE})
+    WSREP_STATUS=$(mysql_exec "SHOW STATUS LIKE 'wsrep_local_state'" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+
+    echoit "--> Checking READ server $hostgroup:$server:$port, current status $stat, wsrep_local_state $WSREP_STATUS"
+
+    if [ $WRITER_IS_READER -eq 0 -a "$writer_stat" == "ONLINE" ] ; then
+
+      if [ $OFFLINE_READERS_FOUND -eq 0 ] ; then
+        if [ -z "$PXC_MAIN_MODE" ]; then
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" ] ; then
+            echoit "server $hostgroup:$server:$port is already ONLINE, is also write node in ONLINE state, not enough non-ONLINE readers found"
+          fi
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" ] ; then
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "marking ONLINE write node as read ONLINE state, not enough non-ONLINE readers found"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          fi
+        else
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+            echoit "server $hostgroup:$server:$port is already ONLINE, is also write node in ONLINE state, not enough non-ONLINE readers found"
+          fi
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE"  -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "marking ONLINE write node as read ONLINE state, not enough non-ONLINE readers found"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          elif [ "${PXC_MAIN_MODE}" != "DISABLED" -a "$stat" = "ONLINE" ];then
+            echoit "Changing server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE"
+            change_server_status  $hostgroup "$server" $port "OFFLINE_SOFT" "Changed  server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE" 2>> ${ERR_FILE}
+            echo "1" > ${RELOAD_CHECK_FILE}
+          fi
+        fi
+      else
+        if [[ -z "$PXC_MAIN_MODE" ]]; then
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" ] ; then
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "OFFLINE_SOFT" "making ONLINE writer node as read OFFLINE_SOFT as well because writers should not be readers"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          fi
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" ] ; then
+            echoit "server $hostgroup:$server:$port is $stat, keeping node in $stat is a writer ONLINE and it's preferred not to have writers as readers"
+          fi
+        else
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "OFFLINE_SOFT" "making ONLINE writer node as read OFFLINE_SOFT as well because writers should not be readers"
+            echo "1" > ${RELOAD_CHECK_FILE}
+          fi
+          if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+            echoit "server $hostgroup:$server:$port is $stat, keeping node in $stat is a writer ONLINE and it's preferred not to have writers as readers"
+          elif [ "${PXC_MAIN_MODE}" != "DISABLED" -a "$stat" = "ONLINE" ];then
+            echoit "Changing server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE"
+            change_server_status  $hostgroup "$server" $port "OFFLINE_SOFT" "Changed  server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE" 2>> ${ERR_FILE}
+            echo "1" > ${RELOAD_CHECK_FILE}
+          fi
+        fi
+      fi
+    else
+      if [[ -z "$PXC_MAIN_MODE" ]]; then
+        if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" ] ; then
+          echoit "server $hostgroup:$server:$port is already ONLINE"
+          OFFLINE_READERS_FOUND=$(( $OFFLINE_READERS_FOUND + 1 ))
+        fi
+
+        # WSREP status OK, but node is not marked ONLINE
+        if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" ] ; then
+          change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "changed state, making read node ONLINE"
+          echo "1" > ${RELOAD_CHECK_FILE}
+          OFFLINE_READERS_FOUND=$(( $OFFLINE_READERS_FOUND + 1 ))
+        fi
+      else
+        if [ "${WSREP_STATUS}" = "4" -a "$stat" == "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+          echoit "server $hostgroup:$server:$port is already ONLINE"
+          OFFLINE_READERS_FOUND=$(( $OFFLINE_READERS_FOUND + 1 ))
+        elif [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" -a "${PXC_MAIN_MODE}" != "DISABLED" ] ; then
+          echoit "server $hostgroup:$server:$port is $stat"
+          OFFLINE_READERS_FOUND=$(( $OFFLINE_READERS_FOUND + 1 ))
+        fi
+
+        # WSREP status OK, but node is not marked ONLINE
+        if [ "${WSREP_STATUS}" = "4" -a "$stat" != "ONLINE" -a "${PXC_MAIN_MODE}" == "DISABLED" ] ; then
+          change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "changed state, making read node ONLINE"
+          echo "1" > ${RELOAD_CHECK_FILE}
+          OFFLINE_READERS_FOUND=$(( $OFFLINE_READERS_FOUND + 1 ))
+        elif [ "${PXC_MAIN_MODE}" != "DISABLED" -a "$stat" = "ONLINE" ];then
+          echoit "Changing server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE"
+          change_server_status  $hostgroup "$server" $port "OFFLINE_SOFT" "Changed  server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE" 2>> ${ERR_FILE}
+          echo "1" > ${RELOAD_CHECK_FILE}
+        fi
+      fi
+    fi
+    # WSREP status is not ok, but the node is marked online, we should put it offline
+    if [ -z "$PXC_MAIN_MODE" ]; then
+      if [ "${WSREP_STATUS}" != "4" -a "$stat" = "ONLINE" ]; then
+        change_server_status $HOSTGROUP_READER_ID "$server" $port "OFFLINE_SOFT" "WSREP status is ${WSREP_STATUS} which is not ok"
+        echo "1" > ${RELOAD_CHECK_FILE}
+      elif [ "${WSREP_STATUS}" != "4" -a "$stat" = "OFFLINE_SOFT" ]; then
+        echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, WSREP status is ${WSREP_STATUS} which is not ok"
+      fi
+    else
+      if [ "${WSREP_STATUS}" != "4" -a "$stat" = "ONLINE" ]; then
+        change_server_status $HOSTGROUP_READER_ID "$server" $port "OFFLINE_SOFT" "WSREP status is ${WSREP_STATUS} which is not ok"
+        echo "1" > ${RELOAD_CHECK_FILE}
+      elif [ "${PXC_MAIN_MODE}" != "DISABLED" -a "$stat" = "ONLINE" ];then
+        echoit "Changing server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE"
+        change_server_status  $HOSTGROUP_WRITER_ID "$server" $port "OFFLINE_SOFT" "Changed  server $hostgroup:$server:$port to status OFFLINE_SOFT due to $PXC_MAIN_MODE" 2>> ${ERR_FILE}
+        echo "1" > ${RELOAD_CHECK_FILE}
+      elif [ "${WSREP_STATUS}" != "4" -a "$stat" = "OFFLINE_SOFT" ]; then
+        echoit "server $hostgroup:$server:$port is already OFFLINE_SOFT, WSREP status is ${WSREP_STATUS} which is not ok"
+      fi
+    fi
+  done
+
+  NUMBER_READERS_ONLINE=$(proxysql_exec "SELECT count(*) FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_READER_ID) AND status = 'ONLINE' AND comment <> 'SLAVEREAD'" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+fi
+
+echoit "###### SUMMARY ######"
+echoit "--> Number of writers that are 'ONLINE': ${NUMBER_WRITERS_ONLINE} : hostgroup: ${HOSTGROUP_WRITER_ID}"
+[[ ${HOSTGROUP_READER_ID} -ne -1 ]] && echoit "--> Number of readers that are 'ONLINE': ${NUMBER_READERS_ONLINE} : hostgroup: ${HOSTGROUP_READER_ID}"
+
+
+cnt=0
+# We don't have any writers... alert, try to bring some online!
+# This includes bringing a DONOR online
+if [[ ${NUMBER_WRITERS_ONLINE} -eq 0 ]]; then
+  echoit "###### TRYING TO FIX MISSING WRITERS ######"
+  echoit "No writers found, Trying to enable last available node of the cluster (in Donor/Desync state)"
+  proxysql_exec "SELECT hostgroup_id, hostname, port, status FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_WRITER_ID) AND status <> 'OFFLINE_HARD' AND comment <> 'SLAVEREAD'" | while read hostgroup server port stat
+  do
+    safety_cnt=0
+      while [ ${cnt} -le $NUMBER_WRITERS -a ${safety_cnt} -lt 5 ]
+      do
+        WSREP_STATUS=$(mysql_exec "SHOW STATUS LIKE 'wsrep_local_state'" 2>>${ERR_FILE} | tail -1 2>>${ERR_FILE})
+        echoit "Check server $hostgroup:$server:$port for only available node in DONOR state, status $stat , wsrep_local_state $WSREP_STATUS"
+        if [ "${WSREP_STATUS}" = "2" -a "$stat" != "ONLINE" ] # if we are on Donor/Desync an not online in mysql_servers -> proceed
+        then
+          PROXY_RUNTIME_STATUS=$(proxysql_exec "SELECT status FROM runtime_mysql_servers WHERE hostname='${server}' AND port='${port}' AND hostgroup_id='${hostgroup}'")
+          if [ "${PROXY_RUNTIME_STATUS}" != "ONLINE" ] # if we are not online in runtime_mysql_servers, proceed to change the server status and reload mysql_servers
+          then
+            change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "WSREP status is DESYNC/DONOR, as this is the only node we will put this one online"
+            echo "1" > ${RELOAD_CHECK_FILE}
+            cnt=$(( $cnt + 1 ))
+          else # otherwise (we are already ONLINE in runtime_mysql_servers) no need to reload so let's just remove RELOAD_CHECK_FILE and update it to ONLINE in mysql_servers (in case something would reload it)
+            rm ${RELOAD_CHECK_FILE}
+            cnt=$(( $cnt + 1 ))
+            change_server_status $HOSTGROUP_WRITER_ID "$server" $port "ONLINE" "WSREP status is DESYNC/DONOR, as this is the only node we will put this one online"
+          fi
+        fi
+        safety_cnt=$(( $safety_cnt + 1 ))
+    done
+  done
+fi
+
+
+cnt=0
+# We don't have any readers... alert, try to bring some online!
+if [[  ${HOSTGROUP_READER_ID} -ne -1 && ${NUMBER_READERS_ONLINE} -eq 0 ]]; then
+  echoit "###### TRYING TO FIX MISSING READERS ######"
+  echoit "--> No readers found, Trying to enable last available node of the cluster (in Donor/Desync state) or pick the master"
+  proxysql_exec "SELECT hostgroup_id, hostname, port, status FROM mysql_servers WHERE hostgroup_id IN ($HOSTGROUP_READER_ID) AND status <> 'OFFLINE_HARD' AND comment <> 'SLAVEREAD'" | while read hostgroup server port stat
+  do
+    safety_cnt=0
+      while [[ ${cnt} -eq 0 && ${safety_cnt} -lt 5 ]]
+      do
+        WSREP_STATUS=$(mysql_exec "SHOW STATUS LIKE 'wsrep_local_state'" 2>>${ERR_FILE} | tail -1 2>>${ERR_FILE})
+        echoit "Check server $hostgroup:$server:$port for only available node in DONOR state, status $stat , wsrep_local_state $WSREP_STATUS"
+        if [ "${WSREP_STATUS}" = "2" -a "$stat" != "ONLINE" ];then # if we are on Donor/Desync an not online in mysql_servers -> proceed
+          PROXY_RUNTIME_STATUS=$(proxysql_exec "SELECT status FROM runtime_mysql_servers WHERE hostname='${server}' AND port='${port}' AND hostgroup_id='${hostgroup}'")
+          if [ "${PROXY_RUNTIME_STATUS}" != "ONLINE" ] # if we are not online in runtime_mysql_servers, proceed to change the server status and reload mysql_servers
+          then
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "WSREP status is DESYNC/DONOR, as this is the only node we will put this one online"
+            echo "1" > ${RELOAD_CHECK_FILE}
+            cnt=$(( $cnt + 1 ))
+          else # otherwise (we are already ONLINE in runtime_mysql_servers) no need to reload so let's just remove RELOAD_CHECK_FILE and update it to ONLINE in mysql_servers (in case something would reload it)
+            rm ${RELOAD_CHECK_FILE}
+            cnt=$(( $cnt + 1 ))
+            change_server_status $HOSTGROUP_READER_ID "$server" $port "ONLINE" "WSREP status is DESYNC/DONOR, as this is the only node we will put this one online"
+          fi
+        fi
+        safety_cnt=$(( $safety_cnt + 1 ))
+    done
+  done
+  CHECK_SLAVE=$(proxysql_exec "SELECT hostname FROM mysql_servers WHERE comment='SLAVEREAD' AND status='ONLINE'" 2>>${ERR_FILE}| tail -1 2>>${ERR_FILE})
+  IS_QUERY_RULE_ACTIVE=$(proxysql_exec "SELECT active FROM mysql_query_rules WHERE destination_hostgroup=$HOSTGROUP_READER_ID limit 1;" 2>> ${ERR_FILE} | tail -1 2>>${ERR_FILE})
+  if [[ "$IS_QUERY_RULE_ACTIVE" != "" ]]; then
+    if [ "$MODE" == "singlewrite" ]; then
+      if [[ -z ${CHECK_SLAVE} ]]; then
+        if [[ ${IS_QUERY_RULE_ACTIVE} -eq 1 ]]; then
+          proxysql_exec "UPDATE mysql_query_rules SET active=0 WHERE destination_hostgroup=$HOSTGROUP_READER_ID;" 2>> ${ERR_FILE}
+          proxysql_exec "LOAD MYSQL QUERY RULES TO RUNTIME;" 2>> ${ERR_FILE}
+          echoit "No readers found, marking single writer node as read/write mode"
+        fi
+      else
+        if [[ ${IS_QUERY_RULE_ACTIVE} -eq 0 ]]; then
+          proxysql_exec "UPDATE mysql_query_rules SET active=1 WHERE destination_hostgroup=$HOSTGROUP_READER_ID;" 2>> ${ERR_FILE}
+          proxysql_exec "LOAD MYSQL QUERY RULES TO RUNTIME;" 2>> ${ERR_FILE}
+          echoit "Slave host is online, disabling read transaction from writer node"
+        fi
+      fi
+    fi
+  fi
+fi
+
+if [ "$MODE" == "singlewrite" ]; then
+  if [[  ${HOSTGROUP_READER_ID} -ne -1 && ${NUMBER_READERS_ONLINE} -gt 0 ]]; then
+    IS_QUERY_RULE_ACTIVE=$(proxysql_exec "SELECT active FROM mysql_query_rules WHERE destination_hostgroup=$HOSTGROUP_READER_ID limit 1;" 2>> ${ERR_FILE} | tail -1 2>>${ERR_FILE})
+    if [[ "$IS_QUERY_RULE_ACTIVE" != "" ]]; then
+      if [[ ${IS_QUERY_RULE_ACTIVE} -eq 0 ]]; then
+        proxysql_exec "UPDATE mysql_query_rules SET active=1 WHERE destination_hostgroup=$HOSTGROUP_READER_ID;" 2>> ${ERR_FILE}
+        proxysql_exec "LOAD MYSQL QUERY RULES TO RUNTIME;" 2>> ${ERR_FILE}
+        echoit "Found reader, disabling read transaction from writer node"
+      fi
+    fi
+  fi
+fi
+
+if [[ $(cat ${RELOAD_CHECK_FILE})  -ne 0 ]] ; then
+    echoit "###### Loading mysql_servers config into runtime ######"
+    proxysql_exec "LOAD MYSQL SERVERS TO RUNTIME;" 2>> ${ERR_FILE}
+else
+    echoit "###### Not loading mysql_servers, no change needed ######"
+fi
+
+rm $CHECKER_PIDFILE
+exit 0

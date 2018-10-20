@@ -101,6 +101,13 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   file {
+    '/usr/bin/proxysql_galera_checker':
+      owner  => root,
+      group  => root,
+      mode   => '0755',
+      require => Package['proxysql'],
+      notify  => Service['proxysql'],
+      source => "puppet:///modules/${module_name}/proxysql_galera_checker";
     '/var/lib/mysql':
       ensure  => directory,
       owner   => proxysql,
