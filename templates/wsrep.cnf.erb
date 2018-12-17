@@ -9,6 +9,11 @@
 [mysqld]
 wsrep_on                       = ON
 <%
+if @memorysize_mb.to_f > 7500
+  wsrep_max_ws_size_value = '2G'
+else
+  wsrep_max_ws_size_value = '1G'
+end
 gcomm_list = 'gcomm://'
 if @force_ipv6
   myip = "[" + @ipaddress6 + "]"
@@ -50,10 +55,10 @@ wsrep_cluster_name             = "<%= @galera_cluster_name %>"
 wsrep_certify_nonPK            = 1
 
 # Maximum number of rows in write set
-wsrep_max_ws_rows              = 131072
+wsrep_max_ws_rows              = 128k
 
 # Maximum size of write set
-wsrep_max_ws_size              = 1073741824
+wsrep_max_ws_size              = "<%= @wsrep_max_ws_size_value %>"
 
 # to enable debug level logging, set this to 1
 wsrep_debug                    = 0
