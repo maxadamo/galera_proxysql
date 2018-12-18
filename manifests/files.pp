@@ -8,6 +8,7 @@ class galera_proxysql::files (
   $backup_dir                   = $::galera_proxysql::params::backup_dir,
   $backup_retention             = $::galera_proxysql::params::backup_retention,
   $custom_server_cnf_parameters = $::galera_proxysql::params::custom_server_cnf_parameters,
+  $custom_client_cnf_parameters = $::galera_proxysql::params::custom_client_cnf_parameters,
   $force_ipv6                   = $::galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $::galera_proxysql::params::galera_hosts,
@@ -77,7 +78,7 @@ class galera_proxysql::files (
     '/etc/my.cnf.d/client.cnf':
       source  => "puppet:///modules/${module_name}/client.cnf";
     '/etc/my.cnf.d/mysql-clients.cnf':
-      source  => "puppet:///modules/${module_name}/mysql-clients.cnf";
+      content => template("${module_name}/mysql-clients.cnf");
     '/etc/my.cnf.d/server.cnf':
       content => template("${module_name}/server.cnf.erb");
     '/etc/my.cnf.d/wsrep.cnf':

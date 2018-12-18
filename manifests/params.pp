@@ -18,6 +18,7 @@ class galera_proxysql::params {
 
   # galera parameters
   $custom_server_cnf_parameters = undef
+  $custom_client_cnf_parameters = undef
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef
   $innodb_buffer_pool_size = '0.7'

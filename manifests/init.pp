@@ -24,6 +24,9 @@
 # [*custom_server_cnf_parameters*] <String>
 #   default: undef (it can be a multiline string with custom values to add to server.cnf)
 #
+# [*custom_client_cnf_parameters*] <String>
+#   default: undef (it can be a multiline string with custom values to add to mysql-client.cnf under section [mysql])
+#
 # [*daily_hotbackup*] <Bool>
 #   WIP: not yet in use
 #
@@ -132,6 +135,7 @@ class galera_proxysql (
   $backup_dir                   = $::galera_proxysql::params::backup_dir,
   $backup_retention             = $::galera_proxysql::params::backup_retention,
   $custom_server_cnf_parameters = $::galera_proxysql::params::custom_server_cnf_parameters,
+  $custom_client_cnf_parameters = $::galera_proxysql::params::custom_client_cnf_parameters,
   $daily_hotbackup              = $::galera_proxysql::params::daily_hotbackup,
   $force_ipv6                   = $::galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
@@ -218,6 +222,7 @@ class galera_proxysql (
       backup_dir                   => $backup_dir,
       backup_retention             => $backup_retention,
       custom_server_cnf_parameters => $custom_server_cnf_parameters,
+      custom_client_cnf_parameters => $custom_client_cnf_parameters,
       force_ipv6                   => $force_ipv6,
       galera_cluster_name          => $galera_cluster_name,
       galera_hosts                 => $galera_hosts,
