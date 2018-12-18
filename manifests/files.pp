@@ -78,7 +78,7 @@ class galera_proxysql::files (
     '/etc/my.cnf.d/client.cnf':
       source  => "puppet:///modules/${module_name}/client.cnf";
     '/etc/my.cnf.d/mysql-clients.cnf':
-      content => template("${module_name}/mysql-clients.cnf");
+      content => template("${module_name}/mysql-clients.cnf.erb");
     '/etc/my.cnf.d/server.cnf':
       content => template("${module_name}/server.cnf.erb");
     '/etc/my.cnf.d/wsrep.cnf':
