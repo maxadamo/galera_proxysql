@@ -20,18 +20,18 @@ class galera_proxysql::proxysql::keepalived (
 
   keepalived::vrrp::script { 'check_proxysql':
     script   => 'killall -0 proxysql',
-    interval => '2',
-    weight   => '2';
+    interval => 2,
+    weight   => 2;
   }
 
   if ($use_ipv6) {
     keepalived::vrrp::instance { 'ProxySQL':
       interface                  => $network_interface,
       state                      => 'BACKUP',
-      virtual_router_id          => '50',
+      virtual_router_id          => 50,
       unicast_source_ip          => $::ipaddress,
       unicast_peers              => [$peer_ip],
-      priority                   => '100',
+      priority                   => 100,
       auth_type                  => 'PASS',
       auth_pass                  => 'secret',
       virtual_ipaddress          => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",
@@ -42,10 +42,10 @@ class galera_proxysql::proxysql::keepalived (
     keepalived::vrrp::instance { 'ProxySQL':
       interface         => $network_interface,
       state             => 'BACKUP',
-      virtual_router_id => '50',
+      virtual_router_id => 50,
       unicast_source_ip => $::ipaddress,
       unicast_peers     => [$peer_ip],
-      priority          => '100',
+      priority          => 100,
       auth_type         => 'PASS',
       auth_pass         => 'secret',
       virtual_ipaddress => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",
