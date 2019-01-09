@@ -15,7 +15,7 @@ define galera_proxysql::create::user (
   } else {
     $host_hash = $galera_hosts
   }
-  $schema_name = inline_template('<%= @table.split(".")[0] %>')
+  $schema_name = split($table, '.')[0]
 
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {

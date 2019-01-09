@@ -13,7 +13,7 @@ class galera_proxysql::backup (
   $backup_dir          = $::galera_proxysql::params::backup_dir,
 ) {
 
-  $nodes = keys($galera_hosts)
+  $nodes = sort(keys($galera_hosts))
 
   if ($daily_hotbackup) {
     $ensure = 'present'
@@ -29,7 +29,7 @@ class galera_proxysql::backup (
   }
 
   # Crontab entry to run daily backups only on the second node
-  if $::fqdn == (inline_template('<%= @nodes.sort[1] %>')) {
+  if ($::fqdn == $nodes[1]) {
     cron { "${galera_cluster_name}-${::hostname}-backup-script":
       ensure  => $ensure,
       command => '/root/bin/hotbackup.sh',

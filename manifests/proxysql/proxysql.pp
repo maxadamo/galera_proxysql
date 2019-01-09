@@ -49,8 +49,8 @@ class galera_proxysql::proxysql::proxysql (
   $http_proxy                     = $::galera_proxysql::params::http_proxy,
 ) inherits galera_proxysql::params {
 
-  $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
-  $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
+  $proxysql_key_first = keys($proxysql_hosts)[0]
+  $vip_key = keys($proxysql_vip)[0]
   $vip_ip = $proxysql_vip[$vip_key]['ipv4']
   if has_key($proxysql_hosts[$proxysql_key_first], 'ipv6') {
     $ipv6_true = true

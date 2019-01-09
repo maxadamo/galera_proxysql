@@ -194,8 +194,8 @@ class galera_proxysql (
     notify { 'Cluster status': message => $msg; }
   }
 
-  $cluster_size = inline_template('<%= @galera_hosts.keys.count %>')
-  $cluster_size_odd = inline_template('<% if @galera_hosts.keys.count.to_i.odd? -%>true<% end -%>')
+  $cluster_size = lenght(keys($galera_hosts))
+  $cluster_size_odd = inline_template('<% if @cluster_size.to_i.odd? -%>true<% end -%>')
 
   #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
   unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd')}
@@ -207,7 +207,7 @@ class galera_proxysql (
   if $manage_lvm and $vg_name == undef { fail('manage_lvm is true but vg_name is undef') }
   if $manage_lvm == undef and $lv_size { fail('manage_lvm is undef but lv_size is defined') }
 
-  $galera_first_key = inline_template('<% @galera_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
+  $galera_first_key = keys($galera_hosts)[0]
   if has_key($galera_hosts[$galera_first_key], 'ipv6') {
     $ipv6_true = true
   } else {

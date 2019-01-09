@@ -7,9 +7,9 @@ class galera_proxysql::proxysql::keepalived (
   $use_ipv6       = undef
 ) inherits galera_proxysql::params {
 
-  $vip_key = inline_template('<% @proxysql_vip.each do |key, value| %><%= key %><% end -%>')
-  $proxysql_key_first = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 0 %><%= key %><% end -%><% end -%>')
-  $proxysql_key_second = inline_template('<% @proxysql_hosts.each_with_index do |(key, value), index| %><% if index == 1 %><%= key %><% end -%><% end -%>')
+  $vip_key = keys($proxysql_vip)[0]
+  $proxysql_key_first = keys($proxysql_hosts)[0]
+  $proxysql_key_second = keys($proxysql_hosts)[1]
   $peer_ip = $::fqdn ? {
     $proxysql_key_first  => $proxysql_hosts[$proxysql_key_second]['ipv4'],
     $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
