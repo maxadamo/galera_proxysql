@@ -194,7 +194,7 @@ class galera_proxysql (
     notify { 'Cluster status': message => $msg; }
   }
 
-  $cluster_size = lenght(keys($galera_hosts))
+  $cluster_size = length(keys($galera_hosts))
   $cluster_size_odd = inline_template('<% if @cluster_size.to_i.odd? -%>true<% end -%>')
 
   #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
