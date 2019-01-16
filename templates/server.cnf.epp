@@ -4,12 +4,12 @@
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
 #
-<% $buf_pool_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::innodb_buffer_pool_size)) %>
+<% $buf_pool_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::innodb_buffer_pool_size)) -%>
 <% if $galera_proxysql::files::force_ipv6 { -%>
 [sst]
 sockopt                        = "pf=ip6"
 
-<% } %>
+<% } -%>
 [mysqld]
 default_storage_engine         = InnoDB
 user                           = mysql

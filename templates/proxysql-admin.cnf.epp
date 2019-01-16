@@ -1,7 +1,7 @@
 # proxysql admin interface credentials.
 export PROXYSQL_DATADIR='/var/lib/proxysql'
 export PROXYSQL_USERNAME='admin'
-export PROXYSQL_PASSWORD='<%= @proxysql_admin_password %>'
+export PROXYSQL_PASSWORD='<%= $galera_proxysql::proxysql::proxysql::proxysql_admin_password %>'
 export PROXYSQL_HOSTNAME='127.0.0.1'
 export PROXYSQL_PORT='3307'
 
@@ -13,7 +13,7 @@ export CLUSTER_PORT='3306'
 
 # proxysql monitoring user. proxysql admin script will create this user in pxc to monitor pxc-nodes.
 export MONITOR_USERNAME='monitor'
-export MONITOR_PASSWORD='<%= @monitor_password %>'
+export MONITOR_PASSWORD='<%= $galera_proxysql::proxysql::proxysql::monitor_password %>'
 
 # Application user to connect to pxc-node through proxysql
 export CLUSTER_APP_USERNAME='proxysql_user'

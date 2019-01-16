@@ -101,9 +101,10 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   file {
+    default:
+      owner => root,
+      group => root;
     '/usr/bin/proxysql_galera_checker':
-      owner   => root,
-      group   => root,
       mode    => '0755',
       require => Package['proxysql'],
       notify  => Service['proxysql'],
@@ -115,16 +116,13 @@ class galera_proxysql::proxysql::proxysql (
       require => Package['proxysql'],
       notify  => Service['proxysql'];
     '/root/.my.cnf':
-      owner   => root,
-      group   => root,
       content => "[client]\nuser=monitor\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n";
     '/etc/proxysql-admin.cnf':
       mode    => '0640',
-      owner   => root,
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'],
-      content => template("${module_name}/proxysql-admin.cnf.erb");
+      content => epp("${module_name}/proxysql-admin.cnf.epp");
   }
 
   concat { '/etc/proxysql.cnf':
