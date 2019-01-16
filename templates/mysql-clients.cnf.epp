@@ -4,7 +4,7 @@
 #
 [mysql]
 prompt = "\u@\h [DB: \d]> "
-<%= @custom_client_cnf_parameters %>
+<%= $galera_proxysql::files::custom_client_cnf_parameters %>
 
 [mysql_upgrade]
 
