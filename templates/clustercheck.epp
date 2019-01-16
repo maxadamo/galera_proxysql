@@ -1,5 +1,5 @@
 # Cluster Check
 MYSQL_USERNAME="monitor"
-MYSQL_PASSWORD="<%= @monitor_password %>"
+MYSQL_PASSWORD="<%= $monitor_password %>"
 MYSQL_HOST="localhost"
 MYSQL_PORT="3306"

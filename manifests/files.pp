@@ -74,7 +74,7 @@ class galera_proxysql::files (
       content => "[client]\nuser=root\npassword=${root_password}\n";
     '/etc/sysconfig/clustercheck':
       notify  => Xinetd::Service['galerachk'],
-      content => template("${module_name}/clustercheck.erb");
+      content => epp("${module_name}/clustercheck.epp");
     '/etc/my.cnf.d/client.cnf':
       source  => "puppet:///modules/${module_name}/client.cnf";
     '/etc/my.cnf.d/mysql-clients.cnf':
