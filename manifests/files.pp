@@ -80,7 +80,7 @@ class galera_proxysql::files (
     '/etc/my.cnf.d/mysql-clients.cnf':
       content => epp("${module_name}/mysql-clients.cnf.epp");
     '/etc/my.cnf.d/server.cnf':
-      content => template("${module_name}/server.cnf.erb");
+      content => epp("${module_name}/server.cnf.epp");
     '/etc/my.cnf.d/wsrep.cnf':
       mode    => '0640',
       content => template("${module_name}/wsrep.cnf.erb");

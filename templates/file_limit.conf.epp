@@ -1,4 +1,4 @@
 [Service]
-<% if $galera_proxysql::proxysql::service::limitnofile { %>
+<% if $galera_proxysql::proxysql::service::limitnofile { -%>
 LimitNOFILE=<%= $galera_proxysql::proxysql::service::limitnofile %>
 <% } %>

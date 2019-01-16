@@ -6,4 +6,5 @@ hostgroup: "fake"
 galera_joined_exist: true
 galera_status: "200"
 galera_rootcnf_exist: true
+memorysize_mb: "11929.47"
 
