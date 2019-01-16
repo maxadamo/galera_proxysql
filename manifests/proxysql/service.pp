@@ -30,7 +30,7 @@ class galera_proxysql::proxysql::service (
     '/etc/systemd/system/proxysql.service.d':
       ensure => directory;
     '/etc/systemd/system/proxysql.service.d/file_limit.conf':
-      content => template("${module_name}/file_limit.conf.erb"),
+      content => epp("${module_name}/file_limit.conf.epp"),
       require => File['/etc/systemd/system/proxysql.service.d'],
       notify  => [
         Exec["${module_name}_daemon_reload"],
