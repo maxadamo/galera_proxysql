@@ -79,25 +79,14 @@ class galera_proxysql::proxysql::proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
-  unless any2bool($manage_repo) == false {
-    package {
-      "Percona-Server-shared-compat-${percona_major_version}":
-        ensure  => installed,
-        require => Yumrepo_core['percona'],
-        before  => Class['::mysql::client'];
-      'proxysql':
-        ensure  => $proxysql_version,
-        require => [Class['::mysql::client'], Yumrepo_core['percona']];
-    }
-  } else {
-    package {
-      "Percona-Server-shared-compat-${percona_major_version}":
-        ensure => installed,
-        before => Class['::mysql::client'];
-      'proxysql':
-        ensure  => $proxysql_version,
-        require => Class['::mysql::client'];
-    }
+  package {
+    "Percona-Server-shared-compat-${percona_major_version}":
+      ensure  => installed,
+      require => Class['::galera_proxysql::repo'],
+      before  => Class['::mysql::client'];
+    'proxysql':
+      ensure  => $proxysql_version,
+      require => [Class['::mysql::client', '::galera_proxysql::repo']];
   }
 
   file {

@@ -5,7 +5,7 @@ class galera_proxysql::repo (
   $manage_repo = $::galera_proxysql::params::manage_repo
 ) inherits galera_proxysql::params {
 
-  unless any2bool($manage_repo) == false {
+  if $manage_repo {
     rpmkey { 'CD2EFD2A':
       ensure => present,
       source => 'http://www.percona.com/downloads/RPM-GPG-KEY-percona';
