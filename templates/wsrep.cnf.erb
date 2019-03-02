@@ -15,8 +15,6 @@ if @force_ipv6
     gcomm_list = gcomm_list + "[" + values['ipv6'] + "],"
   end
 else
-  myip = @ipaddress
-  anyip = "0.0.0.0"
   @galera_hosts.each do | key, values |
     gcomm_list = gcomm_list + values['ipv4'] + ","
   end
