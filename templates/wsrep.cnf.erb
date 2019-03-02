@@ -53,7 +53,7 @@ wsrep_provider_options         = "gmcast.listen_addr=tcp://0.0.0.0:4567;ist.recv
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
 wsrep_sst_receive_address      = "<%= @ipaddress %>:4444"
-<% end %>
+<% end -%>
 
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name             = "<%= @galera_cluster_name %>"
@@ -70,7 +70,7 @@ wsrep_max_ws_rows              = 128k
 wsrep_max_ws_size              = "2G"
 <% else -%>
 wsrep_max_ws_size              = "1G"
-<% end %>
+<% end -%>
 
 # to enable debug level logging, set this to 1
 wsrep_debug                    = 0
