@@ -7,7 +7,7 @@ stages:
 run_validation:
   stage: syntax
   script:
-    - pdk validate puppet,metadata,ruby
+    - pdk validate puppet,metadata,ruby --parallel
 
 run_unit_test:
   stage: unit

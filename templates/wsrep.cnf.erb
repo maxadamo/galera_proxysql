@@ -9,14 +9,13 @@
 [mysqld]
 wsrep_on                       = ON
 <%
-gcomm_list = 'gcomm://'
 if @force_ipv6
   @galera_hosts.each do | key, values |
-    gcomm_list = gcomm_list + "[" + values['ipv6'] + "],"
+    gcomm_list = 'gcomm://' + "[" + values['ipv6'] + "],"
   end
 else
   @galera_hosts.each do | key, values |
-    gcomm_list = gcomm_list + values['ipv4'] + ","
+    gcomm_list = 'gcomm://' + values['ipv4'] + ","
   end
 end
 gcomm_list = gcomm_list.chomp(",")
