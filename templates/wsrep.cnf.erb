@@ -36,7 +36,7 @@ wsrep_node_name                = <%= @hostname %>
 
 # node IP address
 <% if @force_ipv6 -%>
-wsrep_node_address             = "[::]:4567"
+wsrep_node_address             = "[<%= @ipaddress6 %>]:4567"
 
 # Provider specific configuration options
 wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= @ipaddress6 %>]:4568; gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
@@ -45,7 +45,7 @@ wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_ad
 # (SST method dependent. Defaults to the first IP of the first interface)
 wsrep_sst_receive_address      = "[<%= @ipaddress6 %>]:4444"
 <% else -%>
-wsrep_node_address             = "0.0.0.0:4567"
+wsrep_node_address             = "<%= @ipaddress %>:4567"
 
 # Provider specific configuration options
 wsrep_provider_options         = "gmcast.listen_addr=tcp://0.0.0.0:4567;ist.recv_addr=[<%= @ipaddress %>]:4568; gcache.size=<%= (@memorysize_mb.to_f * 0.15).floor %>M"
