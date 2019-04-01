@@ -1,6 +1,6 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
@@ -14,11 +14,11 @@
     },
     {
       "name": "puppetlabs-firewall",
-      "version_requirement": ">= 1.9.0 <= 1.14.0"
+      "version_requirement": ">= 1.9.0 <= 1.15.2"
     },
     {
       "name": "puppetlabs-mysql",
-      "version_requirement": ">= 3.1.1 <= 7.0.0"
+      "version_requirement": ">= 3.1.1 <= 8.0.1"
     },
     {
       "name": "stschulte-rpmkey",
@@ -26,11 +26,11 @@
     },
     {
       "name": "puppetlabs-xinetd",
-      "version_requirement": ">= 3.0.0 <= 3.1.0"
+      "version_requirement": ">= 3.0.0 <= 3.12.0"
     },
     {
       "name": "puppetlabs-yumrepo_core",
-      "version_requirement": ">= 1.0.0 <= 1.0.2"
+      "version_requirement": ">= 1.0.0 <= 1.0.3"
     }
   ],
   "data_provider": "hiera",
@@ -54,7 +54,7 @@
       "version_requirement": ">= 5.5.0 < 7.0.0"
     }
   ],
-  "pdk-version": "1.9.0",
+  "pdk-version": "1.9.1",
   "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
-  "template-ref": "1.9.0-0-g7281db5"
+  "template-ref": "1.9.1-0-g6945d31"
 }
