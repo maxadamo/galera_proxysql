@@ -128,7 +128,7 @@ class galera_proxysql (
   $manage_ipv6 = 'do_not_use',
 
   # print debug messages
-  $puppet_debug                 = $::galera_proxysql::params::puppet_debug,
+  Boolean $puppet_debug         = $::galera_proxysql::params::puppet_debug,
 
   # galera parameters
   $backup_compress              = $::galera_proxysql::params::backup_compress,
@@ -137,7 +137,7 @@ class galera_proxysql (
   $custom_server_cnf_parameters = $::galera_proxysql::params::custom_server_cnf_parameters,
   $custom_client_cnf_parameters = $::galera_proxysql::params::custom_client_cnf_parameters,
   $daily_hotbackup              = $::galera_proxysql::params::daily_hotbackup,
-  $force_ipv6                   = $::galera_proxysql::params::force_ipv6,
+  Boolean $force_ipv6           = $::galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $::galera_proxysql::params::galera_hosts,
   $innodb_buffer_pool_size      = $::galera_proxysql::params::innodb_buffer_pool_size,
@@ -172,8 +172,8 @@ class galera_proxysql (
 
   # common parameters
   $http_proxy                   = $::galera_proxysql::params::http_proxy,
-  $manage_firewall              = $::galera_proxysql::params::manage_firewall,
-  $manage_repo                  = $::galera_proxysql::params::manage_repo,
+  Boolean $manage_firewall      = $::galera_proxysql::params::manage_firewall,
+  Boolean $manage_repo          = $::galera_proxysql::params::manage_repo,
   $proxysql_hosts               = $::galera_proxysql::params::proxysql_hosts,
 
 ) inherits galera_proxysql::params {
@@ -182,7 +182,7 @@ class galera_proxysql (
 
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
-  unless any2bool($puppet_debug) == false {
+  if $puppet_debug {
     # checking cluster status through the facter galera_status
     if $::galera_status == '200' {
       $msg = "HTTP/1.1 ${::galera_status}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
@@ -269,7 +269,7 @@ class galera_proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
-  unless any2bool($manage_firewall) == false {
+  if $manage_firewall {
     class { 'galera_proxysql::firewall':
       use_ipv6         => $ipv6_true,
       galera_hosts     => $galera_hosts,

@@ -76,9 +76,9 @@ def ask(msg):
     """ Ask user confirmation """
     while True:
         print msg
-        go_ahead = raw_input('Would you like to continue? (y/Y|n/N) > ')
+        go_ahead = raw_input('Would you like to continue? (yY/nN) > ')
         if go_ahead.lower() != 'y' and go_ahead.lower() != 'n':
-            print 'you need to answer either y/Y|n/N\n'
+            print 'you need to answer either y/Y/n/N\n'
         else:
             break
     if go_ahead.lower() == 'n':

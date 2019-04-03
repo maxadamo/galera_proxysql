@@ -5,7 +5,7 @@
 class galera_proxysql::params {
 
   # print debug messages
-  $puppet_debug = undef
+  $puppet_debug = false
 
   # backup parameters (this funcionality is not yet properly implemented)
   $backup_compress = false
@@ -30,7 +30,7 @@ class galera_proxysql::params {
   $lv_size = undef
   $percona_major_version = '57'
   $percona_minor_version = 'installed'
-  $manage_lvm = undef
+  $manage_lvm = false
   $max_connections = 1024
   $monitor_password = undef
   $other_pkgs = [
