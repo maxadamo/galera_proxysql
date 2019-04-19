@@ -3,13 +3,13 @@ galera_proxysql::root_password: 'root_pass'
 galera_proxysql::sst_password: 'sst_pass'
 galera_proxysql::monitor_password: 'monitor_pass'
 galera_proxysql::galera_hosts:
-  galera01.example.org:
+  "%{fqdn}":
     ipv4: '192.168.1.10'
     ipv6: '2001:798:3::bf'
-  galera01.example.org:
+  galera02.example.org:
     ipv4: '192.168.1.11'
     ipv6: '2001:798:3::c1'
-  galera01.example.org:
+  galera03.example.org:
     ipv4: '192.168.1.12'
     ipv6: '2001:798:3::c2'
 galera_proxysql::proxysql_hosts:
