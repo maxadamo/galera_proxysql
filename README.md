@@ -16,17 +16,17 @@ This module sets up and bootstrap Galera cluster and ProxySQL.
 The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
 
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
+
 ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floating IP.
 
 * if you want only the Galera cluster you need _at least_ 3 servers and 3 ipv4 (and optionally 3 ipv6)
 * if you want the full stack you need _at least_ 5 servers and 6 IPv4 (and optionally 6 IPv6)
 
-Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` and `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
-The backup provided with this modules is indeed poor, but it can be considered as an example if you want to start using Percona XtraBackup.
+Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` or `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
+
+The backup script provided by this module is indeed poor, but it can be considered as an example if you want to start using Percona XtraBackup. You could also check Xtrabackup from puppetlabs/mysql
 
 **When bootstrapping, avoid running puppet on all the nodes at same time.** You need to bootstrap one node first.
-
-**stay tuned:** since the module is at an early stage, for the time being it will receive frequent updates.
 
 Read at (actual) **limitations** in the paragraph below.
 
@@ -169,7 +169,7 @@ galera_proxysql::create::user { 'zabbix':
 
 ## Limitations
 
-* missing SSL support (ProxySQL 1.4.xx support SSL only to the backends. ProxySQL 2. is still beta)
+* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (Right now I'm using ProxySQL 1.4.xx)
 * not yet tested on ipv4 only (it should work)
 * there are too many moving parts and I decided to temporarily remove support to Ubuntu.
 
