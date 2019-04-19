@@ -1,4 +1,8 @@
 # This file is managed by Puppet
 ALL_NODES = ["<%= $galera_joined_list %>"]
-CREDENTIALS = {"root": "<%= $root_password %>", "sstuser": "<%= $sst_password %>", "monitor": "<%= $monitor_password %>"}
+CREDENTIALS = {
+    "root": "<%= $root_password %>",
+    "sstuser": "<%= $sst_password %>",
+    "monitor": "<%= $monitor_password %>"
+}
 mydomain = "<%= $domain -%>"
