@@ -38,7 +38,7 @@ class galera_proxysql::files (
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
   }
 
-  $galera_joined_list = join($transformed_data, '", "')
+  $galera_joined_list = join($transformed_data, "\",\n    \"")
   if ($force_ipv6) {
     $_gcomm_list = join($transformed_data, '],[')
     $gcomm_list = "[${_gcomm_list}]"
