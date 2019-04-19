@@ -1,7 +1,7 @@
 # == Define: galera_proxysql::create::user
 #
 define galera_proxysql::create::user (
-  $dbpass,
+  Variant[Sensitive, String] $dbpass,
   $galera_hosts   = undef,
   $proxysql_hosts = {},
   $proxysql_vip   = {},
@@ -9,6 +9,16 @@ define galera_proxysql::create::user (
   $table          = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser         = $name
   ) {
+
+  if $dbpass =~ String {
+    notify { '"dbpass" String detected!':
+      message => 'It is advisable to use the Sensitive type for "dbpass"';
+    }
+    $dbpass_wrap = Sensitive($dbpass)
+  } else {
+    $dbpass_wrap = $dbpass
+  }
+
 
   if ($proxysql_hosts) {
     $host_hash = deep_merge($galera_hosts, $proxysql_hosts, $proxysql_vip)
@@ -21,7 +31,7 @@ define galera_proxysql::create::user (
     if ($galera_hosts) {
       mysql::db { $schema_name:
         user     => $dbuser,
-        password => $dbpass,
+        password => $dbpass_wrap.unwrap,
         grant    => $privileges,
         charset  => 'utf8',
         collate  => 'utf8_bin';
@@ -30,12 +40,12 @@ define galera_proxysql::create::user (
         mysql_user {
           "${dbuser}@${host_ips['ipv4']}":
             ensure        => present,
-            password_hash => mysql_password($dbpass),
+            password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           "${dbuser}@${host_name}":
             ensure        => present,
-            password_hash => mysql_password($dbpass),
+            password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
         }
@@ -56,7 +66,7 @@ define galera_proxysql::create::user (
         if has_key($host_ips, 'ipv6') {
           mysql_user { "${dbuser}@${host_ips['ipv6']}":
             ensure        => present,
-            password_hash => mysql_password($dbpass),
+            password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           }
@@ -73,10 +83,10 @@ define galera_proxysql::create::user (
       fail('hash galera_hosts not defined')
     }
   } else {
-    $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass}")+2
-    concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass}":
+    $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass_wrap.unwrap}")+2
+    concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrap}":
       target  => '/etc/proxysql.cnf',
-      content => ",{\n    username = \"${dbuser}\"\n    password = \"${dbpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => ",{\n    username = \"${dbuser}\"\n    password = \"${dbpass_wrap.unwrap}\"\n    default_hostgroup = 0\n    active = 1\n  }",
       order   => $concat_order;
     }
   }
