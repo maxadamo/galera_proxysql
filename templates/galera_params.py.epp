@@ -3,9 +3,9 @@ GALERA_NODES = [
     "<%= $galera_joined_list %>"
 ]
 CREDENTIALS = {
-    "root": "<%= $root_password %>",
-    "sstuser": "<%= $sst_password %>",
-    "monitor": "<%= $monitor_password %>"
+    "root": "<%= $root_password.unwrap %>",
+    "sstuser": "<%= $sst_password.unwrap %>",
+    "monitor": "<%= $monitor_password.unwrap %>"
 }
 MYIP = "<%= $myip %>"
 PING_CMD = "<%= $ping_cmd %>"

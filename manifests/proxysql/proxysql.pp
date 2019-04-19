@@ -20,7 +20,7 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to ProxySQL cluster.
 #   Currently only 2 hosts are supported. Check examples on README.md
 #
-# [*proxysql_admin_password*] <String>
+# [*proxysql_admin_password*] <Sensitive>
 #   proxysql user password
 #
 # [*proxysql_vip*] <Hash>
@@ -32,22 +32,42 @@
 #
 #
 class galera_proxysql::proxysql::proxysql (
-  String $percona_major_version   = $::galera_proxysql::params::percona_major_version,
-  Boolean $force_ipv6             = $::galera_proxysql::params::force_ipv6,
-  Hash $galera_hosts              = $::galera_proxysql::params::galera_hosts,
-  Boolean $manage_repo            = $::galera_proxysql::params::manage_repo,
-  Hash $proxysql_hosts            = $::galera_proxysql::params::proxysql_hosts,
-  Hash $proxysql_vip              = $::galera_proxysql::params::proxysql_vip,
-  String $monitor_password        = $::galera_proxysql::params::monitor_password,
-  String $proxysql_admin_password = $::galera_proxysql::params::proxysql_admin_password,
-  Hash $proxysql_users            = $::galera_proxysql::params::sqlproxy_users,
-  Array $trusted_networks         = $::galera_proxysql::params::trusted_networks,
-  String $network_interface       = $::galera_proxysql::params::network_interface,
-  String $proxysql_version        = $::galera_proxysql::params::proxysql_version,
-  String $proxysql_mysql_version  = $::galera_proxysql::params::proxysql_mysql_version,
-  $limitnofile                    = $::galera_proxysql::params::limitnofile,
-  $http_proxy                     = $::galera_proxysql::params::http_proxy,
+  String $percona_major_version      = $galera_proxysql::params::percona_major_version,
+  Boolean $force_ipv6                = $galera_proxysql::params::force_ipv6,
+  Hash $galera_hosts                 = $galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo               = $galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts               = $galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip                 = $galera_proxysql::params::proxysql_vip,
+  Hash $proxysql_users               = $galera_proxysql::params::sqlproxy_users,
+  Array $trusted_networks            = $galera_proxysql::params::trusted_networks,
+  String $network_interface          = $galera_proxysql::params::network_interface,
+  String $proxysql_version           = $galera_proxysql::params::proxysql_version,
+  String $proxysql_mysql_version     = $galera_proxysql::params::proxysql_mysql_version,
+  $limitnofile                       = $galera_proxysql::params::limitnofile,
+  $http_proxy                        = $galera_proxysql::params::http_proxy,
+
+  # Passwords
+  Variant[Sensitive, String] $monitor_password        = $galera_proxysql::params::monitor_password,
+  Variant[Sensitive, String] $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password
+
 ) inherits galera_proxysql::params {
+
+  if $monitor_password =~ String {
+    notify { '"monitor_password" String detected!':
+      message => 'It is advisable to use the Sensitive datatype for "monitor_password"';
+    }
+    $monitor_password_wrap = Sensitive($monitor_password)
+  } else {
+    $monitor_password_wrap = $monitor_password
+  }
+  if $proxysql_admin_password =~ String {
+    notify { '"proxysql_admin_password" String detected!':
+      message => 'It is advisable to use the Sensitive datatype for "proxysql_admin_password"';
+    }
+    $proxysql_admin_password_wrap = Sensitive($proxysql_admin_password)
+  } else {
+    $proxysql_admin_password_wrap = $proxysql_admin_password
+  }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $vip_key = keys($proxysql_vip)[0]
@@ -135,13 +155,16 @@ class galera_proxysql::proxysql::proxysql (
       require => Package['proxysql'],
       notify  => Service['proxysql'];
     '/root/.my.cnf':
-      content => "[client]\nuser=monitor\npassword=${monitor_password}\nprompt = \"\\u@\\h [DB: \\d]> \"\n";
+      content => Sensitive("[client]\nuser=monitor\npassword=${monitor_password_wrap.unwrap}\nprompt = \"\\u@\\h [DB: \\d]> \"\n");
     '/etc/proxysql-admin.cnf':
       mode    => '0640',
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'],
-      content => epp("${module_name}/proxysql-admin.cnf.epp");
+      content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
+        'monitor_password'        => Sensitive($monitor_password_wrap),
+        'proxysql_admin_password' => Sensitive($proxysql_admin_password_wrap)
+      }));
   }
 
   concat { '/etc/proxysql.cnf':
@@ -157,16 +180,16 @@ class galera_proxysql::proxysql::proxysql (
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_header.cnf.epp", {
-        'proxysql_admin_password' => $proxysql_admin_password,
+        'proxysql_admin_password' => Sensitive($proxysql_admin_password_wrap),
         'proxysql_mysql_version'  => $proxysql_mysql_version,
-        'monitor_password'        => $monitor_password,
+        'monitor_password'        => Sensitive($monitor_password_wrap),
         'server_list_write'       => $server_list_write,
         'server_list'             => $server_list
       }),
       order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
-      content => "  {\n    username = \"monitor\"\n    password = \"${monitor_password}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => "  {\n    username = \"monitor\"\n    password = \"${monitor_password_wrap.unwrap}\"\n    default_hostgroup = 0\n    active = 1\n  }",
       order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
