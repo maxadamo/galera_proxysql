@@ -69,7 +69,6 @@ class galera_proxysql::proxysql::proxysql (
     $proxysql_admin_password_wrap = $proxysql_admin_password
   }
 
-
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $vip_key = keys($proxysql_vip)[0]
   $vip_ip = $proxysql_vip[$vip_key]['ipv4']
@@ -162,7 +161,10 @@ class galera_proxysql::proxysql::proxysql (
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'],
-      content => epp("${module_name}/proxysql-admin.cnf.epp");
+      content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
+        'monitor_password'        => $monitor_password_wrap,
+        'proxysql_admin_password' => $proxysql_admin_password_wrap
+      }));
   }
 
   concat { '/etc/proxysql.cnf':
