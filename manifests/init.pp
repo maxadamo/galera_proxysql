@@ -89,19 +89,19 @@
 # [*proxysql_vip*] <Hash>
 #   host, ipv4 (optionally ipv6) for the VIP
 #
-# [*proxysql_admin_password*] <String>
+# [*proxysql_admin_password*] <Sensitive>
 #   proxysql user password
 #
-# [*monitor_password*] <String>
+# [*monitor_password*] <Sensitive>
 #   galera and proxysql monitor password
 #
 # [*other_pkgs*] <Array>
 #   list of packages needed by Percona Cluster
 #
-# [*root_password*]
+# [*root_password*] <Sensitive>
 #   MySQL root password
 #
-# [*sst_password*]
+# [*sst_password*] <Sensitive>
 #   SST user password
 #
 # [*thread_cache_size*] <Int>
@@ -116,7 +116,7 @@
 #
 # === ToDo
 #
-# - Add root password change
+# - Upgrade to ProxySQL 2.0
 #
 # === Authors
 #
@@ -124,61 +124,56 @@
 #
 class galera_proxysql (
 
-  # temporary parameter
-  $manage_ipv6 = 'do_not_use',
-
   # print debug messages
-  Boolean $puppet_debug         = $::galera_proxysql::params::puppet_debug,
+  Boolean $puppet_debug = $::galera_proxysql::params::puppet_debug,
 
   # galera parameters
-  $backup_compress              = $::galera_proxysql::params::backup_compress,
-  $backup_dir                   = $::galera_proxysql::params::backup_dir,
-  $backup_retention             = $::galera_proxysql::params::backup_retention,
-  $custom_server_cnf_parameters = $::galera_proxysql::params::custom_server_cnf_parameters,
-  $custom_client_cnf_parameters = $::galera_proxysql::params::custom_client_cnf_parameters,
-  $daily_hotbackup              = $::galera_proxysql::params::daily_hotbackup,
-  Boolean $force_ipv6           = $::galera_proxysql::params::force_ipv6,
-  $galera_cluster_name          = $::galera_proxysql::params::galera_cluster_name,
-  $galera_hosts                 = $::galera_proxysql::params::galera_hosts,
-  $innodb_buffer_pool_size      = $::galera_proxysql::params::innodb_buffer_pool_size,
-  $innodb_buffer_pool_instances = $::galera_proxysql::params::innodb_buffer_pool_instances,
-  $innodb_flush_method          = $::galera_proxysql::params::innodb_flush_method,
-  $innodb_io_capacity           = $::galera_proxysql::params::innodb_io_capacity,
-  $innodb_log_file_size         = $::galera_proxysql::params::innodb_log_file_size,
-  $logdir                       = $::galera_proxysql::params::logdir,
-  $lv_size                      = $::galera_proxysql::params::lv_size,
-  $percona_major_version        = $::galera_proxysql::params::percona_major_version,
-  $percona_minor_version        = $::galera_proxysql::params::percona_minor_version,
-  $manage_lvm                   = $::galera_proxysql::params::manage_lvm,
-  $max_connections              = $::galera_proxysql::params::max_connections,
-  $monitor_password             = $::galera_proxysql::params::monitor_password,
-  $other_pkgs                   = $::galera_proxysql::params::other_pkgs,
-  $query_cache_size             = $::galera_proxysql::params::query_cache_size,
-  $query_cache_type             = $::galera_proxysql::params::query_cache_type,
-  $root_password                = $::galera_proxysql::params::root_password,
-  $sst_password                 = $::galera_proxysql::params::sst_password,
-  $thread_cache_size            = $::galera_proxysql::params::thread_cache_size,
-  $tmpdir                       = $::galera_proxysql::params::tmpdir,
-  $trusted_networks             = $::galera_proxysql::params::trusted_networks,
-  $vg_name                      = $::galera_proxysql::params::vg_name,
+  $backup_compress                      = $galera_proxysql::params::backup_compress,
+  $backup_dir                           = $galera_proxysql::params::backup_dir,
+  $backup_retention                     = $galera_proxysql::params::backup_retention,
+  $custom_server_cnf_parameters         = $galera_proxysql::params::custom_server_cnf_parameters,
+  $custom_client_cnf_parameters         = $galera_proxysql::params::custom_client_cnf_parameters,
+  $daily_hotbackup                      = $galera_proxysql::params::daily_hotbackup,
+  Boolean $force_ipv6                   = $galera_proxysql::params::force_ipv6,
+  $galera_cluster_name                  = $galera_proxysql::params::galera_cluster_name,
+  $galera_hosts                         = $galera_proxysql::params::galera_hosts,
+  $innodb_buffer_pool_size              = $galera_proxysql::params::innodb_buffer_pool_size,
+  $innodb_buffer_pool_instances         = $galera_proxysql::params::innodb_buffer_pool_instances,
+  $innodb_flush_method                  = $galera_proxysql::params::innodb_flush_method,
+  $innodb_io_capacity                   = $galera_proxysql::params::innodb_io_capacity,
+  $innodb_log_file_size                 = $galera_proxysql::params::innodb_log_file_size,
+  $logdir                               = $galera_proxysql::params::logdir,
+  $lv_size                              = $galera_proxysql::params::lv_size,
+  $percona_major_version                = $galera_proxysql::params::percona_major_version,
+  $percona_minor_version                = $galera_proxysql::params::percona_minor_version,
+  $manage_lvm                           = $galera_proxysql::params::manage_lvm,
+  $max_connections                      = $galera_proxysql::params::max_connections,
+  Optional[Sensitive] $monitor_password = $galera_proxysql::params::monitor_password,
+  $other_pkgs                           = $galera_proxysql::params::other_pkgs,
+  $query_cache_size                     = $galera_proxysql::params::query_cache_size,
+  $query_cache_type                     = $galera_proxysql::params::query_cache_type,
+  Optional[Sensitive] $root_password    = $galera_proxysql::params::root_password,
+  Optional[Sensitive] $sst_password     = $galera_proxysql::params::sst_password,
+  $thread_cache_size                    = $galera_proxysql::params::thread_cache_size,
+  $tmpdir                               = $galera_proxysql::params::tmpdir,
+  $trusted_networks                     = $galera_proxysql::params::trusted_networks,
+  $vg_name                              = $galera_proxysql::params::vg_name,
 
   # proxysql parameters
-  $proxysql_version             = $::galera_proxysql::params::proxysql_version,
-  $proxysql_vip                 = $::galera_proxysql::params::proxysql_vip,
-  $proxysql_admin_password      = $::galera_proxysql::params::proxysql_admin_password,
+  $proxysql_version                            = $galera_proxysql::params::proxysql_version,
+  $proxysql_vip                                = $galera_proxysql::params::proxysql_vip,
+  Optional[Sensitive] $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration
-  $network_interface            = ::galera_proxysql::params::network_interface,
+  $network_interface = $galera_proxysql::params::network_interface,
 
   # common parameters
-  $http_proxy                   = $::galera_proxysql::params::http_proxy,
-  Boolean $manage_firewall      = $::galera_proxysql::params::manage_firewall,
-  Boolean $manage_repo          = $::galera_proxysql::params::manage_repo,
-  $proxysql_hosts               = $::galera_proxysql::params::proxysql_hosts,
+  $http_proxy              = $galera_proxysql::params::http_proxy,
+  Boolean $manage_firewall = $galera_proxysql::params::manage_firewall,
+  Boolean $manage_repo     = $galera_proxysql::params::manage_repo,
+  $proxysql_hosts          = $galera_proxysql::params::proxysql_hosts,
 
 ) inherits galera_proxysql::params {
-
-  if $manage_ipv6 != 'do_not_use' { fail('please remove the parameter "manage_ipv6". IPv6 is now auto-detected') }
 
   if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
 
@@ -214,7 +209,7 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
-  galera_proxysql::create::root_password { $root_password:; }
+  galera_proxysql::create::root_password { Sensitive($root_password):; }
 
   class {
     '::galera_proxysql::files':

@@ -1,5 +1,5 @@
 # Cluster Check
 MYSQL_USERNAME="monitor"
-MYSQL_PASSWORD="<%= $galera_proxysql::files::monitor_password %>"
+MYSQL_PASSWORD="<%= $galera_proxysql::files::monitor_password.unwrap %>"
 MYSQL_HOST="localhost"
 MYSQL_PORT="3306"

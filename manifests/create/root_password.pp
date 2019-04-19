@@ -5,12 +5,12 @@
 # if the password was changed on one node, it will fail in the other nodes
 # we need to let it fail and check it again, with the new password
 #
-# the password will be change only if /root/.my.cnf is available, it the server
+# the password will be changed only if /root/.my.cnf is available, it the server
 # belonged to a cluster and if the cluster status is 200
 #
-define galera_proxysql::create::root_password () {
+define galera_proxysql::create::root_password() {
 
-  $root_password = $name
+  $root_password = $name.unwrap
   $root_cnf = '/root/.my.cnf'
   $pw_change_cmd = "mysqladmin -u root --\$(grep 'password=' ${root_cnf}) password ${root_password}"
   $old_pw_check = "mysql -u root --\$(grep 'password=' ${root_cnf}) -e \"select 1 from dual\""
