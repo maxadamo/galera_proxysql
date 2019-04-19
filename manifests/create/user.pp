@@ -11,14 +11,13 @@ define galera_proxysql::create::user (
   ) {
 
   if $dbpass =~ String {
-    notify { '"dbpass" String detected!':
+    notify { "'dbpass' String detected for ${dbuser}!":
       message => 'It is advisable to use the Sensitive type for "dbpass"';
     }
     $dbpass_wrap = Sensitive($dbpass)
   } else {
     $dbpass_wrap = $dbpass
   }
-
 
   if ($proxysql_hosts) {
     $host_hash = deep_merge($galera_hosts, $proxysql_hosts, $proxysql_vip)
