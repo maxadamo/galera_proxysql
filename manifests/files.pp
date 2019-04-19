@@ -77,6 +77,7 @@ class galera_proxysql::files (
       mode   => '0755',
       source => "puppet:///modules/${module_name}/galera_wizard.py";
     '/root/galera_params.py':
+      mode    => '0660',
       content => epp("${module_name}/galera_params.py.epp", {
         'ping_cmd'              => $ping_cmd,
         'myip'                  => $myip,
