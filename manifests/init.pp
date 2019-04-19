@@ -266,9 +266,9 @@ class galera_proxysql (
       percona_minor_version => $percona_minor_version;
     '::galera_proxysql::join':
       percona_major_version => $percona_major_version,
-      monitor_password      => $monitor_password,
+      monitor_password      => $monitor_password_wrap,
       root_password         => $root_password,
-      sst_password          => $sst_password,
+      sst_password          => $sst_password_wrap,
       galera_hosts          => $galera_hosts,
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
