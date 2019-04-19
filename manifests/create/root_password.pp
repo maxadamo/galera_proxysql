@@ -8,13 +8,13 @@
 # the password will be changed only if /root/.my.cnf is available, it the server
 # belonged to a cluster and if the cluster status is 200
 #
-define galera_proxysql::create::root_password() {
+define galera_proxysql::create::root_password(Sensitive $root_password) {
 
-  $root_password = $name.unwrap
+  $root_pass = $root_password.unwrap
   $root_cnf = '/root/.my.cnf'
-  $pw_change_cmd = "mysqladmin -u root --\$(grep 'password=' ${root_cnf}) password ${root_password}"
+  $pw_change_cmd = "mysqladmin -u root --\$(grep 'password=' ${root_cnf}) password ${root_pass}"
   $old_pw_check = "mysql -u root --\$(grep 'password=' ${root_cnf}) -e \"select 1 from dual\""
-  $new_pw_check = "mysql -u root --password=${root_password} -e \"select 1 from dual\""
+  $new_pw_check = "mysql -u root --password=${root_pass} -e \"select 1 from dual\""
 
   if ($::galera_rootcnf_exist and $::galera_joined_exist and $::galera_status == '200') {
     exec { 'change_root_password':
