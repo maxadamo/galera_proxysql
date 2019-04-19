@@ -58,7 +58,13 @@ class galera_proxysql::files (
       mode    => '0755',
       content => template("${module_name}/galera_wizard.py.erb");
     '/root/galera_params.py':
-      content => template("${module_name}/galera_params.py.erb"),
+      content => epp("${module_name}/galera_params.py.epp", {
+        'galera_hosts'     => $galera_hosts,
+        'force_ipv6'       => $force_ipv6,
+        'root_password'    => $root_password,
+        'sst_password'     => $sst_password,
+        'monitor_password' => $monitor_password
+      }),
       notify  => Xinetd::Service['galerachk'];
     '/root/bin/hotbackup.sh':
       mode    => '0755',
