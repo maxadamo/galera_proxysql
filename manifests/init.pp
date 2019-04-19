@@ -200,21 +200,21 @@ class galera_proxysql (
 
   # wrap password if it's not wrapped
   if $root_password =~ String {
-    notify { 'String detected!': }
+    notify { '"root_password" String detected!': }
     notify { 'It is advisable to use the Sensitive type for "root_password"': }
     $root_password_wrap = Sensitive($root_password)
   } else {
     $root_password_wrap = $root_password
   }
   if $sst_password =~ String {
-    notify { 'String detected!': }
+    notify { '"sst_password" String detected!': }
     notify { 'It is advisable to use the Sensitive type for "sst_password"': }
     $sst_password_wrap = Sensitive($sst_password)
   } else {
     $sst_password_wrap = $sst_password
   }
   if $monitor_password =~ String {
-    notify { 'String detected!': }
+    notify { '"monitor_password" String detected!': }
     notify { 'It is advisable to use the Sensitive type for "monitor_password"': }
     $monitor_password_wrap = Sensitive($monitor_password)
   } else {
