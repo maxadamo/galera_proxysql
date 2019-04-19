@@ -41,7 +41,7 @@ class galera_proxysql::files (
   $galera_joined_list = join($transformed_data, '", "')
   if ($force_ipv6) {
     $_gcomm_list = join($transformed_data, '],[')
-    $gcomm_list = '[' + $_gcomm_list + ']'
+    $gcomm_list = "[${_gcomm_list}]"
   } else {
     $gcomm_list = join($transformed_data, ',')
   }
