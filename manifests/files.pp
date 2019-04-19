@@ -37,7 +37,14 @@ class galera_proxysql::files (
     $ping_cmd = '/bin/ping'
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
   }
+
   $galera_joined_list = join($transformed_data, '", "')
+  if ($force_ipv6) {
+    $_gcomm_list = join($transformed_data, '],[')
+    $gcomm_list = '[' + $_gcomm_list + ']'
+  } else {
+    $gcomm_list = join($transformed_data, ',')
+  }
 
   unless defined( File['/root/bin'] ) {
     file { '/root/bin':
@@ -103,7 +110,12 @@ class galera_proxysql::files (
       content => epp("${module_name}/server.cnf.epp");
     '/etc/my.cnf.d/wsrep.cnf':
       mode    => '0640',
-      content => template("${module_name}/wsrep.cnf.erb");
+      content => epp("${module_name}/wsrep.cnf.epp", {
+        'sst_password'        => $sst_password,
+        'force_ipv6'          => $force_ipv6,
+        'gcomm_list'          => $gcomm_list,
+        'galera_cluster_name' => $galera_cluster_name
+      });
     '/etc/my.cnf.d/mysqld_safe.cnf':
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
   }

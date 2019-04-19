@@ -1,0 +1,100 @@
+#
+# These groups are read by Percona server.
+# Use it for options that only the server (but not clients) should see
+#
+# See the examples of server my.cnf files in /usr/share/mysql/
+#
+
+# this is read by the standalone daemon and embedded servers
+[mysqld]
+wsrep_on                       = ON
+wsrep_cluster_address          = "gcomm://<%= $gcomm_list %>"
+
+# Full path to wsrep provider library or 'none'
+wsrep_provider                 = /usr/lib64/galera3/libgalera_smm.so
+
+#pxc_strict_mode allowed values: DISABLED,PERMISSIVE,ENFORCING,MASTER
+pxc_strict_mode                = DISABLED
+
+#If wsrep_node_name is not specified,  then system hostname will be used
+wsrep_node_name                = <%= $::hostname %>
+
+# node IP address
+<% $gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new(0.15)) -%>
+<% if $force_ipv6 { -%>
+wsrep_node_address             = "[<%= $::ipaddress6 %>]:4567"
+
+# Provider specific configuration options
+wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $::ipaddress6 %>]:4568; gcache.size=<%= $gcache_size %>M"
+
+# Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
+# (SST method dependent. Defaults to the first IP of the first interface)
+wsrep_sst_receive_address      = "[<%= $::ipaddress6 %>]:4444"
+<% } else { -%>
+wsrep_node_address             = "<%= $::ipaddress %>:4567"
+
+# Provider specific configuration options
+wsrep_provider_options         = "gmcast.listen_addr=tcp://0.0.0.0:4567;ist.recv_addr=[<%= $::ipaddress %>]:4568; gcache.size=<%= $gcache_size %>M"
+
+# Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
+# (SST method dependent. Defaults to the first IP of the first interface)
+wsrep_sst_receive_address      = "<%= $::ipaddress %>:4444"
+<% } -%>
+
+# Logical cluster name. Should be the same for all nodes.
+wsrep_cluster_name             = "<%= $galera_cluster_name %>"
+
+# Generate fake primary keys for non-PK tables (required for multi-master
+# and parallel applying operation)
+wsrep_certify_nonPK            = 1
+
+# Maximum number of rows in write set
+wsrep_max_ws_rows              = 128k
+
+# Maximum size of write set
+<% if Float.new($facts['memorysize_mb']) > 7500 { -%>
+wsrep_max_ws_size              = "2G"
+<% } else { -%>
+wsrep_max_ws_size              = "1G"
+<% } -%>
+
+# to enable debug level logging, set this to 1
+wsrep_debug                    = 0
+
+# convert locking sessions into transactions
+wsrep_convert_LOCK_to_trx      = 0
+
+# how many times to retry deadlocked autocommits
+wsrep_retry_autocommit         = 5
+
+# change auto_increment_increment and auto_increment_offset automatically
+wsrep_auto_increment_control   = 1
+
+# replicate myisam (NOT safe, we use it ONLY for the system tables)
+wsrep_replicate_myisam         = 1 # requires pxc_strict_mode = DISABLED
+
+# retry autoinc insert, which failed for duplicate key error
+wsrep_drupal_282555_workaround = 0
+
+# enable "strictly synchronous" semantics for read operations
+wsrep_causal_reads             = 0
+
+# State Snapshot Transfer method
+# ClusterControl currently DOES NOT support wsrep_sst_method=mysqldump
+wsrep_sst_method               = xtrabackup-v2
+
+# SST authentication string. This will be used to send SST to joining nodes.
+# Depends on SST method. For mysqldump method it is root:<root password>
+wsrep_sst_auth                 = sstuser:<%= $sst_password %>
+
+# Protocol version to use
+#wsrep_protocol_version         =
+
+# Command to call when node status or cluster membership changes.
+# Will be passed all or some of the following options:
+# --status  - new status of this node
+# --uuid    - UUID of the cluster
+# --primary - whether the component is primary or not ("yes"/"no")
+# --members - comma-separated list of members
+# --index   - index of this node in the list
+#wsrep_notify_cmd               =
