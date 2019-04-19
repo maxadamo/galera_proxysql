@@ -91,7 +91,7 @@ class galera_proxysql::files (
       notify  => Xinetd::Service['galerachk'];
     '/root/bin/hotbackup.sh':
       mode    => '0755',
-      content => template("${module_name}/hotbackup.sh.erb"),
+      content => Sensitive(epp("${module_name}/hotbackup.sh.epp")),
       require => File['/root/bin'],
       notify  => Xinetd::Service['galerachk'];
     '/etc/xinetd.d/mysqlchk':
