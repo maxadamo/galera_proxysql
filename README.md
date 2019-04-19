@@ -14,6 +14,7 @@
 
 This module sets up and bootstrap Galera cluster and ProxySQL.
 The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
+
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
 ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floating IP.
 
@@ -33,13 +34,15 @@ Read at (actual) **limitations** in the paragraph below.
 
 ### Beginning with galera_proxysql
 
+Sensitive type for passwords is not mandatory, but it's recommended. If it's not being used the module will emit a notifycation.
+
 To setup Galera:
 
 ```puppet
 class { '::galera_proxysql':
-  root_password    => $root_password,
-  sst_password     => $sst_password,
-  monitor_password => $monitor_password,
+  root_password    => Sensitive($root_password),
+  sst_password     => Sensitive($sst_password),
+  monitor_password => Sensitive($monitor_password),
   proxysql_hosts   => $proxysql_hosts,
   proxysql_vip     => $proxysql_vip,
   galera_hosts     => $galera_hosts,
@@ -54,6 +57,7 @@ To setup ProxySQL:
 
 ```puppet
 class { '::galera_proxysql::proxysql::proxysql':
+  monitor_password => Sensitive($monitor_password),
   trusted_networks => $trusted_networks,
   proxysql_hosts   => $proxysql_hosts,
   proxysql_vip     => $proxysql_vip,
@@ -63,7 +67,7 @@ class { '::galera_proxysql::proxysql::proxysql':
 
 Once you have run puppet on every node, you can manage or check the cluster using the script:
 
-```
+```shell
 [root@test-galera01 ~]# galera_wizard.py -h
 usage: galera_wizard.py [-h] [-cg] [-dr] [-je] [-be] [-jn] [-bn]
 
