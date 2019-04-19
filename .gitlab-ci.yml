@@ -1,7 +1,7 @@
 ---
 stages:
-  - syntax
-  - unit
+  #- syntax
+  #- unit
   - g10k_deploy
 
 run_validation:
