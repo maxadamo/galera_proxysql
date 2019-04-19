@@ -27,6 +27,25 @@ class galera_proxysql::files (
   $tmpdir                       = $::galera_proxysql::params::tmpdir,
 ) inherits galera_proxysql::params {
 
+  $galera_keys = keys($galera_hosts)
+  if ($force_ipv6) {
+    $myip = $galera_hosts[$::fqdn]['ipv6']
+    $ping_cmd = '/bin/ping6'
+    $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
+  } else {
+    $myip = $galera_hosts[$::fqdn]['ipv4']
+    $ping_cmd = '/bin/ping'
+    $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
+  }
+
+  $galera_joined_list = join($transformed_data, '", "')
+  if ($force_ipv6) {
+    $_gcomm_list = join($transformed_data, '],[')
+    $gcomm_list = "[${_gcomm_list}]"
+  } else {
+    $gcomm_list = join($transformed_data, ',')
+  }
+
   unless defined( File['/root/bin'] ) {
     file { '/root/bin':
       ensure => directory,
@@ -55,10 +74,19 @@ class galera_proxysql::files (
       mode   => '0644',
       source => "puppet:///modules/${module_name}/logrotate_mysql";
     '/usr/bin/galera_wizard.py':
-      mode    => '0755',
-      content => template("${module_name}/galera_wizard.py.erb");
+      mode   => '0755',
+      source => "puppet:///modules/${module_name}/galera_wizard.py";
     '/root/galera_params.py':
-      content => template("${module_name}/galera_params.py.erb"),
+      content => epp("${module_name}/galera_params.py.epp", {
+        'ping_cmd'              => $ping_cmd,
+        'myip'                  => $myip,
+        'galera_joined_list'    => $galera_joined_list,
+        'force_ipv6'            => $force_ipv6,
+        'root_password'         => $root_password,
+        'sst_password'          => $sst_password,
+        'monitor_password'      => $monitor_password,
+        'percona_major_version' => $percona_major_version
+      }),
       notify  => Xinetd::Service['galerachk'];
     '/root/bin/hotbackup.sh':
       mode    => '0755',
@@ -83,7 +111,12 @@ class galera_proxysql::files (
       content => epp("${module_name}/server.cnf.epp");
     '/etc/my.cnf.d/wsrep.cnf':
       mode    => '0640',
-      content => template("${module_name}/wsrep.cnf.erb");
+      content => epp("${module_name}/wsrep.cnf.epp", {
+        'sst_password'        => $sst_password,
+        'force_ipv6'          => $force_ipv6,
+        'gcomm_list'          => $gcomm_list,
+        'galera_cluster_name' => $galera_cluster_name
+      });
     '/etc/my.cnf.d/mysqld_safe.cnf':
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
   }

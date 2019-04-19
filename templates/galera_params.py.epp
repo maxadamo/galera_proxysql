@@ -1,0 +1,11 @@
+# This file is managed by Puppet
+ALL_NODES = ["<%= $galera_joined_list %>"]
+CREDENTIALS = {
+    "root": "<%= $root_password %>",
+    "sstuser": "<%= $sst_password %>",
+    "monitor": "<%= $monitor_password %>"
+}
+MYIP = "<%= $myip %>"
+PING_CMD = "<%= $ping_cmd %>"
+PERCONA_MAJOR_VERSION = "<%= $percona_major_version %>"
+mydomain = "<%= $domain -%>"
