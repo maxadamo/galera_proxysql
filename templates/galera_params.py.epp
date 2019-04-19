@@ -5,7 +5,7 @@
 <% } else { -%>
 <% $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] } -%>
 <% } -%>
-<% $joined_list = join($transformed_data, ", ") -%>
+<% $joined_list = join($transformed_data, '", "') -%>
 ALL_NODES = ["<%= $joined_list %>"]
 CREDENTIALS = {"root": "<%= $root_password %>", "sstuser": "<%= $sst_password %>", "monitor": "<%= $monitor_password %>"}
 mydomain = "<%= $domain -%>"
