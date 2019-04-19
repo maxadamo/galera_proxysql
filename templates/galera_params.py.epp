@@ -1,11 +1,4 @@
 # This file is managed by Puppet
-<% $galera_keys = keys($galera_hosts) -%>
-<% if ($force_ipv6) { -%>
-<% $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] } -%>
-<% } else { -%>
-<% $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] } -%>
-<% } -%>
-<% $joined_list = join($transformed_data, '", "') -%>
 ALL_NODES = ["<%= $joined_list %>"]
 CREDENTIALS = {"root": "<%= $root_password %>", "sstuser": "<%= $sst_password %>", "monitor": "<%= $monitor_password %>"}
 mydomain = "<%= $domain -%>"
