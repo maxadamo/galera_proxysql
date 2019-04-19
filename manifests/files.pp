@@ -78,13 +78,14 @@ class galera_proxysql::files (
       source => "puppet:///modules/${module_name}/galera_wizard.py";
     '/root/galera_params.py':
       content => epp("${module_name}/galera_params.py.epp", {
-        'ping_cmd'           => $ping_cmd,
-        'myip'               => $myip,
-        'galera_joined_list' => $galera_joined_list,
-        'force_ipv6'         => $force_ipv6,
-        'root_password'      => $root_password,
-        'sst_password'       => $sst_password,
-        'monitor_password'   => $monitor_password
+        'ping_cmd'              => $ping_cmd,
+        'myip'                  => $myip,
+        'galera_joined_list'    => $galera_joined_list,
+        'force_ipv6'            => $force_ipv6,
+        'root_password'         => $root_password,
+        'sst_password'          => $sst_password,
+        'monitor_password'      => $monitor_password,
+        'percona_major_version' => $percona_major_version
       }),
       notify  => Xinetd::Service['galerachk'];
     '/root/bin/hotbackup.sh':

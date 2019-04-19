@@ -37,11 +37,13 @@ import os
 from warnings import filterwarnings
 import MySQLdb
 
+# make pylint happy
 FORCE = False
 ALL_NODES = []
 CREDENTIALS = {}
 MYIP = ''
 PING_CMD = ''
+PERCONA_MAJOR_VERSION = ''
 
 PURPLE = '\033[95m'
 BLUE = '\033[94m'
@@ -126,7 +128,7 @@ def check_install():
         logger.setLevel(__NO_LOGGING)
 
     yumbase = yum.YumBase()
-    pkg = 'Percona-XtraDB-Cluster-server-<%= @percona_major_version %>'
+    pkg = 'Percona-XtraDB-Cluster-server-{}'.format(PERCONA_MAJOR_VERSION)
     if yumbase.rpmdb.searchNevra(name=pkg):
         pkg_list = yumbase.rpmdb.searchNevra(name=pkg)
         print 'detected {} ...'.format(pkg_list[0])
