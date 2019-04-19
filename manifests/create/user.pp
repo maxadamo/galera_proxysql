@@ -12,7 +12,7 @@ define galera_proxysql::create::user (
 
   if $dbpass =~ String {
     notify { "'dbpass' String detected for ${dbuser}!":
-      message => 'It is advisable to use the Sensitive type for "dbpass"';
+      message => 'It is advisable to use the Sensitive datatype for "dbpass"';
     }
     $dbpass_wrap = Sensitive($dbpass)
   } else {

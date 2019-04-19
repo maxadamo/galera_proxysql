@@ -54,7 +54,7 @@ class galera_proxysql::proxysql::proxysql (
 
   if $monitor_password =~ String {
     notify { '"monitor_password" String detected!':
-      message => 'It is advisable to use the Sensitive type for "monitor_password"';
+      message => 'It is advisable to use the Sensitive datatype for "monitor_password"';
     }
     $monitor_password_wrap = Sensitive($monitor_password)
   } else {
@@ -62,7 +62,7 @@ class galera_proxysql::proxysql::proxysql (
   }
   if $proxysql_admin_password =~ String {
     notify { '"proxysql_admin_password" String detected!':
-      message => 'It is advisable to use the Sensitive type for "proxysql_admin_password"';
+      message => 'It is advisable to use the Sensitive datatype for "proxysql_admin_password"';
     }
     $proxysql_admin_password_wrap = Sensitive($proxysql_admin_password)
   } else {

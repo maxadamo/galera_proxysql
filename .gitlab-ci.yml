@@ -1,8 +1,21 @@
 ---
 stages:
+  - syntax
+  - unit
   - g10k_deploy
+
+run_validation:
+  stage: syntax
+  script:
+    - pdk validate puppet,metadata,ruby --parallel
+
+run_unit_test:
+  stage: unit
+  script:
+    - pdk test unit
 
 job_deploy:
   stage: g10k_deploy
+  when: on_success
   script:
     - /home/gitlab-runner/bin/ci2puppet.sh ${CI_PROJECT_NAME} ${CI_COMMIT_REF_NAME}

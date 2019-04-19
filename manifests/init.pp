@@ -201,7 +201,7 @@ class galera_proxysql (
   # wrap password if it's not wrapped
   if $root_password =~ String {
     notify { '"root_password" String detected!':
-      message => 'It is advisable to use the Sensitive type for "root_password"';
+      message => 'It is advisable to use the Sensitive datatype for "root_password"';
     }
     $root_password_wrap = Sensitive($root_password)
   } else {
@@ -209,7 +209,7 @@ class galera_proxysql (
   }
   if $sst_password =~ String {
     notify { '"sst_password" String detected!':
-      message => 'It is advisable to use the Sensitive type for "sst_password"';
+      message => 'It is advisable to use the Sensitive datatype for "sst_password"';
     }
     $sst_password_wrap = Sensitive($sst_password)
   } else {
@@ -217,7 +217,7 @@ class galera_proxysql (
   }
   if $monitor_password =~ String {
     notify { '"monitor_password" String detected!':
-      message => 'It is advisable to use the Sensitive type for "monitor_password"';
+      message => 'It is advisable to use the Sensitive datatype for "monitor_password"';
     }
     $monitor_password_wrap = Sensitive($monitor_password)
   } else {
