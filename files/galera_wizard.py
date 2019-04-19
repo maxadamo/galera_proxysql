@@ -29,7 +29,6 @@ import logging
 import shutil
 import signal
 import platform
-import socket
 import glob
 import sys
 import pwd
@@ -41,6 +40,8 @@ import MySQLdb
 FORCE = False
 ALL_NODES = []
 CREDENTIALS = {}
+MYIP = ''
+PING_CMD = ''
 
 PURPLE = '\033[95m'
 BLUE = '\033[94m'
@@ -55,16 +56,7 @@ except IOError:
     sys.exit(1)
 
 OTHER_NODES = list(ALL_NODES)
-<%
-if @force_ipv6
-  my_ip = 'socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET6)[0][4][0]'
-  my_ping = '/bin/ping6'
-else
-  my_ip = 'socket.gethostbyname(socket.gethostname())'
-  my_ping = '/bin/ping'
-end
--%>
-OTHER_NODES.remove(<%= my_ip %>)
+OTHER_NODES.remove(MYIP)
 OTHER_WSREP = []
 REMAINING_NODES = []
 LASTCHECK_NODES = []
@@ -227,7 +219,7 @@ def checkhost(sqlhost):
     """check the socket on the other nodes"""
     print "\nChecking socket on {} ...".format(sqlhost)
     fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen(["<%= my_ping %>", "-w2", "-c2", sqlhost],
+    ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
     _, __ = ping.communicate()
     retcode = ping.poll()
@@ -257,7 +249,7 @@ def checkhost(sqlhost):
 def checkwsrep(sqlhost):
     """check if the other nodes belong to the cluster"""
     fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen(["<%= my_ping %>", "-w2", "-c2", sqlhost],
+    ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
     _, __ = ping.communicate()
     retcode = ping.poll()
@@ -385,7 +377,7 @@ def drop_anonymous():
     """drop anonymous user"""
     all_localhosts = [
         "localhost", "127.0.0.1", "::1",
-        <%= my_ip %>
+        MYIP
     ]
     cnx_local = MySQLdb.connect(
         user='root',
@@ -536,7 +528,7 @@ class Cluster(object):
 
     def checkonly(self):
         """runs a cluster check"""
-        OTHER_WSREP.append(<%= my_ip %>)
+        OTHER_WSREP.append(MYIP)
         for hostitem in ALL_NODES:
             checkhost(hostitem)
         if OTHER_WSREP:
@@ -552,7 +544,7 @@ class Cluster(object):
         os.system('clear')
         ALL_NODES.append("localhost")
         print "\n# remove anonymous user\nDROP USER ''@'localhost'"
-        print "DROP USER ''@'{}'".format(<%= my_ip %>)
+        print "DROP USER ''@'{}'".format(MYIP)
         print "\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;"
         print "CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL )' \
         ' ENGINE=InnoDB DEFAULT CHARSET=utf8;"

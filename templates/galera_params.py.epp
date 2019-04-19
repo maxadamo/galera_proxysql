@@ -5,4 +5,6 @@ CREDENTIALS = {
     "sstuser": "<%= $sst_password %>",
     "monitor": "<%= $monitor_password %>"
 }
+MYIP = "<%= $myip %>"
+PING_CMD = "<%= $ping_cmd %>"
 mydomain = "<%= $domain -%>"

@@ -29,8 +29,12 @@ class galera_proxysql::files (
 
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
+    $myip = $galera_hosts[$::fqdn]['ipv6']
+    $ping_cmd = '/bin/ping6'
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
   } else {
+    $myip = $galera_hosts[$::fqdn]['ipv4']
+    $ping_cmd = '/bin/ping'
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
   }
   $galera_joined_list = join($transformed_data, '", "')
@@ -63,8 +67,8 @@ class galera_proxysql::files (
       mode   => '0644',
       source => "puppet:///modules/${module_name}/logrotate_mysql";
     '/usr/bin/galera_wizard.py':
-      mode    => '0755',
-      content => template("${module_name}/galera_wizard.py.erb");
+      mode   => '0755',
+      source => "puppet:///modules/${module_name}/galera_wizard.py.erb";
     '/root/galera_params.py':
       content => epp("${module_name}/galera_params.py.epp", {
         'galera_joined_list' => $galera_joined_list,
