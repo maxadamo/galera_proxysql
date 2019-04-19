@@ -47,7 +47,6 @@ mysql_variables=
   connect_retries_on_failure=10
 }
 
-
 # defines all the MySQL servers
 mysql_servers =
 (

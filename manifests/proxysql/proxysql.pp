@@ -83,10 +83,10 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   $_server_list = join($transformed_data, "${list_bottom}${list_top}")
-  $server_list = "  ${list_top}${_server_list}"
+  $server_list = "  ${list_top}${_server_list}${list_bottom}"
 
   $_server_list_write = join($transformed_data, "${list_bottom_write}${list_top}")
-  $server_list_write = "${list_top}${_server_list_write}"
+  $server_list_write = "${list_top}${_server_list_write}${list_bottom_write}"
 
   class {
     '::galera_proxysql::repo':
