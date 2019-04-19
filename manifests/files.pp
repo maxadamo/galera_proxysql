@@ -68,7 +68,7 @@ class galera_proxysql::files (
       source => "puppet:///modules/${module_name}/logrotate_mysql";
     '/usr/bin/galera_wizard.py':
       mode   => '0755',
-      source => "puppet:///modules/${module_name}/galera_wizard.py.erb";
+      source => "puppet:///modules/${module_name}/galera_wizard.py";
     '/root/galera_params.py':
       content => epp("${module_name}/galera_params.py.epp", {
         'ping_cmd'           => $ping_cmd,
