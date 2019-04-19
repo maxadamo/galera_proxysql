@@ -39,7 +39,7 @@ import MySQLdb
 
 # make pylint happy
 FORCE = False
-ALL_NODES = []
+GALERA_NODES = []
 CREDENTIALS = {}
 MYIP = ''
 PING_CMD = ''
@@ -57,7 +57,7 @@ except IOError:
     print "{}Could not access /root/galera_params.py{}".format(RED, WHITE)
     sys.exit(1)
 
-OTHER_NODES = list(ALL_NODES)
+OTHER_NODES = list(GALERA_NODES)
 OTHER_NODES.remove(MYIP)
 OTHER_WSREP = []
 REMAINING_NODES = []
@@ -442,7 +442,7 @@ def create_users(thisuser):
                     err)
                 os.sys.exit()
     else:
-        for thishost in ALL_NODES:
+        for thishost in GALERA_NODES:
             try:
                 cursor.execute("""
                     CREATE USER '{}'@'{}' IDENTIFIED BY '{}'
@@ -502,7 +502,7 @@ class Cluster(object):
             bootstrap_mysql(self.mode)
             if self.mode == "new":
                 create_monitor_table()
-                ALL_NODES.append("localhost")
+                GALERA_NODES.append("localhost")
                 for creditem in CREDENTIALS:
                     create_users(creditem)
                 print ""
@@ -531,7 +531,7 @@ class Cluster(object):
     def checkonly(self):
         """runs a cluster check"""
         OTHER_WSREP.append(MYIP)
-        for hostitem in ALL_NODES:
+        for hostitem in GALERA_NODES:
             checkhost(hostitem)
         if OTHER_WSREP:
             for wsrepitem in OTHER_WSREP:
@@ -544,7 +544,7 @@ class Cluster(object):
     def show_statements(self):
         """Show SQL statements to create all stuff"""
         os.system('clear')
-        ALL_NODES.append("localhost")
+        GALERA_NODES.append("localhost")
         print "\n# remove anonymous user\nDROP USER ''@'localhost'"
         print "DROP USER ''@'{}'".format(MYIP)
         print "\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;"
@@ -557,11 +557,11 @@ class Cluster(object):
                 for onthishost in ["localhost", "127.0.0.1", "::1"]:
                     print "set PASSWORD for 'root'@'{}' = '{}'".format(
                         onthishost, CREDENTIALS[thisuser])
-            for thishost in ALL_NODES:
+            for thishost in GALERA_NODES:
                 if thisuser != "root":
                     print "CREATE USER \'{}\'@\'{}\' IDENTIFIED BY \'{}\';".format(
                         thisuser, thishost, CREDENTIALS[thisuser])
-            for thishost in ALL_NODES:
+            for thishost in GALERA_NODES:
                 if thisuser == "sstuser":
                     thisgrant = "PROCESS, SELECT, RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.*"
                 elif thisuser == "monitor":
