@@ -4,7 +4,7 @@ class galera_proxysql::proxysql::keepalived (
   $proxysql_hosts    = $::galera_proxysql::params::proxysql_hosts,
   $proxysql_vip      = $::galera_proxysql::params::proxysql_vip,
   $network_interface = $::galera_proxysql::params::network_interface,
-  $use_ipv6       = undef
+  $use_ipv6          = undef
 ) inherits galera_proxysql::params {
 
   $vip_key = keys($proxysql_vip)[0]

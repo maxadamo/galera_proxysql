@@ -39,14 +39,7 @@ from warnings import filterwarnings
 import distro
 import MySQLdb
 
-# make pylint happy
 FORCE = False
-GALERA_NODES = []
-CREDENTIALS = {}
-MYIP = ''
-PING_CMD = ''
-PERCONA_MAJOR_VERSION = ''
-
 PURPLE = '\033[95m'
 BLUE = '\033[94m'
 GREEN = '\033[92m'
