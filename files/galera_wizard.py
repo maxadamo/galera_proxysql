@@ -25,7 +25,7 @@ Author: Massimiliano Adamo <massimiliano.adamo@gant.org>
 import subprocess
 import argparse
 import textwrap
-import logging
+import socket
 import shutil
 import signal
 import glob
@@ -86,6 +86,16 @@ def ask(msg):
     if go_ahead.lower() == 'n':
         print('')
         os.sys.exit()
+
+
+def reverse_lookup(ip_address):
+    """ try reverse lookup or return IP """
+    try:
+        resolved_hostname = socket.gethostbyaddr(ip_address)
+    except socket.herror:
+        resolved_hostname = ip_address
+
+    return resolved_hostname
 
 
 def kill_mysql():
@@ -222,7 +232,8 @@ def bootstrap_mysql(boot):
 
 def checkhost(sqlhost):
     """check the socket on the other nodes"""
-    print("\nChecking socket on {} ...".format(sqlhost))
+    sqlhostname = reverse_lookup(sqlhost)
+    print("\nChecking socket on {} ...".format(sqlhostname))
     fnull = open(os.devnull, 'wb')
     ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
@@ -230,7 +241,7 @@ def checkhost(sqlhost):
     retcode = ping.poll()
     fnull.close()
     if retcode != 0:
-        print("{}Skipping {}: ping failed{}".format(RED, sqlhost, WHITE))
+        print("{}Skipping {}: ping failed{}".format(RED, sqlhostname, WHITE))
         OTHER_WSREP.remove(sqlhost)
     else:
         cnx_sqlhost = None
@@ -242,10 +253,10 @@ def checkhost(sqlhost):
                 host=sqlhost)
         except Exception:
             print("{}Skipping {}: socket is down{}".format(
-                YELLOW, sqlhost, WHITE))
+                YELLOW, sqlhostname, WHITE))
             OTHER_WSREP.remove(sqlhost)
         else:
-            print("{}Socket on {} is up{}".format(GREEN, sqlhost, WHITE))
+            print("{}Socket on {} is up{}".format(GREEN, sqlhostname, WHITE))
         finally:
             if cnx_sqlhost:
                 cnx_sqlhost.close()
@@ -253,6 +264,7 @@ def checkhost(sqlhost):
 
 def checkwsrep(sqlhost):
     """check if the other nodes belong to the cluster"""
+    sqlhostname = reverse_lookup(sqlhost)
     fnull = open(os.devnull, 'wb')
     ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
                             stdout=fnull, stderr=subprocess.STDOUT)
@@ -260,7 +272,7 @@ def checkwsrep(sqlhost):
     retcode = ping.poll()
     fnull.close()
     if retcode == 0:
-        print("\nChecking if {} belongs to cluster ...".format(sqlhost))
+        print("\nChecking if {} belongs to cluster ...".format(sqlhostname))
         cnx_sqlhost = None
         wsrep_status = 0
         try:
@@ -279,7 +291,7 @@ def checkwsrep(sqlhost):
                 cnx_sqlhost.close()
         if wsrep_status == 1:
             LASTCHECK_NODES.append(sqlhost)
-            print("{}{} belongs to cluster{}".format(GREEN, sqlhost, WHITE))
+            print("{}{} belongs to cluster{}".format(GREEN, sqlhostname, WHITE))
         else:
             print("{}Skipping {}: it is not in the cluster{}".format(
                 YELLOW, sqlhost, WHITE))
