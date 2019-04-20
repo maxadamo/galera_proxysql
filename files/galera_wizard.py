@@ -91,7 +91,7 @@ def ask(msg):
 def reverse_lookup(ip_address):
     """ try reverse lookup or return IP """
     try:
-        resolved_hostname = socket.gethostbyaddr(ip_address)
+        resolved_hostname = socket.gethostbyaddr(ip_address)[0]
     except socket.herror:
         resolved_hostname = ip_address
 
