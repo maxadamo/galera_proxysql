@@ -29,7 +29,7 @@ class galera_proxysql::params {
   $monitor_password = undef
   $other_pkgs = [
     'percona-toolkit', 'python36-paramiko', 'python36-pip',
-    'python36-mysql', 'qpress', 'nc', 'socat'
+    'python36-mysql', 'python36-rpm', 'qpress', 'nc', 'socat'
   ]
   $query_cache_size = 0
   $query_cache_type = 0
