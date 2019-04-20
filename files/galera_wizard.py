@@ -120,29 +120,24 @@ def check_install():
         print("{} is not supported".format(distro.os_release_info()['id']))
         sys.exit(1)
     print("\ndetected {} ...".format(distro.os_release_info()['pretty_name']))
-
-    import yum
-    # Remove loggin. Taken from: https://stackoverflow.com/a/46716482
-    from yum.logginglevels import __NO_LOGGING
-    yumloggers = [
-        'yum.filelogging.RPMInstallCallback', 'yum.verbose.Repos',
-        'yum.verbose.plugin', 'yum.Depsolve', 'yum.verbose', 'yum.plugin',
-        'yum.Repos', 'yum', 'yum.verbose.YumBase', 'yum.filelogging',
-        'yum.verbose.YumPlugins', 'yum.RepoStorage', 'yum.YumBase',
-        'yum.filelogging.YumBase', 'yum.verbose.Depsolve'
-    ]
-    for loggername in yumloggers:
-        logger = logging.getLogger(loggername)
-        logger.setLevel(__NO_LOGGING)
-
-    yumbase = yum.YumBase()
+    import rpm
+    percona_installed = None
     pkg = 'Percona-XtraDB-Cluster-server-{}'.format(PERCONA_MAJOR_VERSION)
-    if yumbase.rpmdb.searchNevra(name=pkg):
-        pkg_list = yumbase.rpmdb.searchNevra(name=pkg)
-        print('detected {} ...'.format(pkg_list[0]))
+    rpmts = rpm.TransactionSet()
+    rpmmi = rpmts.dbMatch()
+    for pkg_set in rpmmi:
+        if pkg_set['name'].decode() == pkg:
+            percona_installed = "{}-{}-{}".format(
+                pkg_set['name'].decode(),
+                pkg_set['version'].decode(),
+                pkg_set['release'].decode())
+
+    if percona_installed:
+        print('detected {} ...'.format(percona_installed))
     else:
         print("{}{} not installed{}".format(RED, pkg, WHITE))
         sys.exit(1)
+
     return 'percona'
 
 
