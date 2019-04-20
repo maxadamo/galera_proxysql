@@ -167,6 +167,13 @@ class galera_proxysql::proxysql::proxysql (
       }));
   }
 
+$second_concat = "  {
+    username = \"monitor\"
+    password = \"${monitor_password_wrap.unwrap}\"
+    default_hostgroup = 0
+    active = 1
+  }"
+
   concat { '/etc/proxysql.cnf':
     owner   => 'proxysql',
     group   => 'proxysql',
@@ -189,7 +196,7 @@ class galera_proxysql::proxysql::proxysql (
       order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
-      content => "  {\n    username = \"monitor\"\n    password = \"${monitor_password_wrap.unwrap}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => $second_concat,
       order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',

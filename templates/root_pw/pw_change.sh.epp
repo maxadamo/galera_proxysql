@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=/usr/bin:/usr/sbin:/bin
+
+mysqladmin -u root --$(grep 'password=' <%= $root_cnf %>) password <%= $root_pass.unwrap %>

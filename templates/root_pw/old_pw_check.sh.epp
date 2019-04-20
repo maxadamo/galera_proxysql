@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=/usr/bin:/usr/sbin:/bin
+
+mysql -u root --$(grep 'password=' <%= $root_cnf %>) -e "select 1 from dual"

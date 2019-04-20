@@ -218,7 +218,9 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
-  galera_proxysql::create::root_password { 'root': root_password => $root_password_wrap; }
+  galera_proxysql::create::root_password { 'root':
+    root_pass => $root_password_wrap;
+  }
 
   class {
     '::galera_proxysql::files':

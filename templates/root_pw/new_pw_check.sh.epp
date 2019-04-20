@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=/usr/bin:/usr/sbin:/bin
+
+mysql -u root --password=<%= $root_pass.unwrap %> -e "select 1 from dual"
