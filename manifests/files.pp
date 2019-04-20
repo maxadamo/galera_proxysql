@@ -4,9 +4,6 @@
 #
 class galera_proxysql::files (
   $percona_major_version        = $galera_proxysql::params::percona_major_version,
-  $backup_compress              = $galera_proxysql::params::backup_compress,
-  $backup_dir                   = $galera_proxysql::params::backup_dir,
-  $backup_retention             = $galera_proxysql::params::backup_retention,
   $custom_server_cnf_parameters = $galera_proxysql::params::custom_server_cnf_parameters,
   $custom_client_cnf_parameters = $galera_proxysql::params::custom_client_cnf_parameters,
   $force_ipv6                   = $galera_proxysql::params::force_ipv6,
@@ -88,11 +85,6 @@ class galera_proxysql::files (
         'monitor_password'      => Sensitive($monitor_password),
         'percona_major_version' => $percona_major_version
       })),
-      notify  => Xinetd::Service['galerachk'];
-    '/root/bin/hotbackup.sh':
-      mode    => '0755',
-      content => Sensitive(epp("${module_name}/hotbackup.sh.epp")),
-      require => File['/root/bin'],
       notify  => Xinetd::Service['galerachk'];
     '/etc/xinetd.d/mysqlchk':
       ensure => absent,

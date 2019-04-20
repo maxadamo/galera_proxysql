@@ -11,24 +11,11 @@
 # [*puppet_debug*] <Bool>
 #   default: false (whether to print or not cluster status)
 #
-# [*backup_compress*] <Bool>
-#   default: false (whether to compress or not backup)
-#
-# [*backup_retention*] <Int>
-#   default: 3 (number of day to save the backups)
-#
-# [*backup_dir*] <String>
-#   default: '/mnt/galera' (the directory where we store the backups. You are responsible for
-#            creating sufficient space, a volume, mount a network share on the mount point)
-#
 # [*custom_server_cnf_parameters*] <String>
 #   default: undef (it can be a multiline string with custom values to add to server.cnf)
 #
 # [*custom_client_cnf_parameters*] <String>
 #   default: undef (it can be a multiline string with custom values to add to mysql-client.cnf under section [mysql])
-#
-# [*daily_hotbackup*] <Bool>
-#   WIP: not yet in use
 #
 # [*force_ipv6*] <Bool>
 #   default: false (whether to use IPv6 on cluster communication)
@@ -128,12 +115,8 @@ class galera_proxysql (
   Boolean $puppet_debug = $::galera_proxysql::params::puppet_debug,
 
   # galera parameters
-  $backup_compress              = $galera_proxysql::params::backup_compress,
-  $backup_dir                   = $galera_proxysql::params::backup_dir,
-  $backup_retention             = $galera_proxysql::params::backup_retention,
   $custom_server_cnf_parameters = $galera_proxysql::params::custom_server_cnf_parameters,
   $custom_client_cnf_parameters = $galera_proxysql::params::custom_client_cnf_parameters,
-  $daily_hotbackup              = $galera_proxysql::params::daily_hotbackup,
   Boolean $force_ipv6           = $galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $galera_proxysql::params::galera_hosts,
@@ -239,9 +222,6 @@ class galera_proxysql (
 
   class {
     '::galera_proxysql::files':
-      backup_compress              => $backup_compress,
-      backup_dir                   => $backup_dir,
-      backup_retention             => $backup_retention,
       custom_server_cnf_parameters => $custom_server_cnf_parameters,
       custom_client_cnf_parameters => $custom_client_cnf_parameters,
       force_ipv6                   => $force_ipv6,
@@ -273,11 +253,6 @@ class galera_proxysql (
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
       manage_lvm            => $manage_lvm;
-    '::galera_proxysql::backup':
-      galera_hosts        => $galera_hosts,
-      daily_hotbackup     => $daily_hotbackup,
-      galera_cluster_name => $galera_cluster_name,
-      backup_dir          => $backup_dir;
     '::galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;

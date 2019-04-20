@@ -8,11 +8,16 @@ class galera_proxysql::install (
   $percona_minor_version = $::galera_proxysql::params::percona_minor_version,
 ) inherits galera_proxysql::params {
 
-  package {
-    $other_pkgs:
-      ensure => latest;
-    "Percona-XtraDB-Cluster-full-${percona_major_version}":
+  $other_pkgs.each | $pkg | {
+    unless defined(Package[$pkg]) {
+      package { $pkg: ensure => installed; }
+    }
+  }
+
+  unless defined(Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]) {
+    package { "Percona-XtraDB-Cluster-full-${percona_major_version}":
       ensure => $percona_minor_version;
+    }
   }
 
 }

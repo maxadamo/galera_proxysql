@@ -7,12 +7,6 @@ class galera_proxysql::params {
   # print debug messages
   $puppet_debug = false
 
-  # backup parameters (this funcionality is not yet properly implemented)
-  $backup_compress = false
-  $backup_retention = 3
-  $backup_dir = '/mnt/galera'
-  $daily_hotbackup = undef
-
   #network parameters
   $force_ipv6 = false
 
@@ -34,7 +28,7 @@ class galera_proxysql::params {
   $max_connections = 1024
   $monitor_password = undef
   $other_pkgs = [
-    'percona-xtrabackup-24', 'percona-toolkit', 'python-paramiko',
+    'percona-toolkit', 'python-paramiko',
     'MySQL-python', 'qpress', 'nc', 'socat'
   ]
   $query_cache_size = 0

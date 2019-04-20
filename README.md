@@ -24,11 +24,11 @@ ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floa
 
 Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` or `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
 
-The backup script provided by this module is indeed poor, but it can be considered as an example if you want to start using Percona XtraBackup. You could also check Xtrabackup from puppetlabs/mysql
+Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove XtraBackup from this module.
 
-**When bootstrapping, avoid running puppet on all the nodes at same time.** You need to bootstrap one node first.
+**When bootstrapping, avoid running puppet on all the nodes at same time.** You need to bootstrap one node first and then you can join the other nodes.
 
-Read at (actual) **limitations** in the paragraph below.
+Read at (actual) **limitations** in the section below.
 
 ## Setup
 
@@ -92,7 +92,7 @@ Author: Massimiliano Adamo <maxadamo@gmail.com>
 
 The module will fail on Galera with an even number of nodes and with a number of nodes lower than 3.
 
-To setup a Galera Cluster (and optionally a ProxySQL cluster with Keepalived) we need a hash. If you use hiera it will be like this:
+To setup a Galera Cluster (and optionally a ProxySQL cluster with Keepalived) you need a hash declaration. If you use hiera it will be like this:
 
 ```yaml
 galera_hosts:
@@ -119,7 +119,7 @@ proxysql_vip:
     ipv6: '2001:123:4::70'
 ```
 
-If you do not use ipv6, just skip the `ipv6` keys as following:
+If you do not intend to use ipv6, just skip the `ipv6` keys as following:
 
 ```yaml
 galera_hosts:
@@ -169,9 +169,9 @@ galera_proxysql::create::user { 'zabbix':
 
 ## Limitations
 
-* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (Right now I'm using ProxySQL 1.4.xx)
-* not yet tested on ipv4 only (it should work)
-* there are too many moving parts and I decided to temporarily remove support to Ubuntu.
+* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (right now I'm using ProxySQL 1.4.xx)
+* not yet tested on ipv4 only (but it should work)
+* there are too many moving parts and I decided to temporarily strip support to Ubuntu.
 
 ## Development
 
