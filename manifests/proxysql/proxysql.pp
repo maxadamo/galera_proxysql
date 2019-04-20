@@ -167,7 +167,7 @@ class galera_proxysql::proxysql::proxysql (
       }));
   }
 
-$second_concat = "  {
+$proxysql_cnf_second_content = "  {
     username = \"monitor\"
     password = \"${monitor_password_wrap.unwrap}\"
     default_hostgroup = 0
@@ -196,7 +196,7 @@ $second_concat = "  {
       order   => '1';
     'proxysql_cnf_second':
       target  => '/etc/proxysql.cnf',
-      content => $second_concat,
+      content => $proxysql_cnf_second_content,
       order   => '2';
     'proxysql_cnf_footer':
       target  => '/etc/proxysql.cnf',
