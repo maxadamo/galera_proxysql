@@ -28,8 +28,8 @@ class galera_proxysql::params {
   $max_connections = 1024
   $monitor_password = undef
   $other_pkgs = [
-    'percona-toolkit', 'python-paramiko',
-    'MySQL-python', 'qpress', 'nc', 'socat'
+    'percona-toolkit', 'python36-paramiko', 'python36-pip',
+    'python36-mysql', 'qpress', 'nc', 'socat'
   ]
   $query_cache_size = 0
   $query_cache_type = 0

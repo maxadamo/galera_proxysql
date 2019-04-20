@@ -10,7 +10,7 @@ class galera_proxysql::install (
 
   $other_pkgs.each | $pkg | {
     unless defined(Package[$pkg]) {
-      package { $pkg: ensure => installed; }
+      package { $pkg: before => Package['distro']; }
     }
   }
 
@@ -19,5 +19,7 @@ class galera_proxysql::install (
       ensure => $percona_minor_version;
     }
   }
+
+  package { 'distro': provider => 'pip3'; }
 
 }
