@@ -83,9 +83,15 @@ define galera_proxysql::create::user (
     }
   } else {
     $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass_wrap.unwrap}")+2
+    $concat_content = ",{
+    username = \"${dbuser}\"
+    password = \"${dbpass_wrap.unwrap}\"
+    default_hostgroup = 0
+    active = 1
+  }"
     concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrap}":
       target  => '/etc/proxysql.cnf',
-      content => ",{\n    username = \"${dbuser}\"\n    password = \"${dbpass_wrap.unwrap}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => $concat_content,
       order   => $concat_order;
     }
   }
