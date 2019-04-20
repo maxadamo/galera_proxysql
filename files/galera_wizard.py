@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 '''
 1. This script will either:
@@ -54,7 +54,7 @@ WHITE = '\033[0m'
 try:
     execfile('/root/galera_params.py')
 except IOError:
-    print "{}Could not access /root/galera_params.py{}".format(RED, WHITE)
+    print("{}Could not access /root/galera_params.py{}").format(RED, WHITE)
     sys.exit(1)
 
 OTHER_NODES = list(GALERA_NODES)
