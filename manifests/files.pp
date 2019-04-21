@@ -73,6 +73,8 @@ class galera_proxysql::files (
     '/usr/bin/galera_wizard.py':
       mode   => '0755',
       source => "puppet:///modules/${module_name}/galera_wizard.py";
+    '/root/galera_params.py':
+      ensure => absent;
     '/root/galera_params.ini':
       mode    => '0660',
       content => Sensitive(epp("${module_name}/galera_params.ini.epp", {

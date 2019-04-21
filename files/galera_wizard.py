@@ -29,7 +29,6 @@ import socket
 import shutil
 import signal
 import glob
-import sys
 import pwd
 import grp
 import os
@@ -38,6 +37,7 @@ import configparser
 from warnings import filterwarnings
 import distro
 import MySQLdb
+import pysystemd
 
 FORCE = False
 PURPLE = '\033[95m'
@@ -56,7 +56,7 @@ try:
     PERCONA_MAJOR_VERSION = ast.literal_eval(CONFIG.get('galera', 'PERCONA_MAJOR_VERSION'))
 except configparser.NoOptionError:
     print("{}Could not access values in galera_params.ini{}".format(RED, WHITE))
-    sys.exit(1)
+    os.sys.exit(1)
 
 OTHER_NODES = list(GALERA_NODES)
 OTHER_NODES.remove(MYIP)
@@ -86,7 +86,7 @@ def reverse_lookup(ip_address):
     try:
         resolved_hostname = socket.gethostbyaddr(ip_address)[0]
     except socket.herror:
-        resolved_hostname = ip_address
+        resolved_hostname = "{} [could not resolve IP to hostname]".format(ip_address)
 
     return resolved_hostname
 
@@ -94,8 +94,9 @@ def reverse_lookup(ip_address):
 def kill_mysql():
     """kill mysql"""
     print("\nKilling any running instance of MySQL ...")
-    init_script_1 = ['systemctl', 'stop', 'mysql.service']
-    init_script_2 = ['systemctl', 'stop', 'mysql@bootstrap.service']
+    pysystemd.services('mysql.service').stop()
+    pysystemd.services('mysql@bootstrap.service').stop()
+
     mysqlproc = subprocess.Popen(
         ['pgrep', '-f', 'mysqld'],
         stdout=subprocess.PIPE)
@@ -104,11 +105,6 @@ def kill_mysql():
         os.kill(int(pid), signal.SIGKILL)
     if os.path.isfile("/var/lock/subsys/mysql"):
         os.unlink("/var/lock/subsys/mysql")
-    for stop_script in [init_script_1, init_script_2]:
-        try:
-            subprocess.call(stop_script)
-        except Exception:
-            pass
 
 
 def restore_mycnf():
@@ -121,7 +117,7 @@ def check_install():
     """check if Percona is installed"""
     if distro.os_release_info()['id'] not in ['fedora', 'redhat', 'centos']:
         print("{} is not supported".format(distro.os_release_info()['id']))
-        sys.exit(1)
+        os.sys.exit(1)
     print("\ndetected {} ...".format(distro.os_release_info()['pretty_name']))
     import rpm
     percona_installed = None
@@ -139,7 +135,7 @@ def check_install():
         print('detected {} ...'.format(percona_installed))
     else:
         print("{}{} not installed{}".format(RED, pkg, WHITE))
-        sys.exit(1)
+        os.sys.exit(1)
 
     return 'percona'
 
@@ -166,7 +162,7 @@ def initialize_mysql(datadirectory):
             '--user=mysql'], stdout=fnull)
     except Exception as err:
         print("Error initializing DB: {}".format(err))
-        sys.exit(1)
+        os.sys.exit(1)
     fnull.close()
 
 
@@ -199,14 +195,10 @@ def bootstrap_mysql(boot):
         check_leader()
 
     try:
-        subprocess.call([
-            '/usr/bin/systemctl',
-            'start',
-            'mysql@bootstrap.service'
-        ])
+        pysystemd.services('mysql@bootstrap.service').start()
     except Exception as err:
         print("Error bootstrapping the cluster: {}".format(err))
-        sys.exit(1)
+        os.sys.exit(1)
     print('\nsuccessfully bootstrapped the cluster\n')
     if boot == "new":
         try:
@@ -293,7 +285,6 @@ def checkwsrep(sqlhost):
 def try_joining(how, datadirectory):
     """If we have nodes try Joining the cluster"""
     kill_mysql()
-    init_script = ['systemctl', 'start', 'mysql.service']
     if how == "new":
         if os.path.isfile('/root/.my.cnf'):
             os.rename('/root/.my.cnf', '/root/.my.cnf.bak')
@@ -304,27 +295,27 @@ def try_joining(how, datadirectory):
         print("\nEither:")
         print("- None of the hosts has the value 'wsrep_ready' to 'ON'")
         print("- None of the hosts is running the MySQL process\n")
-        sys.exit(1)
+        os.sys.exit(1)
     else:
         try:
-            subprocess.call(init_script)
+            pysystemd.services('mysql.service').start()
         except Exception:
             print("{}Unable to gently join the cluster{}".format(RED, WHITE))
             print("Force joining cluster with {}".format(LASTCHECK_NODES[0]))
             if os.path.isfile(os.path.join(datadirectory, "grastate.dat")):
                 os.unlink(os.path.join(datadirectory, "grastate.dat"))
                 try:
-                    subprocess.call(init_script)
+                    pysystemd.services('mysql.service').start()
                 except Exception as err:
                     print("{}Unable to join the cluster{}: {}".format(
                         RED, WHITE, err))
-                    sys.exit(1)
+                    os.sys.exit(1)
                 finally:
                     restore_mycnf()
             else:
                 restore_mycnf()
                 print("{}Unable to join the cluster{}".format(RED, WHITE))
-                sys.exit(1)
+                os.sys.exit(1)
         else:
             restore_mycnf()
         print('\nsuccessfully joined the cluster\n')
@@ -345,7 +336,7 @@ def create_monitor_table():
                     """)
     except Exception as err:
         print("Could not create database test: {}".format(err))
-        sys.exit(1)
+        os.sys.exit(1)
     else:
         cnx_local_test.commit()
         cnx_local_test.close()
@@ -367,7 +358,7 @@ def create_monitor_table():
         cnx_local_test.commit()
     except Exception as err:
         print("Could not create test table: {}".format(err))
-        sys.exit(1)
+        os.sys.exit(1)
     else:
         cnx_local_test.commit()
 
@@ -471,7 +462,7 @@ def create_users(thisuser):
         cnx_local.close()
 
 
-class Cluster(object):
+class Cluster:
     """ This class will either:
       - create a new cluster on a server
       - create an existing cluster on a server
@@ -556,8 +547,8 @@ class Cluster(object):
         print("\n# remove anonymous user\nDROP USER ''@'localhost'")
         print("DROP USER ''@'{}'".format(MYIP))
         print("\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;")
-        print("CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL )' \
-        ' ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+        print("CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL ) " \
+              "ENGINE=InnoDB DEFAULT CHARSET=utf8;")
         print('INSERT INTO test.monitor SET id=("placeholder");')
         for thisuser in ['root', 'sstuser', 'monitor']:
             print("\n# define user {}".format(thisuser))
@@ -625,12 +616,12 @@ if __name__ == "__main__":
         _ = pwd.getpwnam("mysql").pw_uid
     except KeyError:
         print("Could not find the user mysql \nGiving up...")
-        sys.exit(1)
+        os.sys.exit(1)
     try:
         _ = grp.getgrnam("mysql").gr_gid
     except KeyError:
         print("Could not find the group mysql \nGiving up...")
-        sys.exit(1)
+        os.sys.exit(1)
 
     ARGS = parse()
     ARGSDICT = vars(ARGS)
