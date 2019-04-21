@@ -42,11 +42,9 @@ import MySQLdb
 import pysystemd
 
 FORCE = False
-PURPLE = '\033[95m'
-BLUE = '\033[94m'
+RED = '\033[91m'
 GREEN = '\033[92m'
 YELLOW = '\033[93m'
-RED = '\033[91m'
 WHITE = '\033[0m'
 CONFIG = configparser.RawConfigParser()
 _ = CONFIG.read('/root/galera_params.ini')
@@ -95,8 +93,14 @@ def reverse_lookup(ip_address):
 def kill_mysql():
     """kill mysql"""
     print("\nKilling any running instance of MySQL ...")
-    pysystemd.services('mysql.service').stop()
-    pysystemd.services('mysql@bootstrap.service').stop()
+    try:
+        pysystemd.services('mysql.service').stop()
+    except pysystemd.subprocess.CalledProcessError:
+        pass
+    try:
+        pysystemd.services('mysql@bootstrap.service').stop()
+    except pysystemd.subprocess.CalledProcessError:
+        pass
 
     mysqlproc = subprocess.Popen(
         ['pgrep', '-f', 'mysqld'],
@@ -155,14 +159,16 @@ def initialize_mysql(datadirectory):
     """initialize mysql default schemas"""
     fnull = open(os.devnull, 'wb')
     clean_dir(datadirectory)
-    try:
-        subprocess.call([
-            '/usr/sbin/mysqld',
-            '--initialize-insecure',
-            '--datadir={}'.format(datadirectory),
-            '--user=mysql'], stdout=fnull)
-    except Exception as err:
-        print("Error initializing DB: {}".format(err))
+    initialize = subprocess.Popen([
+        '/usr/sbin/mysqld',
+        '--initialize-insecure',
+        '--datadir={}'.format(datadirectory),
+        '--user=mysql'], stdout=fnull)
+    _, __ = initialize.communicate()
+    retcode = initialize.poll()
+    fnull.close()
+    if retcode != 0:
+        print("Error initializing DB")
         os.sys.exit(1)
     fnull.close()
 
@@ -197,22 +203,24 @@ def bootstrap_mysql(boot):
 
     try:
         pysystemd.services('mysql@bootstrap.service').start()
-    except Exception as err:
+    except pysystemd.subprocess.CalledProcessError as err:
         print("Error bootstrapping the cluster: {}".format(err))
         os.sys.exit(1)
     print('\nsuccessfully bootstrapped the cluster\n')
     if boot == "new":
-        try:
-            subprocess.call([
-                "/usr/bin/mysqladmin",
-                "--no-defaults",
-                "--socket=/var/lib/mysql/mysql.sock",
-                "-u", "root",
-                "password",
-                CREDENTIALS["root"]
-            ], stdout=fnull, stderr=subprocess.STDOUT)
-        except Exception as err:
-            print("Error setting root password: {}".format(err))
+        bootstrap = subprocess.Popen([
+            "/usr/bin/mysqladmin",
+            "--no-defaults",
+            "--socket=/var/lib/mysql/mysql.sock",
+            "-u", "root",
+            "password",
+            CREDENTIALS["root"]
+        ], stdout=fnull)
+        _, __ = bootstrap.communicate()
+        retcode = bootstrap.poll()
+        fnull.close()
+        if retcode != 0:
+            print("Error setting root password")
         restore_mycnf()
 
 
@@ -303,14 +311,15 @@ def try_joining(how, datadirectory):
     else:
         try:
             pysystemd.services('mysql.service').start()
-        except Exception:
-            print("{}Unable to gently join the cluster{}".format(RED, WHITE))
+        except pysystemd.subprocess.CalledProcessError as err:
+            print("{}Unable to gently join the cluster{}:\n{}".format(
+                RED, WHITE, err))
             print("Force joining cluster with {}".format(LASTCHECK_NODES[0]))
             if os.path.isfile(os.path.join(datadirectory, "grastate.dat")):
                 os.unlink(os.path.join(datadirectory, "grastate.dat"))
                 try:
                     pysystemd.services('mysql.service').start()
-                except Exception as err:
+                except pysystemd.subprocess.CalledProcessError as err:
                     print("{}Unable to join the cluster{}: {}".format(
                         RED, WHITE, err))
                     os.sys.exit(1)
@@ -618,12 +627,12 @@ if __name__ == "__main__":
     try:
         _ = pwd.getpwnam("mysql").pw_uid
     except KeyError:
-        print("Could not find the user mysql \nGiving up...")
+        print("Could not find the user mysql\nGiving up...")
         os.sys.exit(1)
     try:
         _ = grp.getgrnam("mysql").gr_gid
     except KeyError:
-        print("Could not find the group mysql \nGiving up...")
+        print("Could not find the group mysql\nGiving up...")
         os.sys.exit(1)
 
     IPV6 = None
