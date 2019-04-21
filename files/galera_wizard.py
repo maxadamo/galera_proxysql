@@ -56,7 +56,7 @@ try:
     MYIP = ast.literal_eval(CONFIG.get('galera', 'MYIP'))
     PERCONA_MAJOR_VERSION = ast.literal_eval(CONFIG.get('galera', 'PERCONA_MAJOR_VERSION'))
 except configparser.NoOptionError:
-    print("{}Could not access values in galera_params.ini{}".format(RED, WHITE))
+    print("{}Could not access values in /root/galera_params.ini{}".format(RED, WHITE))
     os.sys.exit(1)
 
 OTHER_NODES = list(GALERA_NODES)
