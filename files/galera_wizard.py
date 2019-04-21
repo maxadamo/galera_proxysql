@@ -628,17 +628,17 @@ if __name__ == "__main__":
         print("Could not find the group mysql \nGiving up...")
         os.sys.exit(1)
 
+    IPV6 = None
     try:
         ipaddress.IPv4Address(MYIP)
     except ipaddress.AddressValueError:
         try:
             ipaddress.IPv6Address(MYIP)
         except ipaddress.AddressValueError:
-            pass
+            print("Neither IPv6 nor IPv4 detected\nGiving up...")
+            os.sys.exit()
         else:
             IPV6 = True
-    else:
-        IPV6 = None
 
     ARGS = parse(IPV6)
     ARGSDICT = vars(ARGS)
