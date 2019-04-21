@@ -27,11 +27,9 @@ class galera_proxysql::files (
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
     $myip = $galera_hosts[$::fqdn]['ipv6']
-    $ping_cmd = '/bin/ping6'
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
   } else {
     $myip = $galera_hosts[$::fqdn]['ipv4']
-    $ping_cmd = '/bin/ping'
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
   }
 
@@ -78,7 +76,6 @@ class galera_proxysql::files (
     '/root/galera_params.ini':
       mode    => '0660',
       content => Sensitive(epp("${module_name}/galera_params.ini.epp", {
-        'ping_cmd'              => $ping_cmd,
         'myip'                  => $myip,
         'galera_joined_list'    => $galera_joined_list,
         'force_ipv6'            => $force_ipv6,

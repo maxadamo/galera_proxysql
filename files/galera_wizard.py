@@ -34,7 +34,9 @@ import grp
 import os
 import ast
 import configparser
+import ipaddress
 from warnings import filterwarnings
+from multiping import MultiPing
 import distro
 import MySQLdb
 import pysystemd
@@ -52,7 +54,6 @@ try:
     GALERA_NODES = ast.literal_eval(CONFIG.get('galera', 'GALERA_NODES'))
     CREDENTIALS = ast.literal_eval(CONFIG.get('galera', 'CREDENTIALS'))
     MYIP = ast.literal_eval(CONFIG.get('galera', 'MYIP'))
-    PING_CMD = ast.literal_eval(CONFIG.get('galera', 'PING_CMD'))
     PERCONA_MAJOR_VERSION = ast.literal_eval(CONFIG.get('galera', 'PERCONA_MAJOR_VERSION'))
 except configparser.NoOptionError:
     print("{}Could not access values in galera_params.ini{}".format(RED, WHITE))
@@ -215,17 +216,19 @@ def bootstrap_mysql(boot):
         restore_mycnf()
 
 
-def checkhost(sqlhost):
+def checkhost(sqlhost, ipv6):
     """check the socket on the other nodes"""
     sqlhostname = reverse_lookup(sqlhost)
     print("\nChecking socket on {} ...".format(sqlhostname))
-    fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
-                            stdout=fnull, stderr=subprocess.STDOUT)
-    _, __ = ping.communicate()
-    retcode = ping.poll()
-    fnull.close()
-    if retcode != 0:
+    if ipv6:
+        mping = MultiPing([sqlhost])
+    else:
+        mping = MultiPing(sqlhost)
+    mping.send()
+    mping.receive(1)
+    _, no_responses = mping.receive(1)
+
+    if no_responses:
         print("{}Skipping {}: ping failed{}".format(RED, sqlhostname, WHITE))
         OTHER_WSREP.remove(sqlhost)
     else:
@@ -247,16 +250,19 @@ def checkhost(sqlhost):
                 cnx_sqlhost.close()
 
 
-def checkwsrep(sqlhost):
+def checkwsrep(sqlhost, ipv6):
     """check if the other nodes belong to the cluster"""
     sqlhostname = reverse_lookup(sqlhost)
-    fnull = open(os.devnull, 'wb')
-    ping = subprocess.Popen([PING_CMD, "-w2", "-c2", sqlhost],
-                            stdout=fnull, stderr=subprocess.STDOUT)
-    _, __ = ping.communicate()
-    retcode = ping.poll()
-    fnull.close()
-    if retcode == 0:
+    if ipv6:
+        mping = MultiPing([sqlhost])
+    else:
+        mping = MultiPing(sqlhost)
+    mping.send()
+    mping.receive(1)
+    _, no_responses = mping.receive(1)
+    if no_responses:
+        print("{}Skipping {}: it is not in the cluster{}".format(YELLOW, sqlhost, WHITE))
+    else:
         print("\nChecking if {} belongs to cluster ...".format(sqlhostname))
         cnx_sqlhost = None
         wsrep_status = 0
@@ -472,9 +478,10 @@ class Cluster:
       - show SQL statements
     """
 
-    def __init__(self, manner, mode, datadir='/var/lib/mysql', force=FORCE):
+    def __init__(self, manner, mode, ipv6, datadir='/var/lib/mysql'):
         self.manner = manner
         self.mode = mode
+        self.ipv6 = ipv6
         self.datadir = datadir
         self.force = FORCE
         os.chown(self.datadir, pwd.getpwnam("mysql").pw_uid,
@@ -483,7 +490,7 @@ class Cluster:
     def createcluster(self):
         """create and bootstrap a cluster"""
         for hostitem in OTHER_NODES:
-            checkhost(hostitem)
+            checkhost(hostitem, self.ipv6)
         if OTHER_WSREP:
             for wsrepitem in OTHER_WSREP:
                 REMAINING_NODES.append(wsrepitem)
@@ -510,13 +517,13 @@ class Cluster:
     def joincluster(self):
         """join a cluster"""
         for hostitem in OTHER_NODES:
-            checkhost(hostitem)
+            checkhost(hostitem, self.ipv6)
         if OTHER_WSREP:
             for wsrepitem in OTHER_WSREP:
                 REMAINING_NODES.append(wsrepitem)
         if REMAINING_NODES:
             for wsrephost in OTHER_WSREP:
-                checkwsrep(wsrephost)
+                checkwsrep(wsrephost, self.ipv6)
         if LASTCHECK_NODES:
             if self.mode == "new" and not self.force:
                 ask('\nThis operation will destroy the local data')
@@ -531,13 +538,13 @@ class Cluster:
         """runs a cluster check"""
         OTHER_WSREP.append(MYIP)
         for hostitem in GALERA_NODES:
-            checkhost(hostitem)
+            checkhost(hostitem, self.ipv6)
         if OTHER_WSREP:
             for wsrepitem in OTHER_WSREP:
                 REMAINING_NODES.append(wsrepitem)
         if REMAINING_NODES:
             for wsrephost in OTHER_WSREP:
-                checkwsrep(wsrephost)
+                checkwsrep(wsrephost, self.ipv6)
         print('')
 
     def show_statements(self):
@@ -571,7 +578,7 @@ class Cluster:
         print("")
 
 
-def parse():
+def parse(ipv6):
     """Parse options thru argparse and run it..."""
     intro = """\
          Use this script to bootstrap, join nodes within a Galera Cluster
@@ -585,23 +592,23 @@ def parse():
         epilog="Author: Massimiliano Adamo <maxadamo@gmail.com>")
     parser.add_argument(
         '-cg', '--check-galera', help='check if nodes are healthy', action='store_true',
-        dest='Cluster(None, None).checkonly()', required=False)
+        dest='Cluster(None, None, {}).checkonly()'.format(ipv6), required=False)
     parser.add_argument(
         '-dr', '--dry-run', help='print SQL statements', action='store_true',
-        dest='Cluster(None, None).show_statements()', required=False)
+        dest='Cluster(None, None, {}).show_statements()'.format(ipv6), required=False)
     parser.add_argument(
         '-je', '--join-existing', help='join existing Cluster', action='store_true',
-        dest='Cluster("existing", "existing").joincluster()', required=False)
+        dest='Cluster("existing", "existing", {}).joincluster()'.format(ipv6), required=False)
     parser.add_argument(
         '-be', '--bootstrap-existing', help='bootstrap existing Cluster',
-        action='store_true', dest='Cluster(None, "existing").createcluster()',
+        action='store_true', dest='Cluster(None, "existing", {}).createcluster()'.format(ipv6),
         required=False)
     parser.add_argument(
         '-jn', '--join-new', help='join new Cluster', action='store_true',
-        dest='Cluster("new", "new").joincluster()', required=False)
+        dest='Cluster("new", "new", {}).joincluster()'.format(ipv6), required=False)
     parser.add_argument(
         '-bn', '--bootstrap-new', action='store_true', help='bootstrap new Cluster',
-        dest='Cluster(None, "new").createcluster()', required=False)
+        dest='Cluster(None, "new", {}).createcluster()'.format(ipv6), required=False)
     parser.add_argument(
         '-f', '--force', action='store_true',
         help='force bootstrap-new or join-new Cluster', required=False)
@@ -623,7 +630,19 @@ if __name__ == "__main__":
         print("Could not find the group mysql \nGiving up...")
         os.sys.exit(1)
 
-    ARGS = parse()
+    try:
+        ipaddress.IPv4Address(MYIP)
+    except ipaddress.AddressValueError:
+        try:
+            ipaddress.IPv6Address(MYIP)
+        except ipaddress.AddressValueError:
+            pass
+        else:
+            IPV6 = True
+    else:
+        IPV6 = None
+
+    ARGS = parse(IPV6)
     ARGSDICT = vars(ARGS)
     if ARGS.force:
         FORCE = True
