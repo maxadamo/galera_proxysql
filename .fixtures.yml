@@ -6,18 +6,18 @@ fixtures:
       ref: '1.0.3'
     xinetd:
       repo: 'puppetlabs/xinetd'
-      ref: '3.0.0'
+      ref: '3.2.0'
     stdlib:
       repo: 'puppetlabs/stdlib'
-      ref: '5.1.0'
+      ref: '5.2.0'
       # flags: "--module_repository https://my_repo.com"
     mysql:
       repo: 'puppetlabs/mysql'
-      ref: '7.0.0'
+      ref: '8.1.0'
     firewall:
       repo: 'puppetlabs/firewall'
-      ref: '1.12.0'
+      ref: '1.15.3'
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
-      ref: '1.0.2'
+      ref: '1.0.3'
 

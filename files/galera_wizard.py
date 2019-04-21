@@ -598,18 +598,16 @@ def parse(ipv6):
         '-je', '--join-existing', help='join existing Cluster', action='store_true',
         dest='Cluster("existing", "existing", {}).joincluster()'.format(ipv6), required=False)
     parser.add_argument(
-        '-be', '--bootstrap-existing', help='bootstrap existing Cluster',
-        action='store_true', dest='Cluster(None, "existing", {}).createcluster()'.format(ipv6),
-        required=False)
+        '-be', '--bootstrap-existing', help='bootstrap existing Cluster', action='store_true',
+        dest='Cluster(None, "existing", {}).createcluster()'.format(ipv6), required=False)
     parser.add_argument(
         '-jn', '--join-new', help='join new Cluster', action='store_true',
         dest='Cluster("new", "new", {}).joincluster()'.format(ipv6), required=False)
     parser.add_argument(
         '-bn', '--bootstrap-new', action='store_true', help='bootstrap new Cluster',
         dest='Cluster(None, "new", {}).createcluster()'.format(ipv6), required=False)
-    parser.add_argument(
-        '-f', '--force', action='store_true',
-        help='force bootstrap-new or join-new Cluster', required=False)
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='force bootstrap-new or join-new Cluster', required=False)
 
     return parser.parse_args()
 
@@ -635,7 +633,7 @@ if __name__ == "__main__":
         try:
             ipaddress.IPv6Address(MYIP)
         except ipaddress.AddressValueError:
-            print("Neither IPv6 nor IPv4 detected\nGiving up...")
+            print("Neither IPv6 nor IPv4 were detected\nGiving up...")
             os.sys.exit()
         else:
             IPV6 = True
