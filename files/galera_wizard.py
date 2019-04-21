@@ -225,7 +225,6 @@ def checkhost(sqlhost, ipv6):
     else:
         mping = MultiPing(sqlhost)
     mping.send()
-    mping.receive(1)
     _, no_responses = mping.receive(1)
 
     if no_responses:
@@ -258,7 +257,6 @@ def checkwsrep(sqlhost, ipv6):
     else:
         mping = MultiPing(sqlhost)
     mping.send()
-    mping.receive(1)
     _, no_responses = mping.receive(1)
     if no_responses:
         print("{}Skipping {}: it is not in the cluster{}".format(YELLOW, sqlhost, WHITE))
