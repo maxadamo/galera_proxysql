@@ -16,7 +16,7 @@ class galera_proxysql::join (
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 
   $file_list = [
-    '/usr/bin/galera_wizard.py', '/root/galera_params.py', '/etc/my.cnf',
+    '/usr/bin/galera_wizard.py', '/root/galera_params.ini', '/etc/my.cnf',
     '/root/.my.cnf', '/etc/my.cnf.d/server.cnf', '/etc/my.cnf.d/client.cnf',
     '/etc/my.cnf.d/wsrep.cnf', '/etc/my.cnf'
   ]
