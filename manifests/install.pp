@@ -8,9 +8,11 @@ class galera_proxysql::install (
   $percona_minor_version = $::galera_proxysql::params::percona_minor_version,
 ) inherits galera_proxysql::params {
 
+  $pip_pkgs = ['distro', 'multiping', 'pysystemd']
+
   $other_pkgs.each | $pkg | {
     unless defined(Package[$pkg]) {
-      package { $pkg: ensure => installed; }
+      package { $pkg: before => Package[$pip_pkgs]; }
     }
   }
 
@@ -19,5 +21,7 @@ class galera_proxysql::install (
       ensure => $percona_minor_version;
     }
   }
+
+  package { $pip_pkgs: provider => 'pip3'; }
 
 }
