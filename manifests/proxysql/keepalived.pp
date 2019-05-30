@@ -28,7 +28,7 @@ class galera_proxysql::proxysql::keepalived (
     keepalived::vrrp::instance { 'ProxySQL':
       interface                  => $network_interface,
       state                      => 'BACKUP',
-      virtual_router_id          => 50,
+      virtual_router_id          => seeded_rand(255, "${module_name}${::environment}") + 0,
       unicast_source_ip          => $::ipaddress,
       unicast_peers              => [$peer_ip],
       priority                   => 100,
