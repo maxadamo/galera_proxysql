@@ -9,7 +9,7 @@ fixtures:
       ref: '3.2.0'
     stdlib:
       repo: 'puppetlabs/stdlib'
-      ref: '5.2.0'
+      ref: '6.0.0'
       # flags: "--module_repository https://my_repo.com"
     mysql:
       repo: 'puppetlabs/mysql'
