@@ -16,7 +16,7 @@ fixtures:
       ref: '8.1.0'
     firewall:
       repo: 'puppetlabs/firewall'
-      ref: '1.15.3'
+      ref: '2.0.0'
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
       ref: '1.0.3'
