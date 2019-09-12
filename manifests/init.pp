@@ -173,7 +173,7 @@ class galera_proxysql (
   }
 
   $cluster_size = length(keys($galera_hosts))
-  $cluster_size_odd = inline_template('<% if @cluster_size.to_i.odd? -%>true<% end -%>')
+  $cluster_size_odd = (($cluster_size % 2) == 1)
 
   #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
   unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd')}
