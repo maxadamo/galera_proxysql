@@ -33,7 +33,7 @@ class galera_proxysql::proxysql::keepalived (
       unicast_peers              => [$peer_ip],
       priority                   => 100,
       auth_type                  => 'PASS',
-      auth_pass                  => 'secret',
+      auth_pass                  => seeded_rand_string(10, "${module_name}${::environment}"),
       virtual_ipaddress          => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",
       virtual_ipaddress_excluded => ["${proxysql_vip[$vip_key]['ipv6']}/${proxysql_vip[$vip_key]['ipv6_subnet']}"],
       track_script               => 'check_proxysql';
@@ -42,12 +42,12 @@ class galera_proxysql::proxysql::keepalived (
     keepalived::vrrp::instance { 'ProxySQL':
       interface         => $network_interface,
       state             => 'BACKUP',
-      virtual_router_id => 50,
+      virtual_router_id => seeded_rand(255, "${module_name}${::environment}")+0,
       unicast_source_ip => $::ipaddress,
       unicast_peers     => [$peer_ip],
       priority          => 100,
       auth_type         => 'PASS',
-      auth_pass         => 'secret',
+      auth_pass         => seeded_rand_string(10, "${module_name}${::environment}"),
       virtual_ipaddress => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",
       track_script      => 'check_proxysql';
     }
