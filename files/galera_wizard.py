@@ -12,11 +12,8 @@
 Bugs & Workarounds:
 1.  We have a bug in Innobackupex:
       - https://bugs.launchpad.net/percona-xtrabackup/+bug/1272329
-    A possible solution can come here:
-      - https://bugs.launchpad.net/percona-xtrabackup/2.2/+bug/688717
-    I prefear using the default directory rather than moving to a subdirectory.
-    Therefore we workaround the issue by letting puppet install an incron
-    entry that immediately reassign the directory ownership to mysql:mysql
+    Which is fixed here:
+      - https://jira.percona.com/browse/PXB-907
 
 TODO: (see TODO.txt)
 
