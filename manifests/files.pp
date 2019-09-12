@@ -55,7 +55,7 @@ class galera_proxysql::files (
       owner   => 'root',
       group   => 'root',
       require => [
-        FIle['/root/bin'],
+        File['/root/bin'],
         Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]
       ];
     '/etc/my.cnf':
