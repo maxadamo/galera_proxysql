@@ -43,9 +43,6 @@ define galera_proxysql::create::user (
 
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {
-      if $ensure == absent or $ensure == 'absent' {
-        mysql_user { "${dbuser}@localhost": ensure => absent; }
-      }
       mysql::db { $schema_name:
         ensure   => $ensure_schema,
         user     => $dbuser,
