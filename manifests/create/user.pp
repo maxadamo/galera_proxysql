@@ -8,6 +8,7 @@ define galera_proxysql::create::user (
   $privileges                   = ['SELECT', 'SHOW DATABASES'],
   Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                       = $name,
+  $force_schema_removal         = false,  # do not drop DB if a user is removed
   Enum[
     'present', 'absent',
     present, absent] $ensure    = present,
@@ -34,13 +35,19 @@ define galera_proxysql::create::user (
     $schema_name = $table.map |$item| {split($item, '[.]')[0]}
   }
 
+  if ($force_schema_removal) {
+    $ensure_schema = absent
+  } else {
+    $ensure_schema = present
+  }
+
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {
       if $ensure == absent or $ensure == 'absent' {
         mysql_user { "${dbuser}@localhost": ensure => absent; }
       }
       mysql::db { $schema_name:
-        ensure   => $ensure,
+        ensure   => $ensure_schema,
         user     => $dbuser,
         password => $dbpass_wrap.unwrap,
         grant    => $privileges,
