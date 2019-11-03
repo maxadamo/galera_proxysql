@@ -4,7 +4,7 @@ define galera_proxysql::create::grant (
   Variant[Array, String] $table,
   $privileges,
   $dbuser,
-  Enum['present', 'absent', present, absent] $ensure = present,
+  $ensure = present,
   $source = $name
   ) {
 

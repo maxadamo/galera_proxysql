@@ -58,18 +58,20 @@ define galera_proxysql::create::user (
         }
         unless defined(Galera_proxysql::Create::Grant[$host_ips['ipv4']]) {
           galera_proxysql::create::grant { $host_ips['ipv4']:
-            ensure  => $ensure,
-            dbuser  => $dbuser,
-            table   => $table,
-            require => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
+            ensure     => $ensure,
+            dbuser     => $dbuser,
+            table      => $table,
+            privileges => $privileges,
+            require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
           }
         }
         unless defined(Galera_proxysql::Create::Grant[$host_name]) {
           galera_proxysql::create::grant { $host_name:
-            ensure  => $ensure,
-            dbuser  => $dbuser,
-            table   => $table,
-            require => Mysql_user["${dbuser}@${host_name}"];
+            ensure     => $ensure,
+            dbuser     => $dbuser,
+            table      => $table,
+            privileges => $privileges,
+            require    => Mysql_user["${dbuser}@${host_name}"];
           }
         }
         if has_key($host_ips, 'ipv6') {
@@ -81,10 +83,11 @@ define galera_proxysql::create::user (
           }
           unless defined(Galera_proxysql::Create::Grant[$host_ips['ipv6']]) {
             galera_proxysql::create::grant { $host_ips['ipv6']:
-              ensure  => $ensure,
-              dbuser  => $dbuser,
-              table   => $table,
-              require => Mysql_user["${dbuser}@${host_ips['ipv6']}"]
+              ensure     => $ensure,
+              dbuser     => $dbuser,
+              table      => $table,
+              privileges => $privileges,
+              require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"]
             }
           }
         }
