@@ -12,12 +12,21 @@ define galera_proxysql::create::grant (
     fail("this define is intended to be called only within ${module_name}")
   }
 
-  $table.each | $table_element | {
-    mysql_grant { "${dbuser}@${source}/${table_element}":
+  if $table =~ String {
+    mysql_grant { "${dbuser}@${source}/${table}":
       ensure     => $ensure,
       user       => "${dbuser}@${source}",
       table      => $table,
       privileges => $privileges;
+    }
+  } else {
+    $table.each | $table_element | {
+      mysql_grant { "${dbuser}@${source}/${table_element}":
+        ensure     => $ensure,
+        user       => "${dbuser}@${source}",
+        table      => $table_element,
+        privileges => $privileges;
+      }
     }
   }
 

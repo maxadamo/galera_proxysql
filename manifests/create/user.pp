@@ -30,7 +30,7 @@ define galera_proxysql::create::user (
 
   if $table =~ String {
     $schema_name = split($table, '[.]')[0]
-  } elsif $table =~ Array {
+  } else {
     $schema_name = $table.map |$item| {split($item, '[.]')[0]}
   }
 
