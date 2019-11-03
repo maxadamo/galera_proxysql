@@ -1,7 +1,7 @@
 # == Define: galera_proxysql::create::grant
 #
 define galera_proxysql::create::grant (
-  Variant[Array, String] $table,
+  $table,
   $privileges,
   $dbuser,
   $ensure = present,
@@ -20,11 +20,11 @@ define galera_proxysql::create::grant (
       privileges => $privileges;
     }
   } else {
-    $table.each | $table_element | {
-      mysql_grant { "${dbuser}@${source}/${table_element}":
+    $table.each | $table_item | {
+      mysql_grant { "${dbuser}@${source}/${table_item}":
         ensure     => $ensure,
         user       => "${dbuser}@${source}",
-        table      => $table_element,
+        table      => $table_item,
         privileges => $privileges;
       }
     }
