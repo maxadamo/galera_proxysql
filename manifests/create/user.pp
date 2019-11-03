@@ -53,19 +53,10 @@ define galera_proxysql::create::user (
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
         }
-        mysql_grant {
-          "${dbuser}@${host_ips['ipv4']}/${table}":
-            ensure     => present,
-            user       => "${dbuser}@${host_ips['ipv4']}",
-            table      => $table,
-            privileges => $privileges,
-            require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
-          "${dbuser}@${host_name}/${table}":
-            ensure     => present,
-            user       => "${dbuser}@${host_name}",
-            table      => $table,
-            privileges => $privileges,
-            require    => Mysql_user["${dbuser}@${host_name}"];
+        galera_proxysql::create::grant { [$host_ips['ipv4'], $host_name]:
+          dbuser  => $dbuser,
+          table   => $table,
+          require => Mysql_user["${dbuser}@${host_ips['ipv4']}", "${dbuser}@${host_name}"]
         }
         if has_key($host_ips, 'ipv6') {
           mysql_user { "${dbuser}@${host_ips['ipv6']}":
@@ -74,12 +65,10 @@ define galera_proxysql::create::user (
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           }
-          mysql_grant { "${dbuser}@${host_ips['ipv6']}/${table}":
-            ensure     => present,
-            user       => "${dbuser}@${host_ips['ipv6']}",
-            table      => $table,
-            privileges => $privileges,
-            require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
+          galera_proxysql::create::grant { $host_ips['ipv6']:
+            dbuser  => $dbuser,
+            table   => $table,
+            require => Mysql_user["${dbuser}@${host_ips['ipv6']}"]
           }
         }
       }
