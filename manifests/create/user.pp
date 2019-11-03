@@ -7,7 +7,10 @@ define galera_proxysql::create::user (
   $proxysql_vip                 = {},
   $privileges                   = ['SELECT', 'SHOW DATABASES'],
   Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
-  $dbuser                       = $name
+  $dbuser                       = $name,
+  Enum[
+    'present', 'absent',
+    present, absent] $ensure    = present,
   ) {
 
   if $dbpass =~ String {
@@ -43,29 +46,31 @@ define galera_proxysql::create::user (
       $host_hash.each | $host_name, $host_ips | {
         mysql_user {
           "${dbuser}@${host_ips['ipv4']}":
-            ensure        => present,
+            ensure        => $ensure,
             password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           "${dbuser}@${host_name}":
-            ensure        => present,
+            ensure        => $ensure,
             password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
         }
         galera_proxysql::create::grant { [$host_ips['ipv4'], $host_name]:
+          ensure  => $ensure,
           dbuser  => $dbuser,
           table   => $table,
           require => Mysql_user["${dbuser}@${host_ips['ipv4']}", "${dbuser}@${host_name}"]
         }
         if has_key($host_ips, 'ipv6') {
           mysql_user { "${dbuser}@${host_ips['ipv6']}":
-            ensure        => present,
+            ensure        => $ensure,
             password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           }
           galera_proxysql::create::grant { $host_ips['ipv6']:
+            ensure  => $ensure,
             dbuser  => $dbuser,
             table   => $table,
             require => Mysql_user["${dbuser}@${host_ips['ipv6']}"]
