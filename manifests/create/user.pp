@@ -99,11 +99,11 @@ define galera_proxysql::create::user (
     if $ensure == present or $ensure == 'present' {
       $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass_wrap.unwrap}")+2
       $concat_content = ",{
-      username = \"${dbuser}\"
-      password = \"${dbpass_wrap.unwrap}\"
-      default_hostgroup = 0
-      active = 1
-    }"
+    username = \"${dbuser}\"
+    password = \"${dbpass_wrap.unwrap}\"
+    default_hostgroup = 0
+    active = 1
+  }"
       concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrap}":
         target  => '/etc/proxysql.cnf',
         content => $concat_content,
