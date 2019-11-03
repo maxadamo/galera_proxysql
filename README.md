@@ -148,12 +148,13 @@ On Galera, to create user Zabbix and DB Zabbix:
 
 ```puppet
 galera_proxysql::create::user { 'zabbix':
+  ensure         => present, # defaults to present
   dbpass         => Sensitive(lookup('zabbix_db_pass', String, 'first', 'default_pass')),
   galera_hosts   => $galera_hosts,
   proxysql_hosts => $proxysql_hosts,
   proxysql_vip   => $proxysql_hosts,
   privileges     => ['ALL'],
-  table          => ['zabbix.*', 'zobbix.mytable', 'zubbix.*'];
+  table          => ['zabbix.*', 'zobbix.mytable', 'zubbix.*']; # array or string
 }
 ```
 
