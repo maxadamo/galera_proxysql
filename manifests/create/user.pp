@@ -2,12 +2,12 @@
 #
 define galera_proxysql::create::user (
   Variant[Sensitive, String] $dbpass,
-  $galera_hosts   = undef,
-  $proxysql_hosts = {},
-  $proxysql_vip   = {},
-  $privileges     = ['SELECT', 'SHOW DATABASES'],
-  $table          = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
-  $dbuser         = $name
+  $galera_hosts                 = undef,
+  $proxysql_hosts               = {},
+  $proxysql_vip                 = {},
+  $privileges                   = ['SELECT', 'SHOW DATABASES'],
+  Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
+  $dbuser                       = $name
   ) {
 
   if $dbpass =~ String {
@@ -24,7 +24,12 @@ define galera_proxysql::create::user (
   } else {
     $host_hash = $galera_hosts
   }
-  $schema_name = split($table, '[.]')[0]
+
+  if $table =~ String {
+    $schema_name = split($table, '[.]')[0]
+  } elsif $table =~ Array {
+    $schema_name = $table.map |$item| {split($item, '[.]')[0]}
+  }
 
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {
