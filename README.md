@@ -153,7 +153,7 @@ galera_proxysql::create::user { 'zabbix':
   proxysql_hosts => $proxysql_hosts,
   proxysql_vip   => $proxysql_hosts,
   privileges     => ['ALL'],
-  table          => 'zabbix.*';
+  table          => ['zabbix.*', 'zobbix.mytable', 'zubbix.*'];
 }
 ```
 

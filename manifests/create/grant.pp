@@ -7,28 +7,11 @@ define galera_proxysql::create::grant (
   $source = $name
   ) {
 
-  mysql_grant {
-    "${dbuser}@${host_ips['ipv4']}/${table}":
-      ensure     => present,
-      user       => "${dbuser}@${host_ips['ipv4']}",
-      table      => $table,
-      privileges => $privileges,
-      require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
-    "${dbuser}@${host_name}/${table}":
-      ensure     => present,
-      user       => "${dbuser}@${host_name}",
-      table      => $table,
-      privileges => $privileges,
-      require    => Mysql_user["${dbuser}@${host_name}"];
-  }
-  if has_key($host_ips, 'ipv6') {
-    mysql_grant { "${dbuser}@${host_ips['ipv6']}/${table}":
-      ensure     => present,
-      user       => "${dbuser}@${host_ips['ipv6']}",
-      table      => $table,
-      privileges => $privileges,
-      require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
-    }
+  mysql_grant { "${dbuser}@${source}/${table}":
+    ensure     => present,
+    user       => "${dbuser}@${source}",
+    table      => $table,
+    privileges => $privileges;
   }
 
 }
