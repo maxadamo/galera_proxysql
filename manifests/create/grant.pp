@@ -12,11 +12,13 @@ define galera_proxysql::create::grant (
     fail("this define is intended to be called only within ${module_name}")
   }
 
-  mysql_grant { "${dbuser}@${source}/${table}":
-    ensure     => $ensure,
-    user       => "${dbuser}@${source}",
-    table      => $table,
-    privileges => $privileges;
+  $table.each | $table_element | {
+    mysql_grant { "${dbuser}@${source}/${table_element}":
+      ensure     => $ensure,
+      user       => "${dbuser}@${source}",
+      table      => $table,
+      privileges => $privileges;
+    }
   }
 
 }
