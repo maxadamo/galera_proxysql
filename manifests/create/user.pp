@@ -44,16 +44,16 @@ define galera_proxysql::create::user (
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {
       $schema_name.each | $myschema | {
-      unless defined(Mysql::Db[$myschema]) {
-        mysql::db { $myschema:
-          ensure   => $ensure_schema,
-          user     => $dbuser,
-          password => $dbpass_wrap.unwrap,
-          grant    => $privileges,
-          charset  => 'utf8',
-          collate  => 'utf8_bin';
+        unless defined(Mysql::Db[$myschema]) {
+          mysql::db { $myschema:
+            ensure   => $ensure_schema,
+            user     => $dbuser,
+            password => $dbpass_wrap.unwrap,
+            grant    => $privileges,
+            charset  => 'utf8',
+            collate  => 'utf8_bin';
+          }
         }
-      }
       }
       $host_hash.each | $host_name, $host_ips | {
         mysql_user {
