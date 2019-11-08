@@ -43,8 +43,9 @@ define galera_proxysql::create::user (
 
   if defined(Class['::galera_proxysql::join']) {
     if ($galera_hosts) {
-      unless defined(Mysql::Db[$schema_name]) {
-        mysql::db { $schema_name:
+      $schema_name.each | $myschema | {
+      unless defined(Mysql::Db[$myschema]) {
+        mysql::db { $myschema:
           ensure   => $ensure_schema,
           user     => $dbuser,
           password => $dbpass_wrap.unwrap,
@@ -52,6 +53,7 @@ define galera_proxysql::create::user (
           charset  => 'utf8',
           collate  => 'utf8_bin';
         }
+      }
       }
       $host_hash.each | $host_name, $host_ips | {
         mysql_user {
