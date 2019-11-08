@@ -4,8 +4,8 @@ define galera_proxysql::create::grant (
   $table,
   $privileges,
   $dbuser,
+  $source,
   $ensure = present,
-  $source = $name
   ) {
 
   if $caller_module_name != $module_name {
