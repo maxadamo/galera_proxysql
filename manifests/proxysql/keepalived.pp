@@ -16,7 +16,8 @@ class galera_proxysql::proxysql::keepalived (
     $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
   }
 
-  include ::keepalived
+  class { 'keepalived': sysconf_options => $keepalived_sysconf_options; }
+
   class { '::galera_proxysql::proxysql::firewall': peer_ip => $peer_ip; }
 
   keepalived::vrrp::script { 'check_proxysql':
