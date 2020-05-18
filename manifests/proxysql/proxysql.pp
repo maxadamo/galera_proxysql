@@ -43,9 +43,9 @@ class galera_proxysql::proxysql::proxysql (
   String $network_interface      = $galera_proxysql::params::network_interface,
   String $proxysql_version       = $galera_proxysql::params::proxysql_version,
   String $proxysql_mysql_version = $galera_proxysql::params::proxysql_mysql_version,
-  $keepalived_sysconf_options    = $galera_proxysql::params::keepalived_sysconf_options,
   $limitnofile                   = $galera_proxysql::params::limitnofile,
   $http_proxy                    = $galera_proxysql::params::http_proxy,
+  Optional[String] $keepalived_sysconf_options = $galera_proxysql::params::keepalived_sysconf_options,
 
   # Passwords
   Variant[Sensitive, String] $monitor_password        = $galera_proxysql::params::monitor_password,
