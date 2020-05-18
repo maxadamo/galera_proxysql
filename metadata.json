@@ -1,6 +1,6 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "0.9.51",
+  "version": "0.9.55",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
@@ -10,11 +10,11 @@
   "dependencies": [
     {
       "name": "puppet-keepalived",
-      "version_requirement": ">= 2.0.0 <= 2.1.0"
+      "version_requirement": ">= 2.0.0 <= 2.2.0"
     },
     {
       "name": "puppetlabs-firewall",
-      "version_requirement": ">= 1.9.0 <= 2.0.0"
+      "version_requirement": ">= 1.9.0 <= 2.2.0"
     },
     {
       "name": "puppetlabs-mysql",
@@ -26,11 +26,11 @@
     },
     {
       "name": "puppetlabs-xinetd",
-      "version_requirement": ">= 3.0.0 <= 3.2.0"
+      "version_requirement": ">= 3.0.0 <= 3.3.0"
     },
     {
       "name": "puppetlabs-yumrepo_core",
-      "version_requirement": ">= 1.0.0 <= 1.0.3"
+      "version_requirement": ">= 1.0.0 <= 1.0.6"
     }
   ],
   "data_provider": "hiera",
