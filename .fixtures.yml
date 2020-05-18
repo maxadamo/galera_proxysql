@@ -1,23 +1,26 @@
 ---
 fixtures:
   forge_modules:
+    keepalived:
+      repo: "puppet/keepalived"
+      ref: "2.2.0"
+    firewall:
+      repo: 'puppetlabs/firewall'
+      ref: '2.2.0'
+    mysql:
+      repo: 'puppetlabs/mysql'
+      ref: '10.2.1'
     rpmkey:
       repo: 'stschulte/rpmkey'
       ref: '1.0.3'
     xinetd:
       repo: 'puppetlabs/xinetd'
-      ref: '3.2.0'
+      ref: '3.3.0'
     stdlib:
       repo: 'puppetlabs/stdlib'
       ref: '6.0.0'
       # flags: "--module_repository https://my_repo.com"
-    mysql:
-      repo: 'puppetlabs/mysql'
-      ref: '8.1.0'
-    firewall:
-      repo: 'puppetlabs/firewall'
-      ref: '2.0.0'
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
-      ref: '1.0.3'
+      ref: '1.0.6'
 
