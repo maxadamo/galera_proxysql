@@ -31,7 +31,7 @@ class galera_proxysql::proxysql::keepalived (
       state                      => 'BACKUP',
       virtual_router_id          => seeded_rand(255, "${module_name}${::environment}")+0,
       unicast_source_ip          => $facts['ipaddress'],
-      unicast_peers              => $peer_ip,
+      unicast_peers              => [$peer_ip],
       priority                   => 100,
       auth_type                  => 'PASS',
       auth_pass                  => seeded_rand_string(10, "${module_name}${::environment}"),
