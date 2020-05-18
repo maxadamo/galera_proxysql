@@ -1,11 +1,12 @@
 # == Class: galera_proxysql::proxysql::keepalived
 #
 class galera_proxysql::proxysql::keepalived (
-  $proxysql_hosts    = $::galera_proxysql::params::proxysql_hosts,
-  $proxysql_vip      = $::galera_proxysql::params::proxysql_vip,
-  $network_interface = $::galera_proxysql::params::network_interface,
-  $use_ipv6          = undef
-) inherits galera_proxysql::params {
+  $proxysql_hosts,
+  $proxysql_vip,
+  $network_interface,
+  $keepalived_sysconf_options,
+  $use_ipv6
+) {
 
   $vip_key = keys($proxysql_vip)[0]
   $proxysql_key_first = keys($proxysql_hosts)[0]
@@ -29,8 +30,8 @@ class galera_proxysql::proxysql::keepalived (
       interface                  => $network_interface,
       state                      => 'BACKUP',
       virtual_router_id          => seeded_rand(255, "${module_name}${::environment}")+0,
-      unicast_source_ip          => $::ipaddress,
-      unicast_peers              => [$peer_ip],
+      unicast_source_ip          => $facts['ipaddress'],
+      unicast_peers              => $peer_ip,
       priority                   => 100,
       auth_type                  => 'PASS',
       auth_pass                  => seeded_rand_string(10, "${module_name}${::environment}"),
@@ -43,7 +44,7 @@ class galera_proxysql::proxysql::keepalived (
       interface         => $network_interface,
       state             => 'BACKUP',
       virtual_router_id => seeded_rand(255, "${module_name}${::environment}")+0,
-      unicast_source_ip => $::ipaddress,
+      unicast_source_ip => $facts['ipaddress'],
       unicast_peers     => [$peer_ip],
       priority          => 100,
       auth_type         => 'PASS',

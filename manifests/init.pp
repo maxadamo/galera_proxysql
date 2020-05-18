@@ -143,8 +143,9 @@ class galera_proxysql (
   Variant[Sensitive, String, Undef] $root_password    = $galera_proxysql::params::root_password,
 
   # proxysql parameters
-  $proxysql_version = $galera_proxysql::params::proxysql_version,
-  $proxysql_vip     = $galera_proxysql::params::proxysql_vip,
+  $proxysql_version                            = $galera_proxysql::params::proxysql_version,
+  $proxysql_vip                                = $galera_proxysql::params::proxysql_vip,
+  Optional[String] $keepalived_sysconf_options = $galera_proxysql::params::keepalived_sysconf_options,
   Variant[Sensitive, String, Undef] $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration

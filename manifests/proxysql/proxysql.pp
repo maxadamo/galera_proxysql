@@ -43,6 +43,7 @@ class galera_proxysql::proxysql::proxysql (
   String $network_interface      = $galera_proxysql::params::network_interface,
   String $proxysql_version       = $galera_proxysql::params::proxysql_version,
   String $proxysql_mysql_version = $galera_proxysql::params::proxysql_mysql_version,
+  $keepalived_sysconf_options    = $galera_proxysql::params::keepalived_sysconf_options,
   $limitnofile                   = $galera_proxysql::params::limitnofile,
   $http_proxy                    = $galera_proxysql::params::http_proxy,
 
@@ -109,23 +110,24 @@ class galera_proxysql::proxysql::proxysql (
   $server_list_write = "${list_top}${_server_list_write}${list_bottom_write}".chop()
 
   class {
-    '::galera_proxysql::repo':
+    'galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
-    '::galera_proxysql::proxysql::service':
+    'galera_proxysql::proxysql::service':
       limitnofile => $limitnofile;
-    '::galera_proxysql::proxysql::keepalived':
-      use_ipv6          => $ipv6_true,
-      proxysql_hosts    => $proxysql_hosts,
-      network_interface => $network_interface,
-      proxysql_vip      => $proxysql_vip;
-    '::galera_proxysql::firewall':
+    'galera_proxysql::proxysql::keepalived':
+      use_ipv6                   => $ipv6_true,
+      proxysql_hosts             => $proxysql_hosts,
+      network_interface          => $network_interface,
+      keepalived_sysconf_options => $keepalived_sysconf_options,
+      proxysql_vip               => $proxysql_vip;
+    'galera_proxysql::firewall':
       use_ipv6         => $ipv6_true,
       galera_hosts     => $galera_hosts,
       proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
-    '::mysql::client':
+    'mysql::client':
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 

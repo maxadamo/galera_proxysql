@@ -46,6 +46,7 @@ class galera_proxysql::params {
   $proxysql_vip = undef
   $proxysql_admin_password = Sensitive('admin')
   $proxysql_users = {}
+  $keepalived_sysconf_options = undef
 
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
