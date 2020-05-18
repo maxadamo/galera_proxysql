@@ -20,6 +20,10 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to ProxySQL cluster.
 #   Currently only 2 hosts are supported. Check examples on README.md
 #
+# [*keepalived_sysconf_options*] <String>
+#   list of options to pass to keepalived. Example: -D --snmp
+#   default: => '-D'
+#
 # [*proxysql_admin_password*] <Sensitive>
 #   proxysql user password
 #
