@@ -18,7 +18,7 @@ class galera_proxysql::proxysql::keepalived (
 
   class { 'keepalived': sysconf_options => $keepalived_sysconf_options; }
 
-  class { '::galera_proxysql::proxysql::firewall': peer_ip => $peer_ip; }
+  class { 'galera_proxysql::proxysql::firewall': peer_ip => $peer_ip; }
 
   keepalived::vrrp::script { 'check_proxysql':
     script   => 'killall -0 proxysql',
