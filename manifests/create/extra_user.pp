@@ -8,7 +8,8 @@ define galera_proxysql::create::extra_user (
   $galera_hosts                 = undef,
   $proxysql_hosts               = {},
   $proxysql_vip                 = {},
-  $privileges                   = ['SELECT', 'SHOW DATABASES'],
+  $privileges                   = ['SELECT'],
+  Boolean $show_databases       = false,
   Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                       = $name,  # do not drop DB if a user is removed
   Enum[
@@ -52,6 +53,21 @@ define galera_proxysql::create::extra_user (
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
         }
+        if ($show_databases) {
+          galera_proxysql::create::grant {
+            default:
+              ensure     => $ensure,
+              dbuser     => $dbuser,
+              table      => $table,
+              privileges => $privileges;
+            "${host_ips['ipv4']} ${dbuser} show_databases":
+              source  => $host_ips['ipv4'],
+              require => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
+            "${host_name} ${dbuser} show_databases":
+              source  => $host_name,
+              require => Mysql_user["${dbuser}@${host_name}"];
+          }
+        }
         galera_proxysql::create::grant { "${host_ips['ipv4']} ${dbuser}":
           ensure     => $ensure,
           source     => $host_ips['ipv4'],
@@ -74,6 +90,16 @@ define galera_proxysql::create::extra_user (
             password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
+          }
+          if ($show_databases) {
+            galera_proxysql::create::grant { "${host_ips['ipv6']} ${dbuser} show_databases":
+              ensure     => $ensure,
+              dbuser     => $dbuser,
+              table      => $table,
+              privileges => $privileges,
+              source     => $host_ips['ipv6'],
+              require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
+            }
           }
           galera_proxysql::create::grant { "${host_ips['ipv6']} ${dbuser}":
             ensure     => $ensure,
