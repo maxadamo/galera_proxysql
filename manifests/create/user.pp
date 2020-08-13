@@ -6,9 +6,9 @@ define galera_proxysql::create::user (
   $proxysql_hosts                    = {},
   $proxysql_vip                      = {},
   $privileges                        = ['SELECT'],
-  Enum[
-    'present', 'absent',
-    present, absent] $show_databases = absent,
+  #Enum[
+  #  'present', 'absent',
+  #  present, absent] $show_databases = absent,
   Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                            = $name,
   $force_schema_removal              = false,  # do not drop DB if a user is removed
