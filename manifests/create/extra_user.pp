@@ -9,9 +9,9 @@ define galera_proxysql::create::extra_user (
   $proxysql_hosts                    = {},
   $proxysql_vip                      = {},
   $privileges                        = ['SELECT'],
-  #Enum[
-  #  'present', 'absent',
-  #  present, absent] $show_databases = absent,
+  Enum[
+    'present', 'absent',
+    present, absent] $show_databases = absent,
   Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                            = $name,  # do not drop DB if a user is removed
   Enum[
@@ -68,13 +68,17 @@ define galera_proxysql::create::extra_user (
             source  => $host_name,
             require => Mysql_user["${dbuser}@${host_name}"];
           "${host_ips['ipv4']} ${dbuser} show_databases":
-            table   => '*.*',
-            source  => $host_ips['ipv4'],
-            require => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
+            ensure     => $show_databases,
+            table      => '*.*',
+            source     => $host_ips['ipv4'],
+            privileges => ['SHOW DATABASES'],
+            require    => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
           "${host_name} ${dbuser} show_databases":
-            table   => '*.*',
-            source  => $host_name,
-            require => Mysql_user["${dbuser}@${host_name}"];
+            ensure     => $show_databases,
+            table      => '*.*',
+            source     => $host_name,
+            privileges => ['SHOW DATABASES'],
+            require    => Mysql_user["${dbuser}@${host_name}"];
         }
         if has_key($host_ips, 'ipv6') {
           mysql_user { "${dbuser}@${host_ips['ipv6']}":
@@ -87,7 +91,7 @@ define galera_proxysql::create::extra_user (
             ensure     => $show_databases,
             dbuser     => $dbuser,
             table      => '*.*',
-            privileges => $privileges,
+            privileges => ['SHOW DATABASES'],
             source     => $host_ips['ipv6'],
             require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
           }
@@ -96,7 +100,7 @@ define galera_proxysql::create::extra_user (
             source     => $host_ips['ipv6'],
             dbuser     => $dbuser,
             table      => $table,
-            privileges => $privileges,
+            privileges => ['SHOW DATABASES'],
             require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"]
           }
         }
