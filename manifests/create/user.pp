@@ -6,9 +6,6 @@ define galera_proxysql::create::user (
   $proxysql_hosts                    = {},
   $proxysql_vip                      = {},
   $privileges                        = ['SELECT'],
-  Enum[
-    'present', 'absent',
-    present, absent] $show_databases = absent,
   Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                            = $name,
   $force_schema_removal              = false,  # do not drop DB if a user is removed
@@ -86,19 +83,6 @@ define galera_proxysql::create::user (
         }
         galera_proxysql::create::grant {
           default:
-            ensure     => $show_databases,
-            dbuser     => $dbuser,
-            table      => '*.*',
-            privileges => ['SHOW DATABASES'];
-          "${host_ips['ipv4']} ${dbuser} show_databases":
-            source  => $host_ips['ipv4'],
-            require => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
-          "${host_name} ${dbuser} show_databases":
-            source  => $host_name,
-            require => Mysql_user["${dbuser}@${host_name}"];
-        }
-        galera_proxysql::create::grant {
-          default:
             ensure     => $ensure,
             dbuser     => $dbuser,
             table      => $table,
@@ -116,14 +100,6 @@ define galera_proxysql::create::user (
             password_hash => mysql_password($dbpass_wrap.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
-          }
-          galera_proxysql::create::grant { "${host_ips['ipv6']} ${dbuser} show_databases":
-            ensure     => $show_databases,
-            dbuser     => $dbuser,
-            table      => '*.*',
-            privileges => ['SHOW DATABASES'],
-            source     => $host_ips['ipv6'],
-            require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
           }
           galera_proxysql::create::grant { "${host_ips['ipv6']} ${dbuser}":
             ensure     => $ensure,
