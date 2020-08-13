@@ -6,9 +6,9 @@ define galera_proxysql::create::user (
   $proxysql_hosts                    = {},
   $proxysql_vip                      = {},
   $privileges                        = ['SELECT'],
-  #Enum[
-  #  'present', 'absent',
-  #  present, absent] $show_databases = absent,
+  Enum[
+    'present', 'absent',
+    present, absent] $show_databases = absent,
   Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
   $dbuser                            = $name,
   $force_schema_removal              = false,  # do not drop DB if a user is removed
@@ -89,7 +89,7 @@ define galera_proxysql::create::user (
             ensure     => $show_databases,
             dbuser     => $dbuser,
             table      => '*.*',
-            privileges => $privileges;
+            privileges => ['SHOW DATABASES'];
           "${host_ips['ipv4']} ${dbuser} show_databases":
             source  => $host_ips['ipv4'],
             require => Mysql_user["${dbuser}@${host_ips['ipv4']}"];
@@ -121,7 +121,7 @@ define galera_proxysql::create::user (
             ensure     => $show_databases,
             dbuser     => $dbuser,
             table      => '*.*',
-            privileges => $privileges,
+            privileges => ['SHOW DATABASES'],
             source     => $host_ips['ipv6'],
             require    => Mysql_user["${dbuser}@${host_ips['ipv6']}"];
           }
