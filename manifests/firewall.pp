@@ -4,12 +4,14 @@
 # We set inbound traffic only through the application manifest
 #
 class galera_proxysql::firewall (
-  $use_ipv6         = $::galera_proxysql::params::use_ipv6,
-  $galera_hosts     = $::galera_proxysql::params::galera_hosts,
-  $proxysql_hosts   = $::galera_proxysql::params::proxysql_hosts,
-  $proxysql_vip     = $::galera_proxysql::params::proxysql_vip,
-  $trusted_networks = $::galera_proxysql::params::trusted_networks
-) inherits galera_proxysql::params {
+  $use_ipv6,
+  $galera_hosts,
+  $proxysql_hosts,
+  $proxysql_vip,
+  $trusted_networks
+) {
+
+  assert_private("this manifest should only be called by ${module_name}")
 
   $trusted_networks.each | String $source | {
     if $source =~ Stdlib::IP::Address::V6 { $provider = 'ip6tables' } else { $provider = 'iptables' }

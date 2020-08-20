@@ -260,9 +260,9 @@ class galera_proxysql (
       percona_minor_version => $percona_minor_version;
     '::galera_proxysql::join':
       percona_major_version => $percona_major_version,
-      monitor_password      => $monitor_password_wrap,
-      root_password         => $root_password,
-      sst_password          => $sst_password_wrap,
+      monitor_password      => Sensitive($monitor_password),
+      root_password         => Sensitive($root_password),
+      sst_password          => Sensitive($sst_password),
       galera_hosts          => $galera_hosts,
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
@@ -283,6 +283,7 @@ class galera_proxysql (
     class { 'galera_proxysql::firewall':
       use_ipv6         => $ipv6_true,
       galera_hosts     => $galera_hosts,
+      proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
     }

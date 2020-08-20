@@ -1,9 +1,8 @@
 # == Class: galera_proxysql::repo inherits galera
 #
-class galera_proxysql::repo (
-  $http_proxy  = $::galera_proxysql::params::http_proxy,
-  $manage_repo = $::galera_proxysql::params::manage_repo
-) inherits galera_proxysql::params {
+class galera_proxysql::repo ($http_proxy, $manage_repo) {
+
+  assert_private("this manifest should only be called by ${module_name}")
 
   if $manage_repo {
     rpmkey { 'CD2EFD2A':

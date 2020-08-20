@@ -3,15 +3,17 @@
 # This Class manages services
 #
 class galera_proxysql::join (
-  $percona_major_version = $::galera_proxysql::params::percona_major_version,
-  $monitor_password      = $::galera_proxysql::params::monitor_password,
-  $root_password         = $::galera_proxysql::params::root_password,
-  $sst_password          = $::galera_proxysql::params::sst_password,
-  $galera_hosts          = $::galera_proxysql::params::galera_hosts,
-  $proxysql_hosts        = $::galera_proxysql::params::proxysql_hosts,
-  $proxysql_vip          = $::galera_proxysql::params::proxysql_vip,
-  $manage_lvm            = $::galera_proxysql::params::manage_lvm,
-) inherits galera_proxysql::params {
+  $percona_major_version,
+  Sensitive $monitor_password,
+  Sensitive $root_password,
+  Sensitive $sst_password,
+  $galera_hosts,
+  $proxysql_hosts,
+  $proxysql_vip,
+  $manage_lvm,
+) {
+
+  assert_private("this manifest should only be called by ${module_name}")
 
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 
