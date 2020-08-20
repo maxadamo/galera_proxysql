@@ -161,8 +161,8 @@ galera_proxysql::create::user { 'zabbix':
 On ProxySQL:
 
 ```puppet
-galera_proxysql::create::user { 'zabbix':
-  dbpass => Sensitive(lookup('zabbix_db_pass', String, 'first', 'zabbix'));
+galera_proxysql::create::user { 'whatever_user':
+  dbpass => Sensitive(lookup('my_db_pass', String, 'first', 'nothing_can_be_worse_than_trump'));
 }
 ```
 
@@ -170,7 +170,7 @@ galera_proxysql::create::user { 'zabbix':
 
 ## Limitations
 
-* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (right now I'm using ProxySQL 1.4.xx)
+* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (right ProxySQL 1.4.xx is being used)
 * not yet tested on ipv4 only (but it should work)
 * there are too many moving parts and I decided to temporarily strip support to Ubuntu.
 
