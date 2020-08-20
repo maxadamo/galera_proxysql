@@ -16,7 +16,7 @@ class galera_proxysql::params {
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef
   $gcache_size = '0.15'
-  $wsrep_custom_options = ''
+  $custom_wsrep_options = ''
   $innodb_buffer_pool_size = '0.7'
   $innodb_buffer_pool_instances = floor(Float.new($facts['memorysize_mb']) * Float.new(0.7)/130)
   $innodb_flush_method = 'O_DIRECT'

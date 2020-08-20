@@ -27,7 +27,7 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to the cluster: not less than 3, not even.
 #   check examples on README.md
 #
-# [*wsrep_custom_options*] <String-number>
+# [*custom_wsrep_options*] <String-number>
 #   default: '' => a semi-colon separate list of values (see Galera Cluster documentation)
 #
 # [*gcache_size*] <String-number>
@@ -127,7 +127,7 @@ class galera_proxysql (
   $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $galera_proxysql::params::galera_hosts,
   $gcache_size                  = $galera_proxysql::params::gcache_size,
-  $wsrep_custom_options         = $galera_proxysql::params::wsrep_custom_options,
+  $custom_wsrep_options         = $galera_proxysql::params::custom_wsrep_options,
   $innodb_buffer_pool_size      = $galera_proxysql::params::innodb_buffer_pool_size,
   $innodb_buffer_pool_instances = $galera_proxysql::params::innodb_buffer_pool_instances,
   $innodb_flush_method          = $galera_proxysql::params::innodb_flush_method,
