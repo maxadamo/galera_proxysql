@@ -232,27 +232,28 @@ class galera_proxysql (
 
   class {
     '::galera_proxysql::files':
+      percona_major_version        => $percona_major_version,
       custom_server_cnf_parameters => $custom_server_cnf_parameters,
       custom_client_cnf_parameters => $custom_client_cnf_parameters,
       force_ipv6                   => $force_ipv6,
-      galera_cluster_name          => $galera_cluster_name,
-      galera_hosts                 => $galera_hosts,
       gcache_size                  => $gcache_size,
       custom_wsrep_options         => $custom_wsrep_options,
       innodb_buffer_pool_size      => $innodb_buffer_pool_size,
+      galera_cluster_name          => $galera_cluster_name,
+      galera_hosts                 => $galera_hosts,
       innodb_buffer_pool_instances => $innodb_buffer_pool_instances,
       innodb_flush_method          => $innodb_flush_method,
       innodb_io_capacity           => $innodb_io_capacity,
       innodb_log_file_size         => $innodb_log_file_size,
       logdir                       => $logdir,
       max_connections              => $max_connections,
-      monitor_password             => $monitor_password_wrap,
       query_cache_size             => $query_cache_size,
       query_cache_type             => $query_cache_type,
-      root_password                => $root_password_wrap,
-      sst_password                 => $sst_password_wrap,
-      tmpdir                       => $tmpdir,
-      thread_cache_size            => $thread_cache_size;
+      monitor_password             => Sensitive($monitor_password),
+      root_password                => Sensitive($root_password),
+      sst_password                 => Sensitive($sst_password),
+      thread_cache_size            => $thread_cache_size,
+      tmpdir                       => $tmpdir;
     '::galera_proxysql::install':
       other_pkgs            => $other_pkgs,
       percona_major_version => $percona_major_version,
