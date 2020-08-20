@@ -271,9 +271,10 @@ class galera_proxysql (
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
     '::galera_proxysql::lvm':
-      manage_lvm => $manage_lvm,
-      vg_name    => $vg_name,
-      lv_size    => $lv_size;
+      manage_lvm            => $manage_lvm,
+      vg_name               => $vg_name,
+      lv_size               => $lv_size,
+      percona_major_version => $percona_major_version;
     '::galera_proxysql::services':;
     '::mysql::client':
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
