@@ -4,6 +4,7 @@
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
 #
+<% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::gcache_size)) -%>
 
 # this is read by the standalone daemon and embedded servers
 [mysqld]
@@ -20,9 +21,6 @@ pxc_strict_mode                = DISABLED
 wsrep_node_name                = <%= $::hostname %>
 
 # node IP address
-<% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::gcache_size)) -%>
-
-<% $gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new(0.15)) -%>
 <% if $force_ipv6 { -%>
 wsrep_node_address             = "[<%= $::ipaddress6 %>]:4567"
 
