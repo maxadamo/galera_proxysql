@@ -15,8 +15,10 @@ class galera_proxysql::params {
   $custom_client_cnf_parameters = undef
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef
+  $gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new(0.15))
+  $wsrep_custom_options = ''
   $innodb_buffer_pool_size = '0.7'
-  $innodb_buffer_pool_instances = floor(Float.new($facts['memorysize_mb']) * Float.new(0.7)/130)
+  $innodb_buffer_pool_instances = '0.7'
   $innodb_flush_method = 'O_DIRECT'
   $innodb_io_capacity = 200
   $innodb_log_file_size = '512M'

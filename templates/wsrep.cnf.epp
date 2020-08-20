@@ -20,12 +20,14 @@ pxc_strict_mode                = DISABLED
 wsrep_node_name                = <%= $::hostname %>
 
 # node IP address
+<% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::gcache_size)) -%>
+
 <% $gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new(0.15)) -%>
 <% if $force_ipv6 { -%>
 wsrep_node_address             = "[<%= $::ipaddress6 %>]:4567"
 
 # Provider specific configuration options
-wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $::ipaddress6 %>]:4568; gcache.size=<%= $gcache_size %>M"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $::ipaddress6 %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M;<%= $galera_proxysql::files::wsrep_custom_options %>"
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)

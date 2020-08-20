@@ -27,6 +27,12 @@
 #   list of hosts, ipv4 (optionally ipv6) belonging to the cluster: not less than 3, not even.
 #   check examples on README.md
 #
+# [*wsrep_custom_options*] <String-number>
+#   default: '' => a semi-colon separate list of values (see Galera Cluster documentation)
+#
+# [*gcache_size*] <String-number>
+#   default: 0.15 => 15% of memory is assigned to this MySQL parameter
+#
 # [*innodb_buffer_pool_size*] <String-number>
 #   default: 0.7 => 70% of memory is assigned to this MySQL parameter
 #
@@ -120,6 +126,8 @@ class galera_proxysql (
   Boolean $force_ipv6           = $galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $galera_proxysql::params::galera_hosts,
+  $gcache_size                  = $galera_proxysql::params::gcache_size,
+  $wsrep_custom_options         = $galera_proxysql::params::wsrep_custom_options,
   $innodb_buffer_pool_size      = $galera_proxysql::params::innodb_buffer_pool_size,
   $innodb_buffer_pool_instances = $galera_proxysql::params::innodb_buffer_pool_instances,
   $innodb_flush_method          = $galera_proxysql::params::innodb_flush_method,
