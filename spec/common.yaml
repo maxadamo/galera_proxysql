@@ -1,7 +1,10 @@
 ---
-galera_proxysql::root_password: 'root_pass'
+galera_proxysql::root_password: '33'
 galera_proxysql::sst_password: 'sst_pass'
 galera_proxysql::monitor_password: 'monitor_pass'
+lookup_options:
+  '^galera_proxysql::(.*)_password$':
+    convert_to: "Sensitive"
 galera_proxysql::galera_hosts:
   "%{fqdn}":
     ipv4: '192.168.1.10'
