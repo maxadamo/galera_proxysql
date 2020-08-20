@@ -4,6 +4,8 @@
 #
 class galera_proxysql::services {
 
+  assert_private("this class should be called only by ${module_name}")
+
   xinetd::service { 'galerachk':
     server         => '/usr/bin/clustercheck',
     port           => '9200',

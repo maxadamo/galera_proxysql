@@ -2,6 +2,8 @@
 #
 class galera_proxysql::proxysql::firewall ($peer_ip) {
 
+  assert_private("this class should be called only by ${module_name}")
+
   firewall {
     default:
       action => accept,

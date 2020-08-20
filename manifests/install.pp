@@ -8,7 +8,7 @@ class galera_proxysql::install (
   $percona_minor_version,
 ) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   $pip_pkgs = ['distro', 'multiping', 'pysystemd']
 

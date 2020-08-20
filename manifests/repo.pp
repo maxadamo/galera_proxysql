@@ -2,7 +2,7 @@
 #
 class galera_proxysql::repo ($http_proxy, $manage_repo) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   if $manage_repo {
     rpmkey { 'CD2EFD2A':

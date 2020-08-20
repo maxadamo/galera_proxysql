@@ -118,26 +118,27 @@
 class galera_proxysql (
 
   # print debug messages
-  Boolean $puppet_debug = $::galera_proxysql::params::puppet_debug,
+  Boolean $puppet_debug = $galera_proxysql::params::puppet_debug,
 
   # galera parameters
+  $manage_lvm                   = $galera_proxysql::params::manage_lvm,
+  $vg_name                      = $galera_proxysql::params::vg_name,
+  $lv_size                      = $galera_proxysql::params::lv_size,
   $custom_server_cnf_parameters = $galera_proxysql::params::custom_server_cnf_parameters,
   $custom_client_cnf_parameters = $galera_proxysql::params::custom_client_cnf_parameters,
+  $custom_wsrep_options         = $galera_proxysql::params::custom_wsrep_options,
   Boolean $force_ipv6           = $galera_proxysql::params::force_ipv6,
   $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
   $galera_hosts                 = $galera_proxysql::params::galera_hosts,
   $gcache_size                  = $galera_proxysql::params::gcache_size,
-  $custom_wsrep_options         = $galera_proxysql::params::custom_wsrep_options,
   $innodb_buffer_pool_size      = $galera_proxysql::params::innodb_buffer_pool_size,
   $innodb_buffer_pool_instances = $galera_proxysql::params::innodb_buffer_pool_instances,
   $innodb_flush_method          = $galera_proxysql::params::innodb_flush_method,
   $innodb_io_capacity           = $galera_proxysql::params::innodb_io_capacity,
   $innodb_log_file_size         = $galera_proxysql::params::innodb_log_file_size,
   $logdir                       = $galera_proxysql::params::logdir,
-  $lv_size                      = $galera_proxysql::params::lv_size,
   $percona_major_version        = $galera_proxysql::params::percona_major_version,
   $percona_minor_version        = $galera_proxysql::params::percona_minor_version,
-  $manage_lvm                   = $galera_proxysql::params::manage_lvm,
   $max_connections              = $galera_proxysql::params::max_connections,
   $other_pkgs                   = $galera_proxysql::params::other_pkgs,
   $query_cache_size             = $galera_proxysql::params::query_cache_size,
@@ -145,15 +146,14 @@ class galera_proxysql (
   $thread_cache_size            = $galera_proxysql::params::thread_cache_size,
   $tmpdir                       = $galera_proxysql::params::tmpdir,
   $trusted_networks             = $galera_proxysql::params::trusted_networks,
-  $vg_name                      = $galera_proxysql::params::vg_name,
-  Variant[Sensitive, String, Undef] $monitor_password = $galera_proxysql::params::monitor_password,
-  Variant[Sensitive, String, Undef] $sst_password     = $galera_proxysql::params::sst_password,
-  Variant[Sensitive, String, Undef] $root_password    = $galera_proxysql::params::root_password,
+  Sensitive $monitor_password   = $galera_proxysql::params::monitor_password,
+  Sensitive $sst_password       = $galera_proxysql::params::sst_password,
+  Sensitive $root_password      = $galera_proxysql::params::root_password,
 
   # proxysql parameters
-  $proxysql_version = $galera_proxysql::params::proxysql_version,
-  $proxysql_vip     = $galera_proxysql::params::proxysql_vip,
-  Variant[Sensitive, String, Undef] $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
+  $proxysql_version                  = $galera_proxysql::params::proxysql_version,
+  $proxysql_vip                      = $galera_proxysql::params::proxysql_vip,
+  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration
   $network_interface = $galera_proxysql::params::network_interface,
@@ -185,35 +185,6 @@ class galera_proxysql (
 
   #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
   unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd')}
-  unless $root_password { fail('parameter "root_password" is missing') }
-  unless $sst_password { fail('parameter "sst_password" is missing') }
-  unless $monitor_password { fail('parameter "monitor_password" is missing') }
-
-  # wrap password if it's not wrapped
-  if $root_password =~ String {
-    notify { '"root_password" String detected!':
-      message => 'It is advisable to use the Sensitive datatype for "root_password"';
-    }
-    $root_password_wrap = Sensitive($root_password)
-  } else {
-    $root_password_wrap = $root_password
-  }
-  if $sst_password =~ String {
-    notify { '"sst_password" String detected!':
-      message => 'It is advisable to use the Sensitive datatype for "sst_password"';
-    }
-    $sst_password_wrap = Sensitive($sst_password)
-  } else {
-    $sst_password_wrap = $sst_password
-  }
-  if $monitor_password =~ String {
-    notify { '"monitor_password" String detected!':
-      message => 'It is advisable to use the Sensitive datatype for "monitor_password"';
-    }
-    $monitor_password_wrap = Sensitive($monitor_password)
-  } else {
-    $monitor_password_wrap = $monitor_password
-  }
 
   if $manage_lvm and $lv_size == undef { fail('manage_lvm is true but lv_size is undef') }
   if $manage_lvm and $vg_name == undef { fail('manage_lvm is true but vg_name is undef') }
@@ -227,7 +198,7 @@ class galera_proxysql (
   }
 
   galera_proxysql::create::root_password { 'root':
-    root_pass => $root_password_wrap;
+    root_pass => $root_password;
   }
 
   class {

@@ -2,16 +2,16 @@
 #
 define galera_proxysql::create::user (
   Variant[Sensitive, String] $dbpass,
-  $galera_hosts                      = undef,
-  $proxysql_hosts                    = {},
-  $proxysql_vip                      = {},
-  $privileges                        = ['SELECT'],
-  Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
-  $dbuser                            = $name,
-  $force_schema_removal              = false,  # do not drop DB if a user is removed
+  $galera_hosts                 = undef,
+  $proxysql_hosts               = {},
+  $proxysql_vip                 = {},
+  $privileges                   = ['SELECT'],
+  Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
+  $dbuser                       = $name,
+  $force_schema_removal         = false,  # do not drop DB if a user is removed
   Enum[
     'present', 'absent',
-    present, absent] $ensure         = present,
+    present, absent] $ensure    = present,
   ) {
 
   if $dbpass =~ String {

@@ -7,7 +7,7 @@ class galera_proxysql::lvm (
   $percona_major_version,
 ) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   if ($lv_size and $manage_lvm and $vg_name) {
     logical_volume { 'lv_galera':

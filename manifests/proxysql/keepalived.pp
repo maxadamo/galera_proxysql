@@ -8,6 +8,8 @@ class galera_proxysql::proxysql::keepalived (
   $use_ipv6
 ) {
 
+  assert_private("this class should be called only by ${module_name}")
+
   $vip_key = keys($proxysql_vip)[0]
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $proxysql_key_second = keys($proxysql_hosts)[1]

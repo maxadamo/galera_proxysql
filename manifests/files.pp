@@ -27,7 +27,7 @@ class galera_proxysql::files (
   $tmpdir
 ) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {

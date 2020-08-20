@@ -8,9 +8,7 @@ define galera_proxysql::create::sys_user (
   $dbuser         = $name
 ) {
 
-  if $caller_module_name != $module_name {
-    fail("this define is intended to be called only within ${module_name}")
-  }
+  assert_private("this define should be called only by ${module_name}")
 
   if $dbuser == 'monitor' {
     if ($proxysql_hosts) {

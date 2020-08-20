@@ -11,6 +11,8 @@
 #
 class galera_proxysql::proxysql::service ($limitnofile) {
 
+  assert_private("this class should be called only by ${module_name}")
+
   file {
     '/etc/init.d/proxysql':
       ensure  => absent,

@@ -8,9 +8,7 @@ define galera_proxysql::create::grant (
   $ensure = present,
   ) {
 
-  if $caller_module_name != $module_name {
-    fail("this define is intended to be called only within ${module_name}")
-  }
+  assert_private("this define should be called only by ${module_name}")
 
   if $table =~ String {
     mysql_grant { "${dbuser}@${source}/${table}":

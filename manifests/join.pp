@@ -13,7 +13,7 @@ class galera_proxysql::join (
   $manage_lvm,
 ) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 

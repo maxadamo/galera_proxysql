@@ -11,7 +11,7 @@ class galera_proxysql::firewall (
   $trusted_networks
 ) {
 
-  assert_private("this manifest should only be called by ${module_name}")
+  assert_private("this class should be called only by ${module_name}")
 
   $trusted_networks.each | String $source | {
     if $source =~ Stdlib::IP::Address::V6 { $provider = 'ip6tables' } else { $provider = 'iptables' }

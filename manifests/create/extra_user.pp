@@ -5,12 +5,12 @@
 define galera_proxysql::create::extra_user (
   Variant[Sensitive, String] $dbpass,
   String $database,
-  $galera_hosts                      = undef,
-  $proxysql_hosts                    = {},
-  $proxysql_vip                      = {},
-  $privileges                        = ['SELECT'],
-  Variant[Array, String] $table      = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
-  $dbuser                            = $name,  # do not drop DB if a user is removed
+  $galera_hosts                 = undef,
+  $proxysql_hosts               = {},
+  $proxysql_vip                 = {},
+  $privileges                   = ['SELECT'],
+  Variant[Array, String] $table = '*.*',  # Example: 'schema.table', 'schema.*', '*.*'
+  $dbuser                       = $name,  # do not drop DB if a user is removed
   Enum[
     'present', 'absent',
     present, absent] $ensure    = present,

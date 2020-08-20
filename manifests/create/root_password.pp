@@ -12,7 +12,6 @@ define galera_proxysql::create::root_password(Sensitive $root_pass) {
 
   $root_cnf = '/root/.my.cnf'
 
-  # I'm not sure when exec started supporting Sensitive data. Switching to files
   file {
     default:
       mode    => '0750',

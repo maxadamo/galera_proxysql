@@ -52,27 +52,10 @@ class galera_proxysql::proxysql::proxysql (
   Optional[String] $keepalived_sysconf_options = $galera_proxysql::params::keepalived_sysconf_options,
 
   # Passwords
-  Variant[Sensitive, String] $monitor_password        = $galera_proxysql::params::monitor_password,
-  Variant[Sensitive, String] $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password
+  Sensitive $monitor_password        = $galera_proxysql::params::monitor_password,
+  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password
 
 ) inherits galera_proxysql::params {
-
-  if $monitor_password =~ String {
-    notify { '"monitor_password" String detected!':
-      message => 'It is advisable to use the Sensitive datatype for "monitor_password"';
-    }
-    $monitor_password_wrap = Sensitive($monitor_password)
-  } else {
-    $monitor_password_wrap = $monitor_password
-  }
-  if $proxysql_admin_password =~ String {
-    notify { '"proxysql_admin_password" String detected!':
-      message => 'It is advisable to use the Sensitive datatype for "proxysql_admin_password"';
-    }
-    $proxysql_admin_password_wrap = Sensitive($proxysql_admin_password)
-  } else {
-    $proxysql_admin_password_wrap = $proxysql_admin_password
-  }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $vip_key = keys($proxysql_vip)[0]
@@ -161,21 +144,21 @@ class galera_proxysql::proxysql::proxysql (
       require => Package['proxysql'],
       notify  => Service['proxysql'];
     '/root/.my.cnf':
-      content => Sensitive("[client]\nuser=monitor\npassword=${monitor_password_wrap.unwrap}\nprompt = \"\\u@\\h [DB: \\d]> \"\n");
+      content => Sensitive("[client]\nuser=monitor\npassword=${monitor_password.unwrap}\nprompt = \"\\u@\\h [DB: \\d]> \"\n");
     '/etc/proxysql-admin.cnf':
       mode    => '0640',
       group   => proxysql,
       require => Package['proxysql'],
       notify  => Service['proxysql'],
       content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
-        'monitor_password'        => Sensitive($monitor_password_wrap),
-        'proxysql_admin_password' => Sensitive($proxysql_admin_password_wrap)
+        'monitor_password'        => Sensitive($monitor_password),
+        'proxysql_admin_password' => Sensitive($proxysql_admin_password)
       }));
   }
 
 $proxysql_cnf_second_content = "  {
     username = \"monitor\"
-    password = \"${monitor_password_wrap.unwrap}\"
+    password = \"${monitor_password.unwrap}\"
     default_hostgroup = 0
     active = 1
   }"
@@ -193,9 +176,9 @@ $proxysql_cnf_second_content = "  {
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_header.cnf.epp", {
-        'proxysql_admin_password' => Sensitive($proxysql_admin_password_wrap),
+        'proxysql_admin_password' => Sensitive($proxysql_admin_password),
         'proxysql_mysql_version'  => $proxysql_mysql_version,
-        'monitor_password'        => Sensitive($monitor_password_wrap),
+        'monitor_password'        => Sensitive($monitor_password),
         'server_list_write'       => $server_list_write,
         'server_list'             => $server_list
       }),
