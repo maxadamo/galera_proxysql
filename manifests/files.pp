@@ -25,7 +25,7 @@ class galera_proxysql::files (
   Sensitive $sst_password,
   $thread_cache_size,
   $tmpdir
-) inherits galera_proxysql {
+) {
 
   assert_private('this manifest should only be called by the module')
 
