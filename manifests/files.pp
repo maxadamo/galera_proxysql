@@ -3,26 +3,31 @@
 # This Class provides files
 #
 class galera_proxysql::files (
-  $percona_major_version        = $galera_proxysql::params::percona_major_version,
-  $custom_server_cnf_parameters = $galera_proxysql::params::custom_server_cnf_parameters,
-  $custom_client_cnf_parameters = $galera_proxysql::params::custom_client_cnf_parameters,
-  $force_ipv6                   = $galera_proxysql::params::force_ipv6,
-  $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
-  $galera_hosts                 = $galera_proxysql::params::galera_hosts,
-  $innodb_buffer_pool_instances = $galera_proxysql::params::innodb_buffer_pool_instances,
-  $innodb_flush_method          = $galera_proxysql::params::innodb_flush_method,
-  $innodb_io_capacity           = $galera_proxysql::params::innodb_io_capacity,
-  $innodb_log_file_size         = $galera_proxysql::params::innodb_log_file_size,
-  $logdir                       = $galera_proxysql::params::logdir,
-  $max_connections              = $galera_proxysql::params::max_connections,
-  Sensitive $monitor_password   = $galera_proxysql::params::monitor_password,
-  $query_cache_size             = $galera_proxysql::params::query_cache_size,
-  $query_cache_type             = $galera_proxysql::params::query_cache_type,
-  Sensitive $root_password      = $galera_proxysql::params::root_password,
-  Sensitive $sst_password       = $galera_proxysql::params::sst_password,
-  $thread_cache_size            = $galera_proxysql::params::thread_cache_size,
-  $tmpdir                       = $galera_proxysql::params::tmpdir,
-) inherits galera_proxysql::params {
+  $percona_major_version,
+  $custom_server_cnf_parameters,
+  $custom_client_cnf_parameters,
+  $force_ipv6,
+  $gcache_size,
+  $custom_wsrep_options,
+  $innodb_buffer_pool_size,
+  $galera_cluster_name,
+  $galera_hosts,
+  $innodb_buffer_pool_instances,
+  $innodb_flush_method,
+  $innodb_io_capacity,
+  $innodb_log_file_size,
+  $logdir,
+  $max_connections,
+  Sensitive $monitor_password,
+  $query_cache_size,
+  $query_cache_type,
+  Sensitive $root_password,
+  Sensitive $sst_password,
+  $thread_cache_size,
+  $tmpdir
+) inherits galera_proxysql {
+
+  assert_private('this manifest should only be called by the module')
 
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
