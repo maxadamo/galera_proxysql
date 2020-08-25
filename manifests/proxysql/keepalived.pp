@@ -18,13 +18,13 @@ class galera_proxysql::proxysql::keepalived (
     $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
   }
 
-  if has_key($proxysql_hosts[$facts['fqdn']]['priority']) {
+  if has_key($proxysql_hosts[$facts['fqdn']], 'priority') {
     $priority = $proxysql_hosts[$facts['fqdn']]['priority']
   } else {
     $priority = 100
   }
 
-  if has_key($proxysql_hosts[$facts['fqdn']]['state']) {
+  if has_key($proxysql_hosts[$facts['fqdn']], 'state') {
     $state = $proxysql_hosts[$facts['fqdn']]['state']
   } else {
     $state = 'BACKUP'
