@@ -13,9 +13,21 @@ class galera_proxysql::proxysql::keepalived (
   $vip_key = keys($proxysql_vip)[0]
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $proxysql_key_second = keys($proxysql_hosts)[1]
-  $peer_ip = $::fqdn ? {
+  $peer_ip = $facts['fqdn'] ? {
     $proxysql_key_first  => $proxysql_hosts[$proxysql_key_second]['ipv4'],
     $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
+  }
+
+  if has_key($proxysql_hosts[$facts['fqdn']]['priority']) {
+    $priority = $proxysql_hosts[$facts['fqdn']]['priority']
+  } else {
+    $priority = 100
+  }
+
+  if has_key($proxysql_hosts[$facts['fqdn']]['state']) {
+    $state = $proxysql_hosts[$facts['fqdn']]['state']
+  } else {
+    $state = 'BACKUP'
   }
 
   class { 'keepalived': sysconf_options => $keepalived_sysconf_options; }
@@ -31,11 +43,11 @@ class galera_proxysql::proxysql::keepalived (
   if ($use_ipv6) {
     keepalived::vrrp::instance { 'ProxySQL':
       interface                  => $network_interface,
-      state                      => 'BACKUP',
+      state                      => $state,
       virtual_router_id          => seeded_rand(255, "${module_name}${::environment}")+0,
       unicast_source_ip          => $facts['ipaddress'],
       unicast_peers              => [$peer_ip],
-      priority                   => 100,
+      priority                   => $priority+0,
       auth_type                  => 'PASS',
       auth_pass                  => seeded_rand_string(10, "${module_name}${::environment}"),
       virtual_ipaddress          => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",
@@ -49,7 +61,7 @@ class galera_proxysql::proxysql::keepalived (
       virtual_router_id => seeded_rand(255, "${module_name}${::environment}")+0,
       unicast_source_ip => $facts['ipaddress'],
       unicast_peers     => [$peer_ip],
-      priority          => 100,
+      priority          => $priority+0,
       auth_type         => 'PASS',
       auth_pass         => seeded_rand_string(10, "${module_name}${::environment}"),
       virtual_ipaddress => "${proxysql_vip[$vip_key]['ipv4']}/${proxysql_vip[$vip_key]['ipv4_subnet']}",

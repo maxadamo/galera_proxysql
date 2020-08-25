@@ -107,6 +107,8 @@ galera_hosts:
     ipv6: '2001:123:4::6d'
 proxysql_hosts:
   test-proxysql01.example.net:
+    priority: 250              # optional: defaults to 100
+    state: 'MASTER'            # optional: defaults to 'BACKUP'
     ipv4: '192.168.0.86'
     ipv6: '2001:123:4::6e'
   test-proxysql02.example.net:
