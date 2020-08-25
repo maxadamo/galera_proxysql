@@ -176,6 +176,7 @@ galera_proxysql::create::user { 'whatever_user':
 * not yet tested on ipv4 only (but it should work)
 * there are too many moving parts and I decided to temporarily strip support to Ubuntu. 
 * Spec test needs improvements (move to Litmus?)
+* No changelog is available
 
 ## Development
 
