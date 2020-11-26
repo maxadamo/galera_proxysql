@@ -8,9 +8,14 @@
 # the password will be changed only if /root/.my.cnf is available, it the server
 # belonged to a cluster and if the cluster status is 200
 #
-define galera_proxysql::create::root_password(Sensitive $root_pass) {
+define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $force_ipv6) {
 
   $root_cnf = '/root/.my.cnf'
+  if ($force_ipv6) {
+    $root_host_list = ['127.0.0.1', 'localhost', '::1']
+  } else {
+    $root_host_list = ['127.0.0.1', 'localhost']
+  }
 
   file {
     default:
@@ -38,6 +43,17 @@ define galera_proxysql::create::root_password(Sensitive $root_pass) {
       path    => '/root/bin',
       unless  => 'new_pw_check.sh &>/dev/null',
       before  => File[$root_cnf];
+    }
+  }
+
+  # this is needed if the user wants to set mysql_grant purge to true
+  $root_host_list.each | $local_host | {
+    mysql_grant { "root@${local_host}":
+      ensure     => present,
+      user       => "root@${local_host}",
+      table      => '*.*',
+      privileges => 'ALL',
+      require    => File[$root_cnf];
     }
   }
 

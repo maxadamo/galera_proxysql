@@ -198,7 +198,8 @@ class galera_proxysql (
   }
 
   galera_proxysql::create::root_password { 'root':
-    root_pass => Sensitive($root_password);
+    force_ipv6 => $force_ipv6,
+    root_pass  => Sensitive($root_password);
   }
 
   class {
