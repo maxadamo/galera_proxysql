@@ -52,7 +52,7 @@ define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $for
       ensure     => present,
       user       => "root@${local_host}",
       table      => '*.*',
-      privileges => 'SUPER',
+      privileges => ['ALL', 'SUPER'],
       require    => File[$root_cnf];
     }
   }
@@ -61,7 +61,7 @@ define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $for
     ensure     => present,
     user       => 'mysql.session@localhost',
     table      => 'performance_schema.*',
-    privileges => ['ALL', 'SUPER'],
+    privileges => 'SELECT',
     require    => File[$root_cnf];
   }
 
