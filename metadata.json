@@ -1,6 +1,6 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
