@@ -57,4 +57,12 @@ define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $for
     }
   }
 
+  mysql_grant { 'mysql.session@localhost/performance_schema.*':
+    ensure     => present,
+    user       => 'mysql.session@localhost',
+    table      => 'performance_schema.*',
+    privileges => 'ALL',
+    require    => File[$root_cnf];
+  }
+
 }
