@@ -69,4 +69,46 @@ define galera_proxysql::create::sys_user (
     }
   }
 
+  $galera_hosts_first_key = keys($galera_hosts)[0]
+
+  mysql_user {
+    "${dbuser}@localhost":
+      ensure        => present,
+      password_hash => mysql_password($dbpass.unwrap),
+      provider      => 'mysql';
+    "${dbuser}@127.0.0.1":
+      ensure        => present,
+      password_hash => mysql_password($dbpass.unwrap),
+      provider      => 'mysql';
+  }
+  mysql_grant {
+    "${dbuser}@localhost/${table}":
+      ensure     => present,
+      user       => "${dbuser}@localhost",
+      table      => $table,
+      privileges => $privileges,
+      require    => Mysql_user["${dbuser}@localhost"];
+    "${dbuser}@127.0.0.1/${table}":
+      ensure     => present,
+      user       => "${dbuser}@127.0.0.1",
+      table      => $table,
+      privileges => $privileges,
+      require    => Mysql_user["${dbuser}@127.0.0.1"];
+  }
+
+  if has_key($galera_hosts[$galera_hosts_first_key], 'ipv6') {
+    mysql_user { "${dbuser}@::1":
+        ensure        => present,
+        password_hash => mysql_password($dbpass.unwrap),
+        provider      => 'mysql';
+    }
+    mysql_grant { "${dbuser}@::1/${table}":
+        ensure     => present,
+        user       => "${dbuser}@::1",
+        table      => $table,
+        privileges => $privileges,
+        require    => Mysql_user["${dbuser}@::1"];
+    }
+  }
+
 }
