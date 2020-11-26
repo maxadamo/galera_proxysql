@@ -46,7 +46,8 @@ define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $for
     }
   }
 
-  # this is needed if the user wants to set mysql_grant purge to true
+  # the code below is needed if the user wants to set mysql_grant purge to true
+  # it won't work in a perfect way but at least it won't break MySQL
   $root_host_list.each | $local_host | {
     mysql_grant { "root@${local_host}/*.*":
       ensure     => present,
