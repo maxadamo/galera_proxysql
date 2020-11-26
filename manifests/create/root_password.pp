@@ -52,7 +52,7 @@ define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $for
       ensure     => present,
       user       => "root@${local_host}",
       table      => '*.*',
-      privileges => 'ALL',
+      privileges => 'SUPER',
       require    => File[$root_cnf];
     }
   }
