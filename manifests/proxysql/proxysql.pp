@@ -45,7 +45,7 @@ class galera_proxysql::proxysql::proxysql (
   Hash $proxysql_users           = $galera_proxysql::params::sqlproxy_users,
   Array $trusted_networks        = $galera_proxysql::params::trusted_networks,
   String $network_interface      = $galera_proxysql::params::network_interface,
-  String $proxysql_package       = $galera_proxysql::params::network_interface,
+  String $proxysql_package       = $galera_proxysql::params::proxysql_package,
   String $proxysql_version       = $galera_proxysql::params::proxysql_version,
   String $proxysql_mysql_version = $galera_proxysql::params::proxysql_mysql_version,
   $limitnofile                   = $galera_proxysql::params::limitnofile,
