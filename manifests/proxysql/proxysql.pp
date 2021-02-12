@@ -45,6 +45,7 @@ class galera_proxysql::proxysql::proxysql (
   Hash $proxysql_users           = $galera_proxysql::params::sqlproxy_users,
   Array $trusted_networks        = $galera_proxysql::params::trusted_networks,
   String $network_interface      = $galera_proxysql::params::network_interface,
+  String $proxysql_package       = $galera_proxysql::params::network_interface,
   String $proxysql_version       = $galera_proxysql::params::proxysql_version,
   String $proxysql_mysql_version = $galera_proxysql::params::proxysql_mysql_version,
   $limitnofile                   = $galera_proxysql::params::limitnofile,
@@ -123,21 +124,21 @@ class galera_proxysql::proxysql::proxysql (
       group => root;
     '/usr/bin/proxysql_galera_checker':
       mode    => '0755',
-      require => Package['proxysql'],
+      require => Package[$proxysql_package],
       notify  => Service['proxysql'],
       source  => "puppet:///modules/${module_name}/proxysql_galera_checker";
     '/var/lib/mysql':
       ensure  => directory,
       owner   => proxysql,
       group   => proxysql,
-      require => Package['proxysql'],
+      require => Package[$proxysql_package],
       notify  => Service['proxysql'];
     '/root/.my.cnf':
       content => Sensitive("[client]\nuser=monitor\npassword=${monitor_password.unwrap}\nprompt = \"\\u@\\h [DB: \\d]> \"\n");
     '/etc/proxysql-admin.cnf':
       mode    => '0640',
       group   => proxysql,
-      require => Package['proxysql'],
+      require => Package[$proxysql_package],
       notify  => Service['proxysql'],
       content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
         'monitor_password'        => Sensitive($monitor_password),
@@ -157,7 +158,7 @@ class galera_proxysql::proxysql::proxysql (
     group   => 'proxysql',
     mode    => '0640',
     order   => 'numeric',
-    require => Package['proxysql'],
+    require => Package[$proxysql_package],
     notify  => Service['proxysql'];
   }
 
@@ -191,7 +192,8 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   exec { 'clear_proxysql1':
-    command     => 'yum reinstall -y proxysql; yum remove -y proxysql1',
+    command     => 'yum reinstall -y proxysql; yum remove -y proxysql',
+    provider    => shell,
     onlyif      => 'rpm -qa proxysql',
     path        => '/usr/bin:/bin',
     refreshonly => true;
