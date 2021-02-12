@@ -3,56 +3,69 @@
 # This config file is parsed using libconfig , and its grammar is described in:
 # http://www.hyperrealm.com/libconfig/libconfig_manual.html#Configuration-File-Grammar
 # Grammar is also copied at the end of this file
-
+#
 datadir="/var/lib/proxysql"
 
 admin_variables=
 {
-  admin_credentials="admin:<%= $proxysql_admin_password.unwrap %>"
-  mysql_ifaces="127.0.0.1:3307;/var/lib/mysql/mysql_admin.sock"
-  # refresh_interval=2000
-  # debug=true
+    admin_credentials="admin:<%= $proxysql_admin_password.unwrap %>"
+    mysql_ifaces="127.0.0.1:3307;/var/lib/mysql/mysql_admin.sock"
+    # refresh_interval=2000
+    # debug=true
 }
 
 mysql_variables=
 {
-  threads=<%= $::processorcount %>
-  max_connections=2048
-  default_query_delay=0
-  default_query_timeout=36000000
-  have_compress=true
-  poll_timeout=2000
-<% if ($::ipaddress6) and $::ipaddress6 =~ Stdlib::IP::Address::V6 { -%>
-  interfaces="0.0.0.0:3306;[::]:3306;/var/lib/mysql/mysql.sock"
+    threads=<%= $facts['processorcount'] %>
+    max_connections=2048
+    default_query_delay=0
+    default_query_timeout=36000000
+    have_compress=true
+    poll_timeout=2000
+<% if ($facts['ipaddress6']) and $facts['ipaddress6'] =~ Stdlib::IP::Address::V6 { -%>
+    interfaces="0.0.0.0:3306;[::]:3306;/var/lib/mysql/mysql.sock"
 <% } else { -%>
-  interfaces="0.0.0.0:3306;/var/lib/mysql/mysql.sock"
+    interfaces="0.0.0.0:3306;/var/lib/mysql/mysql.sock"
 <% } -%>
-  default_schema="information_schema"
-  stacksize=1048576
-  server_version="<%= $proxysql_mysql_version %>"
-  connect_timeout_server=3000
-  # make sure to configure monitor username and password
-  # https://github.com/sysown/proxysql/wiki/Global-variables#mysql-monitor_username-mysql-monitor_password
-  monitor_username="monitor"
-  monitor_password="<%= $monitor_password.unwrap %>"
-  monitor_history=600000
-  monitor_connect_interval=60000
-  monitor_ping_interval=10000
-  monitor_read_only_interval=1500
-  monitor_read_only_timeout=500
-  ping_interval_server_msec=120000
-  ping_timeout_server=500
-  commands_stats=true
-  sessions_sort=true
-  connect_retries_on_failure=10
+    default_schema="information_schema"
+    stacksize=1048576
+    server_version="<%= $proxysql_mysql_version %>"
+    connect_timeout_server=3000
+    monitor_username="monitor"
+    monitor_password="<%= $monitor_password.unwrap %>"
+    monitor_galera_healthcheck_interval=2000
+    monitor_galera_healthcheck_timeout=800
+    monitor_history=600000
+    monitor_connect_interval=60000
+    monitor_ping_interval=10000
+    ping_interval_server_msec=120000
+    ping_timeout_server=500
+    commands_stats=true
+    sessions_sort=true
+    connect_retries_on_failure=10
 }
 
-# defines all the MySQL servers
-mysql_servers =
+# defines MySQL Galera hostgroups
+mysql_galera_hostgroups =
 (
-<%= $server_list -%><%= $server_list_write %>
+    {
+        writer_hostgroup=10
+        backup_writer_hostgroup=20
+        reader_hostgroup=30
+        offline_hostgroup=9999
+        max_writers=1
+        writer_is_also_reader=1
+        max_transactions_behind=30
+        active=1
+    }
 )
 
-# defines all the MySQL users
+# defines MySQL servers
+mysql_servers =
+(
+<%= $server_list %>
+)
+
+# defines MySQL users
 mysql_users:
 (

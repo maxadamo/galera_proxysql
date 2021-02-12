@@ -203,7 +203,7 @@ class galera_proxysql (
   }
 
   class {
-    '::galera_proxysql::files':
+    'galera_proxysql::files':
       percona_major_version        => $percona_major_version,
       custom_server_cnf_parameters => $custom_server_cnf_parameters,
       custom_client_cnf_parameters => $custom_client_cnf_parameters,
@@ -226,11 +226,11 @@ class galera_proxysql (
       sst_password                 => Sensitive($sst_password),
       thread_cache_size            => $thread_cache_size,
       tmpdir                       => $tmpdir;
-    '::galera_proxysql::install':
+    'galera_proxysql::install':
       other_pkgs            => $other_pkgs,
       percona_major_version => $percona_major_version,
       percona_minor_version => $percona_minor_version;
-    '::galera_proxysql::join':
+    'galera_proxysql::join':
       percona_major_version => $percona_major_version,
       monitor_password      => Sensitive($monitor_password),
       root_password         => Sensitive($root_password),
@@ -239,7 +239,7 @@ class galera_proxysql (
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
       manage_lvm            => $manage_lvm;
-    '::galera_proxysql::repo':
+    'galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
     '::galera_proxysql::lvm':
@@ -247,8 +247,8 @@ class galera_proxysql (
       vg_name               => $vg_name,
       lv_size               => $lv_size,
       percona_major_version => $percona_major_version;
-    '::galera_proxysql::services':;
-    '::mysql::client':
+    'galera_proxysql::services':;
+    'mysql::client':
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
