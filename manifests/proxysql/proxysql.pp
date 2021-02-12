@@ -42,7 +42,7 @@ class galera_proxysql::proxysql::proxysql (
   Boolean $manage_repo           = $galera_proxysql::params::manage_repo,
   Hash $proxysql_hosts           = $galera_proxysql::params::proxysql_hosts,
   Hash $proxysql_vip             = $galera_proxysql::params::proxysql_vip,
-  $proxysql_users                = undef,
+  $proxysql_users                = undef,  # users are now created through galera_proxysql::create::user
   Array $trusted_networks        = $galera_proxysql::params::trusted_networks,
   String $network_interface      = $galera_proxysql::params::network_interface,
   String $proxysql_package       = $galera_proxysql::params::proxysql_package,
