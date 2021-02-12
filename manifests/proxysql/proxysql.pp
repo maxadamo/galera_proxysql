@@ -110,12 +110,11 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   exec { 'clear_proxysql1':
-    command     => 'yum reinstall -y proxysql; yum remove -y proxysql',
-    provider    => shell,
-    before      => Package[$proxysql_package],
-    creates     => '/usr/bin/proxysql-login-file',
-    path        => '/usr/bin:/bin',
-    refreshonly => true;
+    command  => 'yum reinstall -y proxysql; yum remove -y proxysql',
+    provider => shell,
+    before   => Package[$proxysql_package],
+    creates  => '/usr/bin/proxysql-login-file',  # this file belongs to proxysql2 only
+    path     => '/usr/bin:/bin';
   }
 
   package {
