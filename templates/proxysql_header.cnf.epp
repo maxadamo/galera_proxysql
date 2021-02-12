@@ -10,7 +10,12 @@ admin_variables=
 {
     admin_credentials="admin:<%= $proxysql_admin_password.unwrap %>"
     mysql_ifaces="127.0.0.1:3307;/var/lib/mysql/mysql_admin.sock"
+    # WIP: web stats
     # refresh_interval=2000
+    # web_enabled=true
+    # web_port=6080
+    # stats_credentials="stats:admin"
+    # end WIP
     # debug=true
 }
 
