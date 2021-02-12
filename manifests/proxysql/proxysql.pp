@@ -91,7 +91,8 @@ class galera_proxysql::proxysql::proxysql (
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
     'galera_proxysql::proxysql::service':
-      limitnofile => $limitnofile;
+      limitnofile      => $limitnofile,
+      proxysql_package => $proxysql_package;
     'galera_proxysql::proxysql::keepalived':
       use_ipv6                   => $ipv6_true,
       proxysql_hosts             => $proxysql_hosts,
