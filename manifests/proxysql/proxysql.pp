@@ -71,15 +71,15 @@ class galera_proxysql::proxysql::proxysql (
     $ipv6_true = undef
   }
 
-  $list_top = "{\n    address = \""
-  $list_bottom = '"
-      port = 3306
-      hostgroup = 10
-      status = "ONLINE"
-      weight = 1
-      compression = 0
-      max_replication_lag = 0
-  },'
+  $list_top = "    {\n        address = \""
+  $list_bottom = "\"
+        port = 3306
+        hostgroup = 10
+        status = \"ONLINE\"
+        weight = 1
+        compression = 0
+        max_replication_lag = 0
+  }\n"
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
