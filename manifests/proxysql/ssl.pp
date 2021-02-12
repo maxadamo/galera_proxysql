@@ -20,7 +20,7 @@ class galera_proxysql::proxysql::ssl (
     '/var/lib/proxysql/proxysql-cert.pem':
       source => $ssl_cert_source_path;
     '/var/lib/proxysql/proxysql-ca.pem':
-      source => $ssl_cert_source_path;
+      source => $ssl_ca_source_path;
     '/var/lib/proxysql/proxysql-key.pem':
       mode   => '0640',
       source => Sensitive($ssl_key_source_path);
