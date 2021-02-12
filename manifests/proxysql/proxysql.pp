@@ -93,8 +93,10 @@ class galera_proxysql::proxysql::proxysql (
 
   if ($manage_ssl) {
     class { 'galera_proxysql::proxysql':
-      proxysql_package => $proxysql_package,
-
+      ssl_ca_source_path   => $ssl_ca_source_path,
+      ssl_cert_source_path => $ssl_cert_source_path,
+      ssl_key_source_path  => $ssl_key_source_path;
+    }
   }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
