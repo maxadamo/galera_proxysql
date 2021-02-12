@@ -109,14 +109,23 @@ class galera_proxysql::proxysql::proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
+  exec { 'clear_proxysql1':
+    command     => 'yum reinstall -y proxysql; yum remove -y proxysql',
+    provider    => shell,
+    before      => Package[$proxysql_version],
+    creates     => '/usr/bin/proxysql-login-file',
+    path        => '/usr/bin:/bin',
+    refreshonly => true;
+  }
+
   package {
     "Percona-Server-shared-compat-${percona_major_version}":
       ensure  => installed,
-      require => Class['::galera_proxysql::repo'],
-      before  => Class['::mysql::client'];
+      require => Class['galera_proxysql::repo'],
+      before  => Class['mysql::client'];
     'proxysql2':
       ensure  => $proxysql_version,
-      require => [Class['::mysql::client', '::galera_proxysql::repo']];
+      require => [Class['mysql::client', 'galera_proxysql::repo']];
   }
 
   file {
@@ -190,14 +199,6 @@ class galera_proxysql::proxysql::proxysql (
       content => "    { username = \"${sqluser}\", password = \"${sqlpass}\", default_hostgroup = 0, active = 1 }",
       order   => $concat_order;
     }
-  }
-
-  exec { 'clear_proxysql1':
-    command     => 'yum reinstall -y proxysql; yum remove -y proxysql',
-    provider    => shell,
-    onlyif      => 'rpm -qa proxysql',
-    path        => '/usr/bin:/bin',
-    refreshonly => true;
   }
 
   # we need a fake exec in common with galera nodes to let galera

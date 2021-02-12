@@ -43,7 +43,7 @@ class galera_proxysql::proxysql::service ($limitnofile, $proxysql_package) {
 
   exec { "${module_name}_daemon_reload":
     refreshonly => true,
-    path        => '/usr/bin:/usr/sbin:/bin',
+    path        => '/usr/bin:/usr/sbin:/bin:/sbin',
     command     => 'systemctl daemon-reload',
     before      => Service['proxysql'];
   }
