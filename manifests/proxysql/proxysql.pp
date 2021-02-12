@@ -92,7 +92,7 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   if ($manage_ssl) {
-    class { 'galera_proxysql::proxysql':
+    class { 'galera_proxysql::proxysql::ssl':
       ssl_ca_source_path   => $ssl_ca_source_path,
       ssl_cert_source_path => $ssl_cert_source_path,
       ssl_key_source_path  => $ssl_key_source_path;
