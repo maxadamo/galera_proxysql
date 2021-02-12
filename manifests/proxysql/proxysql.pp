@@ -34,8 +34,37 @@
 #   default: undef => List of IPv4 and/or IPv6 host and or networks.
 #            It's used by iptables to determine from where to allow access to MySQL
 #
+# [*manage_ssl*] <Boolean>
+#   default: undef => Use your own certificate or use self-signed
+#  *BEWARE*: if you leave manage_ssl undef, you'll use a self-signed certificate and
+#            it will be different on each node of the cluster. You may need to synchronize
+#            them manually, but they are valid for 10 years and I know that you can afford it :-)
+#
+# [*ssl_ca_source_path*] <Stdlib::Filesource>
+#   default: undef => it's mandatory if manage_ssl is true
+#            it can be a local path on the server or a path like: puppet:///modules/...
+#
+# [*ssl_cert_source_path*] <Stdlib::Filesource>
+#   default: undef => it's mandatory if manage_ssl is true
+#            it can be a local path on the server or a path like: puppet:///modules/...
+#
+# [*ssl_key_source_path*] <Stdlib::Filesource>
+#   default: undef => it's mandatory if manage_ssl is true
+#            it can be a local path on the server or a path like: puppet:///modules/...
+#
 #
 class galera_proxysql::proxysql::proxysql (
+
+  # SSL settings
+  # BEWARE: if you leave manage_ssl undef, you'll use a self-signed certificate and
+  # it will be different on each node of the cluster. You may need to synchronize
+  # them manually, but they are valid for 10 years and I know that you can afford it :-)
+  Boolean $manage_ssl                                = undef,  # use the default self-signed
+  Optional[Stdlib::Filesource] $ssl_ca_source_path   = $galera_proxysql::params::ssl_ca_source_path,
+  Optional[Stdlib::Filesource] $ssl_cert_source_path = $galera_proxysql::params::ssl_cert_source_path,
+  Optional[Stdlib::Filesource] $ssl_key_source_path  = $galera_proxysql::params::ssl_key_source_path,
+
+  # PRoxySQL general settings
   String $percona_major_version  = $galera_proxysql::params::percona_major_version,
   Boolean $force_ipv6            = $galera_proxysql::params::force_ipv6,
   Hash $galera_hosts             = $galera_proxysql::params::galera_hosts,
@@ -60,6 +89,12 @@ class galera_proxysql::proxysql::proxysql (
 
   if ($proxysql_users) {
     fail('please re-use the same galera_proxysql::create::user resources used on Galera to create users even on ProxySQL')
+  }
+
+  if ($manage_ssl) {
+    class { 'galera_proxysql::proxysql':
+      proxysql_package => $proxysql_package,
+
   }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
