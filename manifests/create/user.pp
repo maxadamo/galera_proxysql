@@ -120,8 +120,8 @@ define galera_proxysql::create::user (
       concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrapped}":
         target  => '/etc/proxysql.cnf',
         content => Sensitive(epp("${module_name}/proxysql_user.cnf.epp", {
-          sqluser => $dbuser,
-          sqlpass => $dbpass_wrapped
+          dbuser => $dbuser,
+          dbpass => $dbpass_wrapped
         })),
         order   => $concat_order;
       }
