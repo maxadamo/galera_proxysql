@@ -71,7 +71,8 @@ class galera_proxysql::proxysql::proxysql (
     $ipv6_true = undef
   }
 
-  $list_top = "    {\n        address = \""
+  $list_top = "    {
+        address = \""
   $list_bottom = "\"
         port = 3306
         hostgroup = 10
@@ -88,7 +89,7 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   $_server_list = join($transformed_data, "${list_bottom}${list_top}")
-  $server_list = "  ${list_top}${_server_list}${list_bottom}".chop()
+  $server_list = "${list_top}${_server_list}${list_bottom}".chop()
 
   class {
     'galera_proxysql::repo':
