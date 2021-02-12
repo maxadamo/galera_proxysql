@@ -151,12 +151,18 @@ class galera_proxysql::proxysql::proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
-  exec { 'clear_proxysqlONE':
-    command  => 'yum reinstall -y proxysql; yum remove -y proxysql',
-    provider => shell,
-    before   => Package[$proxysql_package],
-    creates  => '/usr/bin/proxysql-login-file',  # this file belongs to proxysql2 only
-    path     => '/usr/bin:/bin';
+  exec {
+    default:
+      path     => '/usr/bin:/bin';
+    'clear_proxysqlONE':
+      command  => 'yum reinstall -y proxysql; yum remove -y proxysql',
+      provider => shell,
+      before   => Package[$proxysql_package],
+      creates  => '/usr/bin/proxysql-login-file';  # this file belongs to proxysql2 only
+    'reset_proxysql_configuration':
+      command     => 'rm -f /var/lib/proxysql/proxysql.db',
+      refreshonly => true,
+      notify      => Service['proxysql'];
   }
 
   package {
@@ -209,7 +215,7 @@ class galera_proxysql::proxysql::proxysql (
     mode    => '0640',
     order   => 'numeric',
     require => Package[$proxysql_package],
-    notify  => Service['proxysql'];
+    notify  => Exec['reset_proxysql_configuration'];
   }
 
   concat::fragment {

@@ -21,6 +21,7 @@ admin_variables=
 
 mysql_variables=
 {
+    have_ssl=true
     threads=<%= $facts['processorcount'] %>
     max_connections=2048
     default_query_delay=0

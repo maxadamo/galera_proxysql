@@ -172,10 +172,9 @@ galera_proxysql::create::user { 'whatever_user':
 
 ## Limitations
 
-* In order to add SSL on the frontend, I need to add support for ProxySQL 2 (right ProxySQL 1.4.xx is being used)
 * not yet tested on ipv4 only (but it should work)
-* there are too many moving parts and I decided to temporarily strip support to Ubuntu. 
-* Spec test needs improvements (move to Litmus?)
+* Ubuntu/Debian are still on hold.
+* Spec test needs improvements.
 * No changelog is available
 
 ## Development
