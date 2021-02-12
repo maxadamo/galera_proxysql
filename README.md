@@ -5,10 +5,10 @@
 1. [Description](#description)
 1. [Setup - The basics of getting started with galera_proxysql](#setup)
     * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
-1. [Usage - Configuration options and additional functionality](#usage)
-1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
-1. [Limitations - OS compatibility, etc.](#limitations)
-1. [Development - Guide for contributing to the module](#development)
+1. [Usage](#usage)
+1. [Reference](#reference)
+1. [Limitations](#limitations)
+1. [Development](#development)
 
 ## Description
 
@@ -34,7 +34,8 @@ Read at (actual) **limitations** in the section below.
 
 ### Beginning with galera_proxysql
 
-Sensitive type for passwords is not mandatory, but it's recommended. If it's not being used the module will emit a notifycation.
+
+Sensitive type for passwords is not mandatory, but it's recommended. If it's not being used you'll see a warning.
 
 To setup Galera:
 
@@ -55,13 +56,21 @@ class { '::galera_proxysql':
 
 To setup ProxySQL:
 
+* with version 2.x SSL is always enabled, but unless otherwise configured, it's optional on the client side, and it can be enabled on a per user basis.
+
+* ProxySQL generates a self-signed certificates. Bear in mind that it will be on each node. If you want to use your own certificates, you can use `manage_ssl` and specify the source for the certificate, CA and private key.
+
 ```puppet
 class { '::galera_proxysql::proxysql::proxysql':
-  monitor_password => Sensitive($monitor_password),
-  trusted_networks => $trusted_networks,
-  proxysql_hosts   => $proxysql_hosts,
-  proxysql_vip     => $proxysql_vip,
-  galera_hosts     => $galera_hosts;
+  manage_ssl           => true,
+  ssl_cert_source_path => "puppet:///modules/my_module/${facts['domain']}.crt",
+  ssl_ca_source_path   => '/etc/pki/tls/certs/COMODO_OV.crt',
+  ssl_key_source_path  => "/etc/pki/tls/private/${facts['domain']}.key",
+  monitor_password     => Sensitive($monitor_password),
+  trusted_networks     => $trusted_networks,
+  proxysql_hosts       => $proxysql_hosts,
+  proxysql_vip         => $proxysql_vip,
+  galera_hosts         => $galera_hosts;
 }
 ```
 
