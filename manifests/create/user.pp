@@ -41,7 +41,7 @@ define galera_proxysql::create::user (
     $ensure_schema = present
   }
 
-  if defined(Class['::galera_proxysql::join']) {
+  if defined(Class['galera_proxysql::join']) {
     if ($galera_hosts) {
       if $schema_name =~ String {
         unless defined(Mysql::Db[$schema_name]) {
@@ -117,15 +117,12 @@ define galera_proxysql::create::user (
   } else {
     if $ensure == present or $ensure == 'present' {
       $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass_wrap.unwrap}")+2
-      $concat_content = ",{
-    username = \"${dbuser}\"
-    password = \"${dbpass_wrap.unwrap}\"
-    default_hostgroup = 0
-    active = 1
-  }"
       concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrap}":
         target  => '/etc/proxysql.cnf',
-        content => $concat_content,
+        content => Sensitive(epp("${module_name}/proxysql_user.cnf.epp", {
+          sqluser => $dbuser,
+          sqlpass => $dbpass
+        })),
         order   => $concat_order;
       }
     }

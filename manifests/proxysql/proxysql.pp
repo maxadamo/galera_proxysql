@@ -42,7 +42,7 @@ class galera_proxysql::proxysql::proxysql (
   Boolean $manage_repo           = $galera_proxysql::params::manage_repo,
   Hash $proxysql_hosts           = $galera_proxysql::params::proxysql_hosts,
   Hash $proxysql_vip             = $galera_proxysql::params::proxysql_vip,
-  Hash $proxysql_users           = $galera_proxysql::params::sqlproxy_users,
+  $proxysql_users                = undef,
   Array $trusted_networks        = $galera_proxysql::params::trusted_networks,
   String $network_interface      = $galera_proxysql::params::network_interface,
   String $proxysql_package       = $galera_proxysql::params::proxysql_package,
@@ -57,6 +57,10 @@ class galera_proxysql::proxysql::proxysql (
   Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password
 
 ) inherits galera_proxysql::params {
+
+  if ($proxysql_users) {
+    fail('please re-use the same galera_proxysql::create::user resources used on Galera to create users even on ProxySQL')
+  }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $vip_key = keys($proxysql_vip)[0]
@@ -109,7 +113,7 @@ class galera_proxysql::proxysql::proxysql (
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
   }
 
-  exec { 'clear_proxysql1':
+  exec { 'clear_proxysqlONE':
     command  => 'yum reinstall -y proxysql; yum remove -y proxysql',
     provider => shell,
     before   => Package[$proxysql_package],
@@ -184,18 +188,6 @@ class galera_proxysql::proxysql::proxysql (
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_footer.cnf.epp"),
       order   => '999999999';
-  }
-
-  $proxysql_users.each | $sqluser, $sqlpass | {
-    $concat_order = fqdn_rand(999999997, "${sqluser}${sqlpass}")+2
-    concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
-      target  => '/etc/proxysql.cnf',
-      content => Sensitive(epp("${module_name}/proxysql_user.cnf.epp", {
-        sqluser => $sqluser,
-        sqlpass => $sqlpass
-      })),
-      order   => $concat_order;
-    }
   }
 
   # we need a fake exec in common with galera nodes to let galera
