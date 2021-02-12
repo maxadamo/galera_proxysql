@@ -112,7 +112,7 @@ class galera_proxysql::proxysql::proxysql (
   exec { 'clear_proxysql1':
     command     => 'yum reinstall -y proxysql; yum remove -y proxysql',
     provider    => shell,
-    before      => Package[$proxysql_version],
+    before      => Package[$proxysql_package],
     creates     => '/usr/bin/proxysql-login-file',
     path        => '/usr/bin:/bin',
     refreshonly => true;
@@ -123,7 +123,7 @@ class galera_proxysql::proxysql::proxysql (
       ensure  => installed,
       require => Class['galera_proxysql::repo'],
       before  => Class['mysql::client'];
-    'proxysql2':
+    $proxysql_package:
       ensure  => $proxysql_version,
       require => [Class['mysql::client', 'galera_proxysql::repo']];
   }
