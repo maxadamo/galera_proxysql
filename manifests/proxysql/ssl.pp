@@ -8,8 +8,6 @@ class galera_proxysql::proxysql::ssl (
   $proxysql_package = $galera_proxysql::params::proxysql_package,
 ) {
 
-  notify { "test ${proxysql_package}": }
-
   file {
     default:
       owner   => proxysql,
