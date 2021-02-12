@@ -69,3 +69,4 @@ mysql_servers =
 # defines MySQL users
 mysql_users:
 (
+    { username = "monitor", password = "<%= $monitor_password.unwrap -%>", default_hostgroup = 10, active = 1 },
