@@ -153,7 +153,7 @@ class galera_proxysql::proxysql::proxysql (
 
   exec {
     default:
-      path     => '/usr/bin:/bin';
+      path => '/usr/bin:/bin';
     'clear_proxysqlONE':
       command  => 'yum reinstall -y proxysql; yum remove -y proxysql',
       provider => shell,
@@ -232,23 +232,6 @@ class galera_proxysql::proxysql::proxysql (
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_footer.cnf.epp"),
       order   => '999999999';
-  }
-
-  # we need a fake exec in common with galera nodes to let galera
-  # use the `before` statement defined in the same firewall class
-  unless defined(Exec['bootstrap_or_join']) {
-    exec { 'bootstrap_or_join':
-      command     => 'echo',
-      path        => '/usr/bin:/bin',
-      refreshonly => true;
-    }
-  }
-  unless defined(Exec['join_existing']) {
-    exec { 'join_existing':
-      command     => 'echo',
-      path        => '/usr/bin:/bin',
-      refreshonly => true;
-    }
   }
 
 }

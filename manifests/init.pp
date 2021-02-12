@@ -21,7 +21,7 @@
 #   default: false (whether to use IPv6 on cluster communication)
 #
 # [*galera_cluster_name*] <String>
-#   default: ${::environment}_${::hostgroup} (if you don't have $::hostgroup I'll throw a fail)
+#   default: ${::environment}_galera
 #
 # [*galera_hosts*] <Hash>
 #   list of hosts, ipv4 (optionally ipv6) belonging to the cluster: not less than 3, not even.
@@ -109,7 +109,7 @@
 #
 # === ToDo
 #
-# - Upgrade to ProxySQL 2.0
+# - Upgrade to Percona 8.x
 #
 # === Authors
 #
@@ -166,16 +166,16 @@ class galera_proxysql (
 
 ) inherits galera_proxysql::params {
 
-  if $::osfamily != 'RedHat' { fail("${::operatingsystem} not yet supported") }
+  if $facts['osfamily'] != 'RedHat' { fail("${facts['operatingsystem']} not yet supported") }
 
   if $puppet_debug {
     # checking cluster status through the facter galera_status
-    if $::galera_status == '200' {
-      $msg = "HTTP/1.1 ${::galera_status}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
-    } elsif $::galera_status == 'UNKNOWN' {
-      $msg = "HTTP/1.1 ${::galera_status}: could not determine the status of the cluster. Most likely xinetd is not running yet"
+    if $facts['galera_status'] == '200' {
+      $msg = "HTTP/1.1 ${facts['galera_status']}: the node is healthy and belongs to the cluster ${galera_cluster_name}"
+    } elsif $facts['galera_status'] == 'UNKNOWN' {
+      $msg = "HTTP/1.1 ${facts['galera_status']}: could not determine the status of the cluster. Most likely xinetd is not running yet"
     } else {
-      $msg = "HTTP/1.1 ${::galera_status}: the node is disconnected from the cluster ${galera_cluster_name}"
+      $msg = "HTTP/1.1 ${facts['galera_status']}: the node is disconnected from the cluster ${galera_cluster_name}"
     }
     notify { 'Cluster status': message => $msg; }
   }
@@ -231,6 +231,7 @@ class galera_proxysql (
       percona_major_version => $percona_major_version,
       percona_minor_version => $percona_minor_version;
     'galera_proxysql::join':
+      manage_firewall       => $manage_firewall,
       percona_major_version => $percona_major_version,
       monitor_password      => Sensitive($monitor_password),
       root_password         => Sensitive($root_password),
@@ -242,7 +243,7 @@ class galera_proxysql (
     'galera_proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
-    '::galera_proxysql::lvm':
+    'galera_proxysql::lvm':
       manage_lvm            => $manage_lvm,
       vg_name               => $vg_name,
       lv_size               => $lv_size,

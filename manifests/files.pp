@@ -31,10 +31,10 @@ class galera_proxysql::files (
 
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
-    $myip = $galera_hosts[$::fqdn]['ipv6']
+    $myip = $galera_hosts[$facts['fqdn']]['ipv6']
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
   } else {
-    $myip = $galera_hosts[$::fqdn]['ipv4']
+    $myip = $galera_hosts[$facts['fqdn']]['ipv4']
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv4'] }
   }
 

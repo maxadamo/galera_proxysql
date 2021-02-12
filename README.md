@@ -9,6 +9,7 @@
 1. [Reference](#reference)
 1. [Limitations](#limitations)
 1. [Development](#development)
+1. [ToDo](#todo)
 
 ## Description
 
@@ -33,7 +34,6 @@ Read at (actual) **limitations** in the section below.
 ## Setup
 
 ### Beginning with galera_proxysql
-
 
 Sensitive type for passwords is not mandatory, but it's recommended. If it's not being used you'll see a warning.
 
@@ -191,3 +191,7 @@ galera_proxysql::create::user { 'whatever_user':
 Feel free to make pull requests and/or open issues on [my GitHub Repository](https://github.com/maxadamo/galera_proxysql)
 
 ## Release Notes/Contributors/Etc. **Optional**
+
+## ToDo
+
+* Upgrade to Percona 8.x

@@ -11,6 +11,7 @@ class galera_proxysql::join (
   $proxysql_hosts,
   $proxysql_vip,
   $manage_lvm,
+  $manage_firewall
 ) {
 
   assert_private("this class should be called only by ${module_name}")
@@ -24,18 +25,24 @@ class galera_proxysql::join (
   ]
 
   if ($manage_lvm) {
-    $require_list = [
+    $_require_list = [
       File[$file_list],
       File_line['mysql_systemd'],
       Package["Percona-XtraDB-Cluster-full-${percona_major_version}"],
       Mount['/var/lib/mysql']
     ]
   } else {
-    $require_list = [
+    $_require_list = [
       File[$file_list],
       File_line['mysql_systemd'],
       Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]
     ]
+  }
+
+  if ($manage_firewall) {
+    $require_list = $_require_list + Class['galera_proxysql::firewall']
+  } else {
+    $require_list = $_require_list
   }
 
   unless defined(Exec['bootstrap_or_join']) {
@@ -48,7 +55,7 @@ class galera_proxysql::join (
     }
   }
 
-  if ($::galera_joined_exist and $::galera_status != '200') {
+  if ($facts['galera_joined_exist'] and $facts['galera_status'] != '200') {
     unless defined(Exec['join_existing']) {
       exec { 'join_existing':
         command => 'galera_wizard.py -je',
@@ -67,7 +74,7 @@ class galera_proxysql::join (
     }
   }
 
-  if ($::galera_joined_exist and $::galera_status == '200') {
+  if ($facts['galera_joined_exist'] and $facts['galera_status'] == '200') {
     galera_proxysql::create::sys_user {
       'sstuser':
         galera_hosts   => $galera_hosts,
