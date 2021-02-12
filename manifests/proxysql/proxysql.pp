@@ -195,6 +195,12 @@ class galera_proxysql::proxysql::proxysql (
         monitor_password        => Sensitive($monitor_password),
         proxysql_admin_password => Sensitive($proxysql_admin_password)
       }));
+    '/var/lib/proxysql/.my-admin.cnf':
+      mode    => '0640',
+      owner   => proxysql,
+      group   => proxysql,
+      require => Package[$proxysql_package],
+      content => Sensitive("[client]\nuser=admin\npassword=admin\nport=3307\nhost=127.0.0.1\nprotocol=tcp\n")
   }
 
   concat { '/etc/proxysql.cnf':
