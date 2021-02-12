@@ -197,7 +197,9 @@ class galera_proxysql::proxysql::proxysql (
       }));
   }
 
+  # lint:ignore:140chars
   $proxysql_cnf_second_content = "    { username = \"monitor\", password = \"${monitor_password.unwrap}\", default_hostgroup = 10, active = 1 },\n"
+  # lint:endignore
 
   concat { '/etc/proxysql.cnf':
     owner   => 'proxysql',
