@@ -155,8 +155,8 @@ class galera_proxysql::proxysql::proxysql (
       require => Package[$proxysql_package],
       notify  => Service['proxysql'],
       content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
-        'monitor_password'        => Sensitive($monitor_password),
-        'proxysql_admin_password' => Sensitive($proxysql_admin_password)
+        monitor_password        => Sensitive($monitor_password),
+        proxysql_admin_password => Sensitive($proxysql_admin_password)
       }));
   }
 

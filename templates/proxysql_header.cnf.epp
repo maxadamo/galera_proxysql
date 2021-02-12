@@ -45,6 +45,21 @@ mysql_variables=
     connect_retries_on_failure=10
 }
 
+# defines MySQL Galera hostgroups
+mysql_galera_hostgroups =
+(
+    {
+        writer_hostgroup=10
+        backup_writer_hostgroup=20
+        reader_hostgroup=30
+        offline_hostgroup=9999
+        max_writers=1
+        writer_is_also_reader=1
+        max_transactions_behind=30
+        active=1
+    }
+)
+
 # defines MySQL servers
 mysql_servers =
 (
