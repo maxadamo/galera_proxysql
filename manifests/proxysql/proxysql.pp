@@ -79,7 +79,7 @@ class galera_proxysql::proxysql::proxysql (
         weight = 1
         compression = 0
         max_replication_lag = 0
-  }\n"
+  },\n"
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
     $transformed_data = $galera_keys.map |$items| { $galera_hosts[$items]['ipv6'] }
