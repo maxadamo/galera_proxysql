@@ -190,7 +190,10 @@ class galera_proxysql::proxysql::proxysql (
     $concat_order = fqdn_rand(999999997, "${sqluser}${sqlpass}")+2
     concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
       target  => '/etc/proxysql.cnf',
-      content => "    { username = \"${sqluser}\", password = \"${sqlpass}\", default_hostgroup = 10, active = 1 }",
+      content => Sensitive(epp("${module_name}/proxysql_user.cnf.epp", {
+        sqluser => $sqluser,
+        sqlpass => $sqlpass
+      })),
       order   => $concat_order;
     }
   }
