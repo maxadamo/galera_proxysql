@@ -3,7 +3,7 @@
 # This config file is parsed using libconfig , and its grammar is described in:
 # http://www.hyperrealm.com/libconfig/libconfig_manual.html#Configuration-File-Grammar
 # Grammar is also copied at the end of this file
-
+#
 datadir="/var/lib/proxysql"
 
 admin_variables=
@@ -31,8 +31,6 @@ mysql_variables=
     stacksize=1048576
     server_version="<%= $proxysql_mysql_version %>"
     connect_timeout_server=3000
-    # make sure to configure monitor username and password
-    # https://github.com/sysown/proxysql/wiki/Global-variables#mysql-monitor_username-mysql-monitor_password
     monitor_username="monitor"
     monitor_password="<%= $monitor_password.unwrap %>"
     monitor_galera_healthcheck_interval=2000
@@ -40,8 +38,6 @@ mysql_variables=
     monitor_history=600000
     monitor_connect_interval=60000
     monitor_ping_interval=10000
-    #monitor_read_only_interval=1500
-    #monitor_read_only_timeout=500
     ping_interval_server_msec=120000
     ping_timeout_server=500
     commands_stats=true
@@ -49,12 +45,12 @@ mysql_variables=
     connect_retries_on_failure=10
 }
 
-# defines all the MySQL servers
+# defines MySQL servers
 mysql_servers =
 (
-<%= $server_list -%>
+<%= $server_list %>
 )
 
-# defines all the MySQL users
+# defines MySQL users
 mysql_users:
 (
