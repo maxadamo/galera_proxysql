@@ -68,20 +68,12 @@ class galera_proxysql::proxysql::proxysql (
 
   $list_top = "{\n    address = \""
   $list_bottom = '"
-    port = 3306
-    hostgroup = 0
-    status = "ONLINE"
-    weight = 1
-    compression = 0
-    max_replication_lag = 0
-  },'
-  $list_bottom_write = '"
-    port = 3306
-    hostgroup = 1
-    status = "ONLINE"
-    weight = 1
-    compression = 0
-    max_replication_lag = 0
+      port = 3306
+      hostgroup = 10
+      status = "ONLINE"
+      weight = 1
+      compression = 0
+      max_replication_lag = 0
   },'
   $galera_keys = keys($galera_hosts)
   if ($force_ipv6) {
@@ -91,10 +83,7 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   $_server_list = join($transformed_data, "${list_bottom}${list_top}")
-  $server_list = "  ${list_top}${_server_list}${list_bottom}"
-
-  $_server_list_write = join($transformed_data, "${list_bottom_write}${list_top}")
-  $server_list_write = "${list_top}${_server_list_write}${list_bottom_write}".chop()
+  $server_list = "  ${list_top}${_server_list}${list_bottom}".chop()
 
   class {
     'galera_proxysql::repo':
@@ -123,7 +112,7 @@ class galera_proxysql::proxysql::proxysql (
       ensure  => installed,
       require => Class['::galera_proxysql::repo'],
       before  => Class['::mysql::client'];
-    'proxysql':
+    'proxysql2':
       ensure  => $proxysql_version,
       require => [Class['::mysql::client', '::galera_proxysql::repo']];
   }
@@ -156,10 +145,10 @@ class galera_proxysql::proxysql::proxysql (
       }));
   }
 
-$proxysql_cnf_second_content = "  {
+  $proxysql_cnf_second_content = "  {
     username = \"monitor\"
     password = \"${monitor_password.unwrap}\"
-    default_hostgroup = 0
+    default_hostgroup = 10
     active = 1
   }"
 
@@ -179,7 +168,6 @@ $proxysql_cnf_second_content = "  {
         'proxysql_admin_password' => Sensitive($proxysql_admin_password),
         'proxysql_mysql_version'  => $proxysql_mysql_version,
         'monitor_password'        => Sensitive($monitor_password),
-        'server_list_write'       => $server_list_write,
         'server_list'             => $server_list
       }),
       order   => '1';
@@ -197,9 +185,16 @@ $proxysql_cnf_second_content = "  {
     $concat_order = fqdn_rand(999999997, "${sqluser}${sqlpass}")+2
     concat::fragment { "proxysql_cnf_fragment_${sqluser}_${sqlpass}":
       target  => '/etc/proxysql.cnf',
-      content => ",{\n    username = \"${sqluser}\"\n    password = \"${sqlpass}\"\n    default_hostgroup = 0\n    active = 1\n  }",
+      content => "    { username = \"${sqluser}\", password = \"${sqlpass}\", default_hostgroup = 0, active = 1 }",
       order   => $concat_order;
     }
+  }
+
+  exec { 'clear_proxysql1':
+    command     => 'yum reinstall -y proxysql; yum remove -y proxysql1',
+    onlyif      => 'rpm -qa proxysql',
+    path        => '/usr/bin:/bin',
+    refreshonly => true;
   }
 
   # we need a fake exec in common with galera nodes to let galera
