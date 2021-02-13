@@ -1,6 +1,6 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
@@ -14,7 +14,7 @@
     },
     {
       "name": "puppetlabs-firewall",
-      "version_requirement": ">= 1.9.0 <= 2.5.0"
+      "version_requirement": ">= 1.9.0 <= 2.8.0"
     },
     {
       "name": "puppetlabs-mysql",
@@ -23,6 +23,10 @@
     {
       "name": "stschulte-rpmkey",
       "version_requirement": ">= 1.0.3 <= 1.0.3"
+    },
+    {
+      "name": "puppetlabs-stdlib",
+      "version_requirement": ">= 5.3.0 <= 6.5.0"
     },
     {
       "name": "puppetlabs-xinetd",

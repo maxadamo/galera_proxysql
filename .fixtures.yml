@@ -18,7 +18,7 @@ fixtures:
       ref: '3.3.0'
     stdlib:
       repo: 'puppetlabs/stdlib'
-      ref: '6.0.0'
+      ref: '6.5.0'
       # flags: "--module_repository https://my_repo.com"
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
