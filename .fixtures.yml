@@ -1,5 +1,7 @@
 ---
 fixtures:
+  symlinks:
+    galera_proxysql: "#{source_dir}"
   forge_modules:
     keepalived:
       repo: "puppet/keepalived"
@@ -23,4 +25,3 @@ fixtures:
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
       ref: '1.0.6'
-
