@@ -39,6 +39,11 @@ describe 'galera_proxysql' do
           manage_lvm       => false;
         }
       EOS
+
+      # Run it twice and test for idempotency
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: true)
+    end
   end
   context 'CentOS_6' do
     let(:facts) do
