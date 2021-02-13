@@ -184,7 +184,7 @@ class galera_proxysql (
   $cluster_size_odd = (($cluster_size % 2) == 1)
 
   #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
-  unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd')}
+  unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd') }
 
   if $manage_lvm and $lv_size == undef { fail('manage_lvm is true but lv_size is undef') }
   if $manage_lvm and $vg_name == undef { fail('manage_lvm is true but vg_name is undef') }

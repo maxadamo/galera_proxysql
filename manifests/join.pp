@@ -24,25 +24,22 @@ class galera_proxysql::join (
     '/etc/my.cnf.d/wsrep.cnf', '/etc/my.cnf'
   ]
 
+  $common_require = [
+    File[$file_list],
+    File_line['mysql_systemd'],
+    Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]
+  ]
+
   if ($manage_lvm) {
-    $_require_list = [
-      File[$file_list],
-      File_line['mysql_systemd'],
-      Package["Percona-XtraDB-Cluster-full-${percona_major_version}"],
-      Mount['/var/lib/mysql']
-    ]
+    $lvm_require = $common_require + Mount['/var/lib/mysql']
   } else {
-    $_require_list = [
-      File[$file_list],
-      File_line['mysql_systemd'],
-      Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]
-    ]
+    $lvm_require = $common_require
   }
 
   if ($manage_firewall) {
-    $require_list = $_require_list + Class['galera_proxysql::firewall']
+    $require = $lvm_require + Class['galera_proxysql::firewall']
   } else {
-    $require_list = $_require_list
+    $require = $lvm_require
   }
 
   unless defined(Exec['bootstrap_or_join']) {
@@ -51,7 +48,7 @@ class galera_proxysql::join (
       path    => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
       creates => $joined_file,
       returns => [0,1],
-      require => $require_list;
+      require => $require;
     }
   }
 
@@ -61,7 +58,7 @@ class galera_proxysql::join (
         command => 'galera_wizard.py -je',
         path    => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
         returns => [0,1],
-        require => $require_list;
+        require => $require;
       }
     }
   } else {
