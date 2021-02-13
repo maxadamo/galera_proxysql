@@ -25,3 +25,7 @@ fixtures:
     yumrepo_core:
       repo: 'puppetlabs/yumrepo_core'
       ref: '1.0.6'
+  repositories:
+    facts: 'https://github.com/puppetlabs/puppetlabs-facts.git'
+    puppet_agent: 'https://github.com/puppetlabs/puppetlabs-puppet_agent.git'
+    provision: 'https://github.com/puppetlabs/provision.git'
