@@ -78,7 +78,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
       # idempotent_apply(pp)
       apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
       apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_changes: true)
-
     end
   end
 end
