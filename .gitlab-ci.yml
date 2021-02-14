@@ -1,12 +1,13 @@
 ---
 stages:
   - syntax
-  - unit_test
+  - litmus_test_galera
+  - litmus_test_proxysql
   - g10k_deploy
+  - tear_down
 
 variables:
-  LITMUS_CENTOS7: "litmusimage/centos:7"
-  LITMUS_CENTOS6: "litmusimage/centos:6"
+  CENTOS7_IMAGE: "litmusimage/centos:7"
 
 run_validation:
   stage: syntax
@@ -15,17 +16,35 @@ run_validation:
   tags:
     - shared-runner
 
-run_unit_test:
-  stage: unit_test
+test_galera:
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
-    - pdk bundle exec rake "litmus:provision[docker, ${LITMUS_CENTOS7}]"
+    - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
     - pdk bundle exec rake litmus:install_module
-    - pdk bundle exec rake litmus:acceptance:parallel
-  # only:
-  #   - production
-  #   - master    
+    - HOST_TYPE=galera pdk bundle exec rake litmus:acceptance:parallel
+  #after_script:
+  #  - pdk bundle exec rake litmus:tear_down
+  #only:
+  #  - uat
+  #  - production
+  tags:
+    - shared-runner
+
+test_proxysql:
+  stage: litmus_test_proxysql
+  script:
+    - pdk bundle exec rake spec_prep
+    - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
+    - pdk bundle exec rake 'litmus:install_agent[puppet7]'
+    - pdk bundle exec rake litmus:install_module
+    - HOST_TYPE=proxysql pdk bundle exec rake litmus:acceptance:parallel
+  #after_script:
+  #  - pdk bundle exec rake litmus:tear_down
+  #only:
+  #  - uat
+  #  - production
   tags:
     - shared-runner
 

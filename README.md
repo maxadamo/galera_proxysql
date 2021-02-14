@@ -5,6 +5,8 @@
 1. [Description](#description)
 1. [Setup - The basics of getting started with galera_proxysql](#setup)
     * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
+    * [Firewall](#firewall)
+    * [SSL](#ssl)
 1. [Usage](#usage)
 1. [Reference](#reference)
 1. [Limitations](#limitations)
@@ -97,6 +99,34 @@ optional arguments:
 Author: Massimiliano Adamo <maxadamo@gmail.com>
 ```
 
+### Firewall
+
+This module include optional settings for iptables.
+
+There are few assumptions connected with the the firewall settings in this module. If you set `manage_firewall` to `true`:
+
+1. The first assumption is that the traffic was closed by iptables between your servers, and this module, will open the ports used by Galera and ProxySQL.
+
+2. The other assumption is that you have already included the firewall module for your servers.
+
+```puppet
+include firewall
+```
+
+3. if you don't use IPv6, you have disabled this setting for your firewall:
+
+```puppet
+class { 'firewall': ensure_v6 => stopped; }
+ ```
+
+### SSL
+
+This modules enables SSL offload by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you probably now SSL usage is optional, unless otherwise configured on a per use basis.
+
+You may let proxySQL use its own self-signed certificate, but **beware** of the facts that in this case the certificate will be different on each node of the cluster and you'll have to sync it manually.
+
+Alternatively you can set `manage_ssl` to `true` and specify your own certificates.
+
 ## Usage
 
 The module will fail on Galera with an even number of nodes and with a number of nodes lower than 3.
@@ -169,7 +199,7 @@ galera_proxysql::create::user { 'zabbix':
 }
 ```
 
-On ProxySQL:
+On proxySQL, you can use the above statement again (unused rules, such privileges and table will be ignored) or you can use something as following:
 
 ```puppet
 galera_proxysql::create::user { 'whatever_user':
@@ -181,10 +211,9 @@ galera_proxysql::create::user { 'whatever_user':
 
 ## Limitations
 
-* not yet tested on ipv4 only (but it should work)
 * Ubuntu/Debian are still on hold.
-* Spec test needs improvements.
 * No changelog is available
+* I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?)
 
 ## Development
 
@@ -195,3 +224,4 @@ Feel free to make pull requests and/or open issues on [my GitHub Repository](htt
 ## ToDo
 
 * Upgrade to Percona 8.x
+* Optional setting to enable SSL between ProxySQL and backends

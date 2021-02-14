@@ -3,7 +3,7 @@
 # Add users to existing database
 #
 define galera_proxysql::create::extra_user (
-  Variant[Sensitive, String] $dbpass,
+  Sensitive $dbpass,
   String $database,
   $galera_hosts                 = undef,
   $proxysql_hosts               = {},
@@ -15,15 +15,6 @@ define galera_proxysql::create::extra_user (
     'present', 'absent',
     present, absent] $ensure    = present,
   ) {
-
-  if $dbpass =~ String {
-    notify { "'dbpass' String detected for ${dbuser}!":
-      message => 'It is advisable to use the Sensitive datatype for "dbpass"';
-    }
-    $dbpass_wrapped = Sensitive($dbpass)
-  } else {
-    $dbpass_wrapped = $dbpass
-  }
 
   if ($proxysql_hosts) {
     $host_hash = deep_merge($galera_hosts, $proxysql_hosts, $proxysql_vip)
@@ -43,12 +34,12 @@ define galera_proxysql::create::extra_user (
         mysql_user {
           "${dbuser}@${host_ips['ipv4']}":
             ensure        => $ensure,
-            password_hash => mysql_password($dbpass_wrapped.unwrap),
+            password_hash => mysql_password($dbpass.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           "${dbuser}@${host_name}":
             ensure        => $ensure,
-            password_hash => mysql_password($dbpass_wrapped.unwrap),
+            password_hash => mysql_password($dbpass.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
         }
@@ -68,7 +59,7 @@ define galera_proxysql::create::extra_user (
         if has_key($host_ips, 'ipv6') {
           mysql_user { "${dbuser}@${host_ips['ipv6']}":
             ensure        => $ensure,
-            password_hash => mysql_password($dbpass_wrapped.unwrap),
+            password_hash => mysql_password($dbpass.unwrap),
             provider      => 'mysql',
             require       => Mysql::Db[$schema_name];
           }
@@ -87,12 +78,12 @@ define galera_proxysql::create::extra_user (
     }
   } else {
     if $ensure == present or $ensure == 'present' {
-      $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass_wrapped.unwrap}")+2
-      concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass_wrapped}":
+      $concat_order = fqdn_rand(999999997, "${dbuser}${dbpass.unwrap}")+2
+      concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass}":
         target  => '/etc/proxysql.cnf',
         content => epp("${module_name}/proxysql_user.cnf.epp", {
           dbuser => $dbuser,
-          dbpass => $dbpass_wrapped
+          dbpass => $dbpass
         }),
         order   => $concat_order;
       }

@@ -67,6 +67,9 @@
 # [*manage_repo*] <Bool>
 #   default: true => please check repo.pp to understand what repos are neeeded
 #
+# [*manage_epel*] <Bool>
+#   default: true => whether to handle EPEL within this module
+#
 # [*galera_version*] <String>
 #   default: latest
 #
@@ -152,7 +155,7 @@ class galera_proxysql (
 
   # proxysql parameters
   $proxysql_version                  = $galera_proxysql::params::proxysql_version,
-  $proxysql_vip                      = $galera_proxysql::params::proxysql_vip,
+  Hash $proxysql_vip                 = $galera_proxysql::params::proxysql_vip,
   Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration
@@ -162,7 +165,8 @@ class galera_proxysql (
   $http_proxy              = $galera_proxysql::params::http_proxy,
   Boolean $manage_firewall = $galera_proxysql::params::manage_firewall,
   Boolean $manage_repo     = $galera_proxysql::params::manage_repo,
-  $proxysql_hosts          = $galera_proxysql::params::proxysql_hosts,
+  Boolean $manage_epel     = $galera_proxysql::params::manage_epel,
+  Hash $proxysql_hosts     = $galera_proxysql::params::proxysql_hosts,
 
 ) inherits galera_proxysql::params {
 
@@ -197,11 +201,6 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
-  galera_proxysql::create::root_password { 'root':
-    force_ipv6 => $force_ipv6,
-    root_pass  => Sensitive($root_password);
-  }
-
   class {
     'galera_proxysql::files':
       percona_major_version        => $percona_major_version,
@@ -227,7 +226,7 @@ class galera_proxysql (
       thread_cache_size            => $thread_cache_size,
       tmpdir                       => $tmpdir;
     'galera_proxysql::install':
-      other_pkgs            => $other_pkgs,
+      manage_epel           => $manage_epel,
       percona_major_version => $percona_major_version,
       percona_minor_version => $percona_minor_version;
     'galera_proxysql::join':
@@ -239,10 +238,12 @@ class galera_proxysql (
       galera_hosts          => $galera_hosts,
       proxysql_hosts        => $proxysql_hosts,
       proxysql_vip          => $proxysql_vip,
-      manage_lvm            => $manage_lvm;
+      manage_lvm            => $manage_lvm,
+      force_ipv6            => $force_ipv6;
     'galera_proxysql::repo':
       http_proxy  => $http_proxy,
-      manage_repo => $manage_repo;
+      manage_repo => $manage_repo,
+      manage_epel => $manage_epel;
     'galera_proxysql::lvm':
       manage_lvm            => $manage_lvm,
       vg_name               => $vg_name,

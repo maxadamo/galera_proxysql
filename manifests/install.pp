@@ -3,18 +3,27 @@
 # This Class installs all the packages
 #
 class galera_proxysql::install (
-  $other_pkgs,
   $percona_major_version,
   $percona_minor_version,
+  $manage_epel,
+  $other_pkgs = $galera_proxysql::params::other_pkgs,
+  $pip_pkgs = $galera_proxysql::params::pip_pkgs
 ) {
 
   assert_private("this class should be called only by ${module_name}")
 
-  $pip_pkgs = ['distro', 'multiping', 'pysystemd']
+  if $manage_epel {
+    $require_epel = Class['epel']
+  } else {
+    $require_epel = undef
+  }
 
   $other_pkgs.each | $pkg | {
     unless defined(Package[$pkg]) {
-      package { $pkg: before => Package[$pip_pkgs]; }
+      package { $pkg:
+        require => $require_epel,
+        before  => Package[$pip_pkgs];
+      }
     }
   }
 

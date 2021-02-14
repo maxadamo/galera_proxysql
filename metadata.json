@@ -9,6 +9,10 @@
   "issues_url": "https://github.com/maxadamo/galera_proxysql/issues",
   "dependencies": [
     {
+      "name": "puppet-epel",
+      "version_requirement": ">= 3.0.0 <= 3.0.1"
+    },
+    {
       "name": "puppet-keepalived",
       "version_requirement": ">= 2.0.0 <= 2.2.0"
     },
@@ -37,7 +41,6 @@
       "version_requirement": ">= 1.0.0 <= 1.0.6"
     }
   ],
-  "data_provider": "hiera",
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",

@@ -92,6 +92,9 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   if ($manage_ssl) {
+    if !($ssl_ca_source_path) or !($ssl_cert_source_path) or !($ssl_key_source_path) {
+      fail('if you set manage_ssl, you also need to set ssl_ca_source_path, ssl_cert_source_path and ssl_key_source_path')
+    }
     class { 'galera_proxysql::proxysql::ssl':
       ssl_ca_source_path   => $ssl_ca_source_path,
       ssl_cert_source_path => $ssl_cert_source_path,
@@ -129,7 +132,7 @@ class galera_proxysql::proxysql::proxysql (
   $server_list = "${list_top}${_server_list}${list_bottom}".chop()
 
   class {
-    'galera_proxysql::repo':
+    'galera_proxysql::proxysql::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
     'galera_proxysql::proxysql::service':
@@ -168,11 +171,11 @@ class galera_proxysql::proxysql::proxysql (
   package {
     "Percona-Server-shared-compat-${percona_major_version}":
       ensure  => installed,
-      require => Class['galera_proxysql::repo'],
-      before  => Class['mysql::client'];
+      require => Class['galera_proxysql::proxysql::repo'],
+      before  => [Class['mysql::client'], Package['keepalived']];
     $proxysql_package:
       ensure  => $proxysql_version,
-      require => [Class['mysql::client', 'galera_proxysql::repo']];
+      require => Class['mysql::client', 'galera_proxysql::proxysql::repo'];
   }
 
   file {

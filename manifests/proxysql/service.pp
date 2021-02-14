@@ -1,9 +1,5 @@
 # == Class: galera_proxysql::proxysql::proxysql
 #
-# Managed services
-# Right now proxysql still uses sysv initscript
-# I prefer to get rid of it and use systemd
-#
 # === Parameters & Variables
 #
 # None

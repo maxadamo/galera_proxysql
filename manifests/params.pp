@@ -33,6 +33,7 @@ class galera_proxysql::params {
     'percona-toolkit', 'python36-paramiko', 'python36-pip',
     'python36-mysql', 'python36-rpm', 'qpress', 'nc', 'socat'
   ]
+  $pip_pkgs = ['distro', 'multiping', 'ping3', 'pysystemd']
   $query_cache_size = 0
   $query_cache_type = 0
   $root_password = undef
@@ -49,15 +50,18 @@ class galera_proxysql::params {
   $proxysql_vip = undef
   $proxysql_admin_password = Sensitive('admin')
   $keepalived_sysconf_options = '-D'
-
+  $ssl_ca_source_path = undef
+  $ssl_cert_source_path = undef
+  $ssl_key_source_path = undef
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
   $limitnofile = undef  # limit file number. Example: 65535
 
   # Common Parameters
   $http_proxy = absent # example: 'http://proxy.example.net:8080'
-  $manage_firewall = true
+  $manage_firewall = false
   $manage_repo = true
+  $manage_epel = true
   $proxysql_hosts = undef
 
 }

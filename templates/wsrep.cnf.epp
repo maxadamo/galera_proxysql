@@ -18,27 +18,27 @@ wsrep_provider                 = /usr/lib64/galera3/libgalera_smm.so
 pxc_strict_mode                = DISABLED
 
 #If wsrep_node_name is not specified,  then system hostname will be used
-wsrep_node_name                = <%= $::hostname %>
+wsrep_node_name                = <%= $facts['hostname'] %>
 
 # node IP address
 <% if $force_ipv6 { -%>
-wsrep_node_address             = "[<%= $::ipaddress6 %>]:4567"
+wsrep_node_address             = "[<%= $facts['ipaddress6'] %>]:4567"
 
 # Provider specific configuration options
-wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $::ipaddress6 %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M;<%= $galera_proxysql::files::custom_wsrep_options %>"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $facts['ipaddress6'] %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M;<%= $galera_proxysql::files::custom_wsrep_options %>"
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
-wsrep_sst_receive_address      = "[<%= $::ipaddress6 %>]:4444"
+wsrep_sst_receive_address      = "[<%= $facts['ipaddress6'] %>]:4444"
 <% } else { -%>
-wsrep_node_address             = "<%= $::ipaddress %>:4567"
+wsrep_node_address             = "<%= $facts['ipaddress'] %>:4567"
 
 # Provider specific configuration options
-wsrep_provider_options         = "gmcast.listen_addr=tcp://0.0.0.0:4567;ist.recv_addr=[<%= $::ipaddress %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://0.0.0.0:4567;ist.recv_addr=[<%= $facts['ipaddress'] %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M"
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
-wsrep_sst_receive_address      = "<%= $::ipaddress %>:4444"
+wsrep_sst_receive_address      = "<%= $facts['ipaddress'] %>:4444"
 <% } -%>
 
 # Logical cluster name. Should be the same for all nodes.

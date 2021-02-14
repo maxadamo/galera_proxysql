@@ -34,6 +34,7 @@ import configparser
 import ipaddress
 from warnings import filterwarnings
 from multiping import MultiPing
+import ping3
 import distro
 import MySQLdb
 import pysystemd
@@ -205,19 +206,26 @@ def bootstrap_mysql(boot):
         os.sys.exit(1)
     print('\nsuccessfully bootstrapped the cluster\n')
     if boot == "new":
-        bootstrap = subprocess.Popen([
-            "/usr/bin/mysqladmin",
-            "--no-defaults",
-            "--socket=/var/lib/mysql/mysql.sock",
-            "-u", "root",
-            "password",
-            CREDENTIALS["root"]
-        ], stdout=fnull)
-        _, __ = bootstrap.communicate()
-        retcode = bootstrap.poll()
-        fnull.close()
-        if retcode != 0:
-            print("Error setting root password")
+        cnx_local_test = MySQLdb.connect(
+            user='root',
+            host='localhost',
+            unix_socket='/var/lib/mysql/mysql.sock')
+        cursor = cnx_local_test.cursor()
+
+        try:
+            cursor.execute("""
+                ALTER USER 'root'@'localhost' IDENTIFIED BY '{}'
+                """.format(CREDENTIALS["root"]))
+            cnx_local_test.commit()
+        except Exception as err:
+            print("Could not set password for root: {}".format(err))
+            os.sys.exit(1)
+        try:
+            cursor.execute("""FLUSH PRIVILEGES""")
+            cnx_local_test.commit()
+        except Exception as err:
+            print("Could not flush privileges: {}".format(err))
+            os.sys.exit(1)
         restore_mycnf()
 
 
@@ -227,10 +235,13 @@ def checkhost(sqlhost, ipv6):
     print("\nChecking socket on {} ...".format(sqlhostname))
     if ipv6:
         mping = MultiPing([sqlhost])
+        mping.send()
+        _, no_responses = mping.receive(1)
     else:
-        mping = MultiPing(sqlhost)
-    mping.send()
-    _, no_responses = mping.receive(1)
+        no_responses = None
+        ping_response = ping3.ping(sqlhost, timeout=2)
+        if not ping_response:
+            no_responses = True
 
     if no_responses:
         print("{}Skipping {}: ping failed{}".format(RED, sqlhostname, WHITE))
@@ -259,10 +270,14 @@ def checkwsrep(sqlhost, ipv6):
     sqlhostname = reverse_lookup(sqlhost)
     if ipv6:
         mping = MultiPing([sqlhost])
+        mping.send()
+        _, no_responses = mping.receive(1)
     else:
-        mping = MultiPing(sqlhost)
-    mping.send()
-    _, no_responses = mping.receive(1)
+        no_responses = None
+        ping_response = ping3.ping(sqlhost, timeout=2)
+        if not ping_response:
+            no_responses = True
+
     if no_responses:
         print("{}Skipping {}: it is not in the cluster{}".format(YELLOW, sqlhost, WHITE))
     else:
