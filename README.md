@@ -11,6 +11,7 @@
 1. [Reference](#reference)
 1. [Limitations](#limitations)
 1. [Development](#development)
+1. [Release Notes](#release-notes)
 1. [ToDo](#todo)
 
 ## Description
@@ -219,7 +220,10 @@ galera_proxysql::create::user { 'whatever_user':
 
 Feel free to make pull requests and/or open issues on [my GitHub Repository](https://github.com/maxadamo/galera_proxysql)
 
-## Release Notes/Contributors/Etc. **Optional**
+## Release Notes
+
+* enabled SSL offload with ProxySQL-2
+* boosted Unit Test
 
 ## ToDo
 
