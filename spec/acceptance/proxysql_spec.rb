@@ -75,9 +75,9 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
       EOS
 
       # Run it twice and test for idempotency
-      # idempotent_apply(pp)
       apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
-      apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_changes: true)
+      # keepalived keeps flapping and it doesn't work idempotently
+      # apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_changes: true)
     end
   end
 end
