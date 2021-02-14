@@ -4,7 +4,6 @@ stages:
   - litmus_test_galera
   - litmus_test_proxysql
   - g10k_deploy
-  - tear_down
 
 variables:
   CENTOS7_IMAGE: "litmusimage/centos:7"
@@ -57,12 +56,5 @@ job_deploy:
   when: on_success
   script:
     - /home/gitlab-runner/bin/ci2puppet.sh ${CI_PROJECT_NAME} ${CI_COMMIT_REF_NAME}
-  tags:
-    - shared-runner
-
-clean_up:
-  stage: tear_down
-  script:
-    - pdk bundle exec rake litmus:tear_down
   tags:
     - shared-runner
