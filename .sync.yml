@@ -3,4 +3,6 @@ spec/spec_helper.rb:
   hiera_config: 'spec/hiera.yaml'
 .gitlab-ci.yml:
   unmanaged: true
+.travis.yml:
+  unmanaged: true
 mock_with: ':rspec'

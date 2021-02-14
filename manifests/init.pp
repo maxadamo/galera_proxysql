@@ -59,7 +59,7 @@
 #   default: undef => number of GB. It requires that 'manage_lvm' is set to true
 #
 # [*manage_firewall*] <Bool>
-#   default: true => It requires puppetlabs/firewall
+#   default: false => It requires puppetlabs/firewall
 #
 # [*manage_lvm*] <Bool>
 #   default: false => creates and mount a volume on /var/lib/mysql. I encourage its use.

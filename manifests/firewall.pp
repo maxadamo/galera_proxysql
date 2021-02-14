@@ -16,7 +16,7 @@ class galera_proxysql::firewall (
 
   unless ($proxysql_port) {
     notify { 'using default port 3306 for ProxySQL':
-      message => 'using default port 3306 for ProxySQL. TO SUPPRESS THIS WARNING force the parameter proxysql_port, even for 3306'
+      message => 'using default port 3306 for ProxySQL. TO SUPPRESS THIS WARNING force the parameter $proxysql_port, even for 3306'
     }
     $proxysql_port_final = 3306
   } else {

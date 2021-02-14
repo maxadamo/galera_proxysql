@@ -53,7 +53,7 @@
 #            it can be a local path on the server or a path like: puppet:///modules/...
 #
 # [*manage_firewall*] <Bool>
-#   default: true => It requires puppetlabs/firewall
+#   default: false => It requires puppetlabs/firewall
 #
 class galera_proxysql::proxysql::proxysql (
 

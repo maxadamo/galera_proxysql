@@ -16,7 +16,8 @@
 
 ## Description
 
-This module sets up and bootstrap Galera cluster and ProxySQL.
+The version 2.0.0 of this module is a great step forward (the unit test is fully working). It sets up and bootstrap Galera cluster and ProxySQL with SSL support.
+
 The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
 
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
@@ -28,17 +29,15 @@ ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floa
 
 Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` or `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
 
-Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove XtraBackup from this module.
+Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove XtraBackup scripts from this module.
 
-**When bootstrapping, avoid running puppet on all the nodes at same time.** You need to bootstrap one node first and then you can join the other nodes.
-
-Read at (actual) **limitations** in the section below.
+**When bootstrapping**, avoid running puppet on all the nodes at same time. You need to bootstrap one node first and then you can join the other nodes (i.e.: you better run puppet on one node at time).
 
 ## Setup
 
 ### Beginning with galera_proxysql
 
-Sensitive type for passwords is not mandatory, but it's recommended. If it's not being used you'll see a warning.
+Sensitive type for passwords is now mandatory.
 
 To setup Galera:
 
@@ -59,9 +58,7 @@ class { '::galera_proxysql':
 
 To setup ProxySQL:
 
-* with version 2.x SSL is always enabled, but unless otherwise configured, it's optional on the client side, and it can be enabled on a per user basis.
-
-* ProxySQL generates a self-signed certificates. Bear in mind that it will be on each node. If you want to use your own certificates, you can use `manage_ssl` and specify the source for the certificate, CA and private key.
+* you can check the information in the [SSL](#ssl) section (paying attention where I mention the self-signed certificates)
 
 ```puppet
 class { '::galera_proxysql::proxysql::proxysql':
@@ -122,9 +119,9 @@ class { 'firewall': ensure_v6 => stopped; }
 
 ### SSL
 
-This modules enables SSL offload by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you probably now SSL usage is optional, unless otherwise configured on a per use basis.
+This module offloads and enables SSL by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you may now SSL usage is optional on the client side, unless otherwise configured on a per use basis.
 
-You may let proxySQL use its own self-signed certificate, but **beware** of the facts that in this case the certificate will be different on each node of the cluster and you'll have to sync it manually.
+You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificate will be different on each node of the cluster and you'll have to sync it manually.
 
 Alternatively you can set `manage_ssl` to `true` and specify your own certificates.
 
@@ -222,7 +219,8 @@ Feel free to make pull requests and/or open issues on [my GitHub Repository](htt
 
 ## Release Notes
 
-* enabled SSL offload with ProxySQL-2
+* upgrade to ProxySQL-2
+* offloading and enabling SSL on ProxySQL
 * boosted Unit Test
 
 ## ToDo
