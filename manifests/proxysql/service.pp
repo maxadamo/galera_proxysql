@@ -5,27 +5,26 @@
 # None
 #
 #
-class galera_proxysql::proxysql::service ($limitnofile, $proxysql_package) {
+class galera_proxysql::proxysql::service ($proxysql_package) {
 
   assert_private("this class should be called only by ${module_name}")
 
-  file {
-    '/etc/systemd/system/proxysql.service.d':
-      ensure => directory;
-    '/etc/systemd/system/proxysql.service.d/file_limit.conf':
-      content => epp("${module_name}/file_limit.conf.epp"),
-      require => File['/etc/systemd/system/proxysql.service.d'],
-      notify  => [
-        Exec["${module_name}_daemon_reload"],
-        Service['proxysql']
-      ];
-    '/var/lib/proxysql':
-      ensure       => directory,
-      owner        => proxysql,
-      group        => proxysql,
-      recurse      => true,
-      recurselimit => 1,
-      require      => Package[$proxysql_package];
+  file { '/lib/systemd/system/proxysql.service':
+    ensure  => purged,
+    require => Package[$proxysql_package];
+  }
+  -> systemd::unit_file { 'proxysql.service':
+    source => "puppet:///modules/${module_name}/proxysql.service",
+    notify => Service['proxysql'];
+  }
+
+  file { '/var/lib/proxysql':
+    ensure       => directory,
+    owner        => proxysql,
+    group        => proxysql,
+    recurse      => true,
+    recurselimit => 1,
+    require      => Package[$proxysql_package];
   }
 
   service { 'proxysql':
@@ -33,11 +32,16 @@ class galera_proxysql::proxysql::service ($limitnofile, $proxysql_package) {
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    provider   => 'systemd',
-    require    => File['/etc/systemd/system/proxysql.service.d/file_limit.conf'];
+    provider   => 'systemd';
   }
 
-  exec { "${module_name}_daemon_reload":
+  # temprrary workaround: now the limit is set inside the service file
+  file { '/etc/systemd/system/proxysql.service.d':
+    ensure  => absent,
+    recurse => true,
+    force   => true;
+  }
+  ~> exec { "${module_name}_daemon_reload":
     refreshonly => true,
     path        => '/usr/bin:/usr/sbin:/bin:/sbin',
     command     => 'systemctl daemon-reload',

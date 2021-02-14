@@ -3,7 +3,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
   before(:all) do
     # due to class containment issue yumrepo might not be executed in advance 
     preamble = <<-MANIFEST
-      include epel
       rpmkey { '8507EFA5':
         ensure => present,
         source => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY';
@@ -23,7 +22,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
           descr   => 'Percona';
       }
       -> exec { 'yum check-update || true':
-        require => Class['epel'],
         path => '/usr/bin:/usr/sbin';
       }
     MANIFEST
@@ -65,6 +63,8 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
         class { 'firewall': ensure_v6 => stopped; }
         -> class { 'galera_proxysql::proxysql::proxysql':
           manage_ssl                 => false,
+          manage_firewall            => true,
+          proxysql_port              => 3310,
           trusted_networks           => $trusted_networks,
           monitor_password           => $monitor_password,
           proxysql_hosts             => $proxysql_hosts,
@@ -72,7 +72,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
           galera_hosts               => $galera_hosts,
           manage_repo                => false;
         }
-        notify { 'ProxySQL host installed': }
       EOS
 
       # Run it twice and test for idempotency

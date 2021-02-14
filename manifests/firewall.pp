@@ -8,20 +8,66 @@ class galera_proxysql::firewall (
   $galera_hosts,
   $proxysql_hosts,
   $proxysql_vip,
-  $trusted_networks
+  $trusted_networks,
+  $proxysql_port,
 ) {
 
   assert_private("this class should be called only by ${module_name}")
 
+  unless ($proxysql_port) {
+    notify { 'using default port 3306 for ProxySQL':
+      message => 'using default port 3306 for ProxySQL. TO SUPPRESS THIS WARNING force the parameter proxysql_port, even for 3306'
+    }
+    $proxysql_port_final = 3306
+  } else {
+    $proxysql_port_final = $proxysql_port
+  }
+
+  $proxysql_cluster = deep_merge($proxysql_hosts, $proxysql_vip)
+  $whole_cluster = deep_merge($proxysql_cluster, $galera_hosts)
+  $all_ports = unique([3306, 9200] + $proxysql_port_final)
+  $all_ports_string = join($all_ports, ', ')
+
   $trusted_networks.each | String $source | {
     if $source =~ Stdlib::IP::Address::V6 { $provider = 'ip6tables' } else { $provider = 'iptables' }
-    firewall { "200 Allow inbound Galera ports 3306, 9200 from ${source} for ${provider}":
+    firewall { "200 Allow inbound Galera ports ${proxysql_port_final} from ${source} for ${provider}":
       chain    => 'INPUT',
       source   => $source,
-      dport    => [3306, 9200],
+      dport    => $proxysql_port_final,
       proto    => tcp,
       action   => accept,
       provider => $provider;
+    }
+  }
+
+  $whole_cluster.each | $name, $node | {
+    firewall {
+      default:
+        dport    => $all_ports,
+        proto    => tcp,
+        action   => accept,
+        provider => 'iptables';
+      "200 Allow outbound ports ${all_ports_string} on ipv4 to ${name}":
+        chain       => 'OUTPUT',
+        destination => $node['ipv4'];
+      "200 Allow inbound ports ${all_ports_string} on ipv4 from ${name}":
+        chain  => 'INPUT',
+        source => $node['ipv4'];
+    }
+    if has_key($node, 'ipv6') {
+      firewall {
+        default:
+          dport    => $all_ports,
+          proto    => tcp,
+          action   => accept,
+          provider => 'ip6tables';
+        "200 Allow outbound ports ${all_ports_string} on ipv6 to ${name}":
+          chain       => 'OUTPUT',
+          destination => $node['ipv6'];
+        "200 Allow inbound ports ${all_ports_string} on ipv6 from ${name}":
+          chain  => 'INPUT',
+          source => $node['ipv6'];
+      }
     }
   }
 
@@ -76,8 +122,8 @@ class galera_proxysql::firewall (
     }
   }
 
+
   # ProxySQL rules: let's open all the ports across Keepalived hosts
-  $proxysql_cluster = deep_merge($proxysql_hosts, $proxysql_vip)
   $proxysql_cluster.each | $name, $node | {
     firewall {
       default:

@@ -76,6 +76,8 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' do
           galera_hosts     => $galera_hosts,
           proxysql_hosts   => $proxysql_hosts,
           proxysql_vip     => $proxysql_vip,
+          proxysql_port    => 3310,
+          manage_firewall  => true,
           manage_repo      => true,
           manage_lvm       => false;
         }

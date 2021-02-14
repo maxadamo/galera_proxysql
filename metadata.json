@@ -8,6 +8,10 @@
   "project_page": "https://github.com/maxadamo/galera_proxysql",
   "issues_url": "https://github.com/maxadamo/galera_proxysql/issues",
   "dependencies": [
+    {   
+      "name": "camptocamp-systemd",
+      "version_requirement": ">= 2.12.0 <= 2.12.0"
+    },  
     {
       "name": "puppet-epel",
       "version_requirement": ">= 3.0.0 <= 3.0.1"

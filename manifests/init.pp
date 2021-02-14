@@ -59,7 +59,7 @@
 #   default: undef => number of GB. It requires that 'manage_lvm' is set to true
 #
 # [*manage_firewall*] <Bool>
-#   default: true => Strongly recommended. It requires puppetlabs/firewall
+#   default: true => It requires puppetlabs/firewall
 #
 # [*manage_lvm*] <Bool>
 #   default: false => creates and mount a volume on /var/lib/mysql. I encourage its use.
@@ -154,9 +154,10 @@ class galera_proxysql (
   Sensitive $root_password      = $galera_proxysql::params::root_password,
 
   # proxysql parameters
-  $proxysql_version                  = $galera_proxysql::params::proxysql_version,
-  Hash $proxysql_vip                 = $galera_proxysql::params::proxysql_vip,
-  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
+  $proxysql_version                     = $galera_proxysql::params::proxysql_version,
+  Optional[Stdlib::Port] $proxysql_port = undef,
+  Hash $proxysql_vip                    = $galera_proxysql::params::proxysql_vip,
+  Sensitive $proxysql_admin_password    = $galera_proxysql::params::proxysql_admin_password,
 
   # proxysql Keepalive configuration
   $network_interface = $galera_proxysql::params::network_interface,
@@ -257,6 +258,7 @@ class galera_proxysql (
   if $manage_firewall {
     class { 'galera_proxysql::firewall':
       use_ipv6         => $ipv6_true,
+      proxysql_port    => $proxysql_port,
       galera_hosts     => $galera_hosts,
       proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,

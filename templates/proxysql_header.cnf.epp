@@ -9,7 +9,7 @@ datadir="/var/lib/proxysql"
 admin_variables=
 {
     admin_credentials="admin:<%= $proxysql_admin_password.unwrap %>"
-    mysql_ifaces="127.0.0.1:3307;/var/lib/mysql/mysql_admin.sock"
+    mysql_ifaces="127.0.0.1:<%= $proxysql_admin_port %>;/var/lib/mysql/mysql_admin.sock"
     # WIP: web stats
     # refresh_interval=2000
     # web_enabled=true
@@ -29,9 +29,9 @@ mysql_variables=
     have_compress=true
     poll_timeout=2000
 <% if ($facts['ipaddress6']) and $facts['ipaddress6'] =~ Stdlib::IP::Address::V6 { -%>
-    interfaces="0.0.0.0:3306;[::]:3306;/var/lib/mysql/mysql.sock"
+    interfaces="0.0.0.0:<%= $proxysql_port %>;[::]:<%= $proxysql_port %>;/var/lib/mysql/mysql.sock"
 <% } else { -%>
-    interfaces="0.0.0.0:3306;/var/lib/mysql/mysql.sock"
+    interfaces="0.0.0.0:<%= $proxysql_port %>;/var/lib/mysql/mysql.sock"
 <% } -%>
     default_schema="information_schema"
     stacksize=1048576

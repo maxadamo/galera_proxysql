@@ -24,11 +24,13 @@ test_galera:
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
     - pdk bundle exec rake litmus:install_module
     - HOST_TYPE=galera pdk bundle exec rake litmus:acceptance:parallel
-  #after_script:
-  #  - pdk bundle exec rake litmus:tear_down
-  #only:
-  #  - uat
-  #  - production
+  after_script:
+    - pdk bundle exec rake litmus:tear_down
+  only:
+    - test
+    - uat
+    - production
+    - master
   tags:
     - shared-runner
 
@@ -40,11 +42,13 @@ test_proxysql:
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
     - pdk bundle exec rake litmus:install_module
     - HOST_TYPE=proxysql pdk bundle exec rake litmus:acceptance:parallel
-  #after_script:
-  #  - pdk bundle exec rake litmus:tear_down
-  #only:
-  #  - uat
-  #  - production
+  after_script:
+    - pdk bundle exec rake litmus:tear_down
+  only:
+    - test
+    - uat
+    - production
+    - master
   tags:
     - shared-runner
 

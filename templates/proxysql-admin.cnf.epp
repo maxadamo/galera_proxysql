@@ -12,10 +12,10 @@ export PROXYSQL_DATADIR='/var/lib/proxysql'
 # --------------------------------
 # proxysql admin interface credentials.
 #
-export PROXYSQL_USERNAME="admin"
+export PROXYSQL_USERNAME='admin'
 export PROXYSQL_PASSWORD='<%= $proxysql_admin_password.unwrap %>'
 export PROXYSQL_HOSTNAME='localhost'
-export PROXYSQL_PORT='3307'
+export PROXYSQL_PORT='<%= $proxysql_admin_port %>'
 
 # --------------------------------
 # PXC admin credentials for connecting to pxc-cluster-node.
@@ -23,7 +23,7 @@ export PROXYSQL_PORT='3307'
 export CLUSTER_USERNAME='admin'
 export CLUSTER_PASSWORD='admin'
 export CLUSTER_HOSTNAME='localhost'
-export CLUSTER_PORT='3306'
+export CLUSTER_PORT='<%= $proxysql_port %>'
 
 # --------------------------------
 # proxysql monitoring user. proxysql admin script will create
@@ -49,12 +49,12 @@ export OFFLINE_HOSTGROUP_ID='9999'
 # --------------------------------
 # ProxySQL read/write configuration mode.
 #
-export MODE="singlewrite"
+export MODE='singlewrite'
 
 # --------------------------------
 # max_connections default (used only when INSERTing a new mysql_servers entry)
 #
-export MAX_CONNECTIONS="1000"
+export MAX_CONNECTIONS='1000'
 
 # --------------------------------
 # Determines the maximum number of writesets a node can have queued
@@ -65,7 +65,7 @@ export MAX_TRANSACTIONS_BEHIND=100
 # --------------------------------
 # Connections to the backend servers (from ProxySQL) will use SSL
 #
-export USE_SSL="no"
+export USE_SSL='no'
 
 # --------------------------------
 # Determines if a node should be added to the reader hostgroup if it has
@@ -76,4 +76,4 @@ export USE_SSL="no"
 # If set to 'backup', then only the backup-writers will be added to
 # the read hostgroup.
 #
-export WRITERS_ARE_READERS="backup"
+export WRITERS_ARE_READERS='backup'

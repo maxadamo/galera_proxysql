@@ -6,7 +6,7 @@ PATH=$PATH:/sbin
 PROXYSQL_USERNAME="admin"
 PROXYSQL_PASSWORD="admin"
 PROXYSQL_HOSTNAME="localhost"
-PROXYSQL_PORT="3307"
+PROXYSQL_PORT="<%= $proxysql_admin_port %>"
 #
 
 function usage()

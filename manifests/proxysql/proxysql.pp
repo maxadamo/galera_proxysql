@@ -10,9 +10,6 @@
 #   default: undef  http proxy used for instance by gpg key
 #   Example: 'http://proxy.example.net:8080'
 #
-# [*limitnofile*] <String>
-#   default: undef (number of open files)
-#
 # [*manage_repo*] <Bool>
 #   default: true => please check repo.pp to understand what repos are neeeded
 #
@@ -26,6 +23,9 @@
 #
 # [*proxysql_admin_password*] <Sensitive>
 #   proxysql user password
+#
+# [*proxysql_port*] <Stdlib::Port>
+#   default: 3306 => ProxySQL TCP port
 #
 # [*proxysql_vip*] <Hash>
 #   host, ipv4 (optionally ipv6) for the VIP
@@ -52,6 +52,8 @@
 #   default: undef => it's mandatory if manage_ssl is true
 #            it can be a local path on the server or a path like: puppet:///modules/...
 #
+# [*manage_firewall*] <Bool>
+#   default: true => It requires puppetlabs/firewall
 #
 class galera_proxysql::proxysql::proxysql (
 
@@ -65,30 +67,32 @@ class galera_proxysql::proxysql::proxysql (
   Optional[Stdlib::Filesource] $ssl_key_source_path  = $galera_proxysql::params::ssl_key_source_path,
 
   # PRoxySQL general settings
-  $proxysql_users                = undef,  # users are now created through galera_proxysql::create::user
-  String $percona_major_version  = $galera_proxysql::params::percona_major_version,
-  Boolean $force_ipv6            = $galera_proxysql::params::force_ipv6,
-  Hash $galera_hosts             = $galera_proxysql::params::galera_hosts,
-  Boolean $manage_repo           = $galera_proxysql::params::manage_repo,
-  Hash $proxysql_hosts           = $galera_proxysql::params::proxysql_hosts,
-  Hash $proxysql_vip             = $galera_proxysql::params::proxysql_vip,
-  Array $trusted_networks        = $galera_proxysql::params::trusted_networks,
-  String $network_interface      = $galera_proxysql::params::network_interface,
-  String $proxysql_package       = $galera_proxysql::params::proxysql_package,
-  String $proxysql_version       = $galera_proxysql::params::proxysql_version,
-  String $proxysql_mysql_version = $galera_proxysql::params::proxysql_mysql_version,
-  $limitnofile                   = $galera_proxysql::params::limitnofile,
-  $http_proxy                    = $galera_proxysql::params::http_proxy,
   Optional[String] $keepalived_sysconf_options = $galera_proxysql::params::keepalived_sysconf_options,
+  $proxysql_users                    = undef,  # users are now created through galera_proxysql::create::user
+  Stdlib::Port $proxysql_port        = $galera_proxysql::params::proxysql_port,
+  Stdlib::Port $proxysql_admin_port  = $galera_proxysql::params::proxysql_admin_port,
+  String $percona_major_version      = $galera_proxysql::params::percona_major_version,
+  Boolean $force_ipv6                = $galera_proxysql::params::force_ipv6,
+  Hash $galera_hosts                 = $galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo               = $galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts               = $galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip                 = $galera_proxysql::params::proxysql_vip,
+  Array $trusted_networks            = $galera_proxysql::params::trusted_networks,
+  String $network_interface          = $galera_proxysql::params::network_interface,
+  String $proxysql_package           = $galera_proxysql::params::proxysql_package,
+  String $proxysql_version           = $galera_proxysql::params::proxysql_version,
+  String $proxysql_mysql_version     = $galera_proxysql::params::proxysql_mysql_version,
+  $http_proxy                        = $galera_proxysql::params::http_proxy,
+  Boolean $manage_firewall           = $galera_proxysql::params::manage_firewall,
 
   # Passwords
   Sensitive $monitor_password        = $galera_proxysql::params::monitor_password,
-  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password
+  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
 ) inherits galera_proxysql::params {
 
   if ($proxysql_users) {
-    fail('please re-use the same galera_proxysql::create::user resources used on Galera to create users even on ProxySQL')
+    fail('please re-use the same galera_proxysql::create::user resource used on Galera to create users even on ProxySQL')
   }
 
   if ($manage_ssl) {
@@ -100,6 +104,10 @@ class galera_proxysql::proxysql::proxysql (
       ssl_cert_source_path => $ssl_cert_source_path,
       ssl_key_source_path  => $ssl_key_source_path;
     }
+  }
+
+  if $proxysql_port == $proxysql_admin_port {
+    fail('proxysql_port and proxysql_admin_port cannot be the same')
   }
 
   $proxysql_key_first = keys($proxysql_hosts)[0]
@@ -136,7 +144,6 @@ class galera_proxysql::proxysql::proxysql (
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo;
     'galera_proxysql::proxysql::service':
-      limitnofile      => $limitnofile,
       proxysql_package => $proxysql_package;
     'galera_proxysql::proxysql::keepalived':
       use_ipv6                   => $ipv6_true,
@@ -144,14 +151,19 @@ class galera_proxysql::proxysql::proxysql (
       network_interface          => $network_interface,
       keepalived_sysconf_options => $keepalived_sysconf_options,
       proxysql_vip               => $proxysql_vip;
-    'galera_proxysql::firewall':
+    'mysql::client':
+      package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
+  }
+
+  if $manage_firewall {
+    class { 'galera_proxysql::firewall':
       use_ipv6         => $ipv6_true,
+      proxysql_port    => $proxysql_port,
       galera_hosts     => $galera_hosts,
       proxysql_hosts   => $proxysql_hosts,
       proxysql_vip     => $proxysql_vip,
       trusted_networks => $trusted_networks;
-    'mysql::client':
-      package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
+    }
   }
 
   exec {
@@ -169,12 +181,13 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   package {
-    "Percona-Server-shared-compat-${percona_major_version}":
+    "Percona-XtraDB-Cluster-shared-compat-${percona_major_version}":
       ensure  => installed,
       require => Class['galera_proxysql::proxysql::repo'],
       before  => [Class['mysql::client'], Package['keepalived']];
     $proxysql_package:
       ensure  => $proxysql_version,
+      notify  => Service['proxysql'],
       require => Class['mysql::client', 'galera_proxysql::proxysql::repo'];
   }
 
@@ -186,7 +199,7 @@ class galera_proxysql::proxysql::proxysql (
       mode    => '0755',
       require => Package[$proxysql_package],
       notify  => Service['proxysql'],
-      source  => "puppet:///modules/${module_name}/proxysql_galera_checker";
+      content => epp("${module_name}/proxysql_galera_checker.epp", { proxysql_admin_port => $proxysql_admin_port });
     '/var/lib/mysql':
       ensure  => directory,
       owner   => proxysql,
@@ -201,6 +214,8 @@ class galera_proxysql::proxysql::proxysql (
       require => Package[$proxysql_package],
       notify  => Service['proxysql'],
       content => Sensitive(epp("${module_name}/proxysql-admin.cnf.epp", {
+        proxysql_port           => $proxysql_port,
+        proxysql_admin_port     => $proxysql_admin_port,
         monitor_password        => Sensitive($monitor_password),
         proxysql_admin_password => Sensitive($proxysql_admin_password)
       }));
@@ -209,12 +224,12 @@ class galera_proxysql::proxysql::proxysql (
       owner   => proxysql,
       group   => proxysql,
       require => Package[$proxysql_package],
-      content => Sensitive("[client]\nuser=admin\npassword=admin\nport=3307\nhost=127.0.0.1\nprotocol=tcp\n")
+      content => Sensitive("[client]\nuser=admin\npassword=admin\nport=${proxysql_admin_port}\nhost=127.0.0.1\nprotocol=tcp\n")
   }
 
   concat { '/etc/proxysql.cnf':
-    owner   => 'proxysql',
-    group   => 'proxysql',
+    owner   => proxysql,
+    group   => proxysql,
     mode    => '0640',
     order   => 'numeric',
     require => Package[$proxysql_package],
@@ -225,6 +240,8 @@ class galera_proxysql::proxysql::proxysql (
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_header.cnf.epp", {
+        proxysql_port           => $proxysql_port,
+        proxysql_admin_port     => $proxysql_admin_port,
         proxysql_admin_password => Sensitive($proxysql_admin_password),
         proxysql_mysql_version  => $proxysql_mysql_version,
         monitor_password        => Sensitive($monitor_password),

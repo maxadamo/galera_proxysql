@@ -45,6 +45,8 @@ class galera_proxysql::params {
 
   # proxysql configuration
   $proxysql_package = 'proxysql2'
+  $proxysql_port = 3306
+  $proxysql_admin_port = 3307
   $proxysql_version  = 'latest'
   $proxysql_mysql_version = '5.7.22-22-57'
   $proxysql_vip = undef
@@ -55,7 +57,6 @@ class galera_proxysql::params {
   $ssl_key_source_path = undef
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
-  $limitnofile = undef  # limit file number. Example: 65535
 
   # Common Parameters
   $http_proxy = absent # example: 'http://proxy.example.net:8080'

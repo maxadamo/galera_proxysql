@@ -1,5 +1,5 @@
 [Unit]
-Description=High Performance Advanced Proxy for MySQL
+Description=MySQL Database Proxy
 After=network.target
 
 [Service]
@@ -15,10 +15,6 @@ PIDFile=/var/run/proxysql/proxysql.pid
 # Use the default user and group
 User=proxysql
 Group=proxysql
-
-# Increase file limits
-LimitNOFILE=102400
-LimitCORE=1073741824
 
 ExecStart=/usr/bin/proxysql -f -c /etc/proxysql.cnf -D /var/lib/proxysql
 
