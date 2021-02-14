@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' do
   before(:all) do
-    # due to class containment issue yumrepo might not be executed in advance 
+    # due to class containment issue yumrepo might not be executed in advance
     preamble = <<-MANIFEST
       include epel
       rpmkey { '8507EFA5':
