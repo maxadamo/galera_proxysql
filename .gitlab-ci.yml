@@ -59,3 +59,10 @@ job_deploy:
     - /home/gitlab-runner/bin/ci2puppet.sh ${CI_PROJECT_NAME} ${CI_COMMIT_REF_NAME}
   tags:
     - shared-runner
+
+clean_up:
+  stage: tear_down
+  script:
+    - pdk bundle exec rake litmus:tear_down
+  tags:
+    - shared-runner
