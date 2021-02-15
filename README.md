@@ -4,7 +4,7 @@
 
 1. [Description](#description)
 1. [WYSIWYG](#wysiwyg)
-1. [Setup - The basics of getting started with galera_proxysql](#setup)
+1. [Setup](#setup)
     * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
     * [Firewall](#firewall)
     * [SSL](#ssl)
@@ -17,7 +17,7 @@
 
 ## Description
 
-The version 2.0.0 of this module is a great step forward (the unit test is fully working). It sets up and bootstrap Galera cluster and ProxySQL with SSL support.
+The version 2.x.x of this module is a great leap forward. There is fully working unit test, and the modules sets up and bootstrap Galera cluster and ProxySQL with SSL support.
 
 The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
 
@@ -109,11 +109,11 @@ Author: Massimiliano Adamo <maxadamo@gmail.com>
 
 ### Firewall
 
-This module include optional settings for iptables.
+This module includes optional settings for iptables.
 
-There are few assumptions connected with the the firewall settings in this module. If you set `manage_firewall` to `true`:
+There are few assumptions if you set `manage_firewall` to `true`:
 
-1. The first assumption is that the traffic was closed by iptables between your servers, and this module, will open the ports used by Galera and ProxySQL.
+1. The first assumption is that the traffic was closed by iptables between your servers, and this module, will open the ports used by Galera and ProxySQL. If this was not the case, you don't to manage the fiirewall.
 
 2. The other assumption is that you have already included the firewall module for your servers.
 
@@ -121,7 +121,7 @@ There are few assumptions connected with the the firewall settings in this modul
 include firewall
 ```
 
-3. if you don't use IPv6, you have disabled this setting for your firewall:
+3. if you don't use IPv6, you have already disabled this setting for your firewall:
 
 ```puppet
 class { 'firewall': ensure_v6 => stopped; }
@@ -131,9 +131,9 @@ class { 'firewall': ensure_v6 => stopped; }
 
 This module offloads and enables SSL by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you probably know SSL usage is optional on the client side, unless otherwise configured on a per user basis.
 
-You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificate will be different on each node of the cluster and you'll have to sync it manually.
+You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificates will be different on each node of the cluster and you'll have to sync them manually.
 
-Alternatively you can set `manage_ssl` to `true` and specify your own certificates.
+Alternatively you can set `manage_ssl` to `true` and use your own certificates.
 
 ## Usage
 
