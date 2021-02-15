@@ -33,7 +33,7 @@ define galera_proxysql::create::user (
     $ensure_schema = present
   }
 
-  if defined(Class['galera_proxysql::join']) {
+  if defined(Class['galera_proxysql::galera::join']) {
     if ($galera_hosts) {
       if $schema_name =~ String {
         unless defined(Mysql::Db[$schema_name]) {

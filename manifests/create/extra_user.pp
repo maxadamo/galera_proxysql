@@ -28,7 +28,7 @@ define galera_proxysql::create::extra_user (
     $schema_name = $table.map |$item| {split($item, '[.]')[0]}
   }
 
-  if defined(Class['::galera_proxysql::join']) {
+  if defined(Class['galera_proxysql::galera::join']) {
     if ($galera_hosts) {
       $host_hash.each | $host_name, $host_ips | {
         mysql_user {

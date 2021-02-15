@@ -207,9 +207,11 @@ class galera_proxysql::proxysql::proxysql (
       require => Package[$proxysql_package],
       notify  => Service['proxysql'];
     '/root/.my.cnf':
+      mode    => '0660',
       content => Sensitive("[client]\nuser=monitor\npassword=${monitor_password.unwrap}\nprompt = \"\\u@\\h [DB: \\d]> \"\n");
     '/etc/proxysql-admin.cnf':
       mode    => '0640',
+      owner   => proxysql,
       group   => proxysql,
       require => Package[$proxysql_package],
       notify  => Service['proxysql'],
