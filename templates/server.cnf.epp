@@ -4,8 +4,8 @@
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
 #
-<% $buf_pool_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::innodb_buffer_pool_size)) -%>
-<% if $galera_proxysql::files::force_ipv6 { -%>
+<% $buf_pool_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::galera::files::innodb_buffer_pool_size)) -%>
+<% if $galera_proxysql::galera::files::force_ipv6 { -%>
 [sst]
 sockopt                        = "pf=ip6"
 
@@ -26,12 +26,12 @@ innodb-data-file-path          = ibdata1:100M:autoextend
 innodb-read-io-threads         = 4
 innodb-write-io-threads        = 4
 innodb-doublewrite             = 1 # enabled innodb_doublewrite unless we use ZFS
-innodb-log-file-size           = <%= $galera_proxysql::files::innodb_log_file_size %>
+innodb-log-file-size           = <%= $galera_proxysql::galera::files::innodb_log_file_size %>
 innodb-log-buffer-size         = 8M
-innodb-buffer-pool-instances   = <%= $galera_proxysql::files::innodb_buffer_pool_instances %>
+innodb-buffer-pool-instances   = <%= $galera_proxysql::galera::files::innodb_buffer_pool_instances %>
 innodb-log-files-in-group      = 2
 innodb-thread-concurrency      = 0
-innodb-flush-method            = <%= $galera_proxysql::files::innodb_flush_method %>
+innodb-flush-method            = <%= $galera_proxysql::galera::files::innodb_flush_method %>
 innodb-locks-unsafe-for-binlog = 1
 innodb-autoinc-lock-mode       = 2
 innodb-stats-on-metadata       = 0 # avoid statistics update when doing e.g show tables
@@ -42,10 +42,10 @@ max_heap_table_size            = 64M
 max-allowed-packet             = 512M
 memlock                        = 0
 sysdate-is-now                 = 1
-max-connections                = <%= $galera_proxysql::files::max_connections %>
-thread-cache-size              = <%= $galera_proxysql::files::thread_cache_size %>
-query-cache-type               = <%= $galera_proxysql::files::query_cache_type %>
-query-cache-size               = <%= $galera_proxysql::files::query_cache_size %>
+max-connections                = <%= $galera_proxysql::galera::files::max_connections %>
+thread-cache-size              = <%= $galera_proxysql::galera::files::thread_cache_size %>
+query-cache-type               = <%= $galera_proxysql::galera::files::query_cache_type %>
+query-cache-size               = <%= $galera_proxysql::galera::files::query_cache_size %>
 table-open_cache               = 1024
 lower-case-table-names         = 0
-<%= $galera_proxysql::files::custom_server_cnf_parameters %>
+<%= $galera_proxysql::galera::files::custom_server_cnf_parameters %>

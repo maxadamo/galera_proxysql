@@ -1,5 +1,6 @@
 # == Class: galera_proxysql::proxysql::keepalived
 #
+#
 class galera_proxysql::proxysql::keepalived (
   $proxysql_hosts,
   $proxysql_vip,

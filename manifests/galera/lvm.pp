@@ -1,6 +1,7 @@
-# == Class: galera_proxysql::lvm
+# == Class: galera_proxysql::galera::lvm
 #
-class galera_proxysql::lvm (
+#
+class galera_proxysql::galera::lvm (
   $manage_lvm,
   $lv_size,
   $vg_name,

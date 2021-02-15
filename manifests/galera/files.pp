@@ -1,8 +1,9 @@
-# == Class: galera_proxysql::files
+# == Class: galera_proxysql::galera::files
 #
 # This Class provides files
 #
-class galera_proxysql::files (
+#
+class galera_proxysql::galera::files (
   $percona_major_version,
   $custom_server_cnf_parameters,
   $custom_client_cnf_parameters,

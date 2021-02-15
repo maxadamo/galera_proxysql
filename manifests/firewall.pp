@@ -1,7 +1,7 @@
 # == Class: galera_proxysql::firewall
 #
-# sets firewall up
-# We set inbound traffic only through the application manifest
+# sets firewall up to allow comunication within the cluster
+#
 #
 class galera_proxysql::firewall (
   $use_ipv6,

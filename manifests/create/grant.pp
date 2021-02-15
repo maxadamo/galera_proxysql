@@ -1,5 +1,6 @@
 # == Define: galera_proxysql::create::grant
 #
+#
 define galera_proxysql::create::grant (
   $table,
   $privileges,

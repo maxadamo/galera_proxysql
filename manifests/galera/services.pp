@@ -1,8 +1,9 @@
-# == Class: galera_proxysql::services
+# == Class: galera_proxysql::galera::services
 #
 # This Class manages services
 #
-class galera_proxysql::services {
+#
+class galera_proxysql::galera::services {
 
   assert_private("this class should be called only by ${module_name}")
 

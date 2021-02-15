@@ -1,4 +1,5 @@
-# == Class: galera_proxysql::proxysql::repo inherits galera
+# == Class: galera_proxysql::proxysql::repo
+#
 #
 class galera_proxysql::proxysql::repo ($http_proxy, $manage_repo) {
 

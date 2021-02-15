@@ -55,12 +55,12 @@
 # [*manage_firewall*] <Bool>
 #   default: false => It requires puppetlabs/firewall
 #
+#
 class galera_proxysql::proxysql::proxysql (
 
   # SSL settings
-  # BEWARE: if you leave manage_ssl undef, you'll use a self-signed certificate and
-  # it will be different on each node of the cluster. You may need to synchronize
-  # them manually, but they are valid for 10 years and I know that you can afford it :-)
+  # *BEWARE* if you leave manage_ssl set to undef, you get two self-signed certificates on each node
+  # different from each other. You may want to synchronize them manually (they are valid for 10 years)
   Boolean $manage_ssl                                = undef,  # use the default self-signed
   Optional[Stdlib::Filesource] $ssl_ca_source_path   = $galera_proxysql::params::ssl_ca_source_path,
   Optional[Stdlib::Filesource] $ssl_cert_source_path = $galera_proxysql::params::ssl_cert_source_path,

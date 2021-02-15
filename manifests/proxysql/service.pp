@@ -1,4 +1,4 @@
-# == Class: galera_proxysql::proxysql::proxysql
+# == Class: galera_proxysql::proxysql::service
 #
 # === Parameters & Variables
 #

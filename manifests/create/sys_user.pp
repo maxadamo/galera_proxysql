@@ -1,5 +1,6 @@
 # == Define: galera_proxysql::create::sys_user
 #
+#
 define galera_proxysql::create::sys_user (
   $dbpass,
   $galera_hosts,

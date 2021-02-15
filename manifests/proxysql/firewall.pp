@@ -1,5 +1,6 @@
 # == Class: galera_proxysql::proxysql::firewall
 #
+#
 class galera_proxysql::proxysql::firewall ($peer_ip) {
 
   assert_private("this class should be called only by ${module_name}")

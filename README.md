@@ -3,6 +3,7 @@
 #### Table of Contents
 
 1. [Description](#description)
+1. [WYSIWYG](#wysiwyg)
 1. [Setup - The basics of getting started with galera_proxysql](#setup)
     * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
     * [Firewall](#firewall)
@@ -33,6 +34,14 @@ Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hen
 
 **When bootstrapping**, avoid running puppet on all the nodes at same time. You need to bootstrap one node first and then you can join the other nodes (i.e.: you better run puppet on one node at time).
 
+## WYSIWYG
+
+Architecture Diagram
+
+you can have more than 3 backends to increase the read speed of the cluster (bearing in mind that it could have side effects on the write speed).
+
+![Screenshot N/A](https://filesender.geant.org/pub/galera_proxysql.png  "Architecture Diagram")
+
 ## Setup
 
 ### Beginning with galera_proxysql
@@ -42,13 +51,14 @@ Sensitive type for passwords is now mandatory.
 To setup Galera:
 
 ```puppet
-class { '::galera_proxysql':
+class { 'galera_proxysql':
   root_password    => Sensitive($root_password),
   sst_password     => Sensitive($sst_password),
   monitor_password => Sensitive($monitor_password),
   proxysql_hosts   => $proxysql_hosts,
   proxysql_vip     => $proxysql_vip,
   galera_hosts     => $galera_hosts,
+  proxysql_port    => 3306,
   trusted_networks => $trusted_networks,
   manage_lvm       => true,
   vg_name          => 'rootvg',
@@ -61,7 +71,7 @@ To setup ProxySQL:
 * you can check the information in the [SSL](#ssl) section (paying attention where I mention the self-signed certificates)
 
 ```puppet
-class { '::galera_proxysql::proxysql::proxysql':
+class { 'galera_proxysql::proxysql::proxysql':
   manage_ssl           => true,
   ssl_cert_source_path => "puppet:///modules/my_module/${facts['domain']}.crt",
   ssl_ca_source_path   => '/etc/pki/tls/certs/COMODO_OV.crt',

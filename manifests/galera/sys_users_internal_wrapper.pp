@@ -1,8 +1,9 @@
-# == Class: galera_proxysql::sys_user
+# == Class: galera_proxysql::galera::sys_users_internal_wrapper
 #
 # This Class manages system users
 #
-class galera_proxysql::sys_user (
+#
+class galera_proxysql::galera::sys_users_internal_wrapper (
   Sensitive $root_password,
   Sensitive $monitor_password,
   Sensitive $sst_password,

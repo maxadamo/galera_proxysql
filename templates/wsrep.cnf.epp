@@ -4,7 +4,7 @@
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
 #
-<% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::files::gcache_size)) -%>
+<% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::galera::files::gcache_size)) -%>
 
 # this is read by the standalone daemon and embedded servers
 [mysqld]
@@ -25,7 +25,7 @@ wsrep_node_name                = <%= $facts['hostname'] %>
 wsrep_node_address             = "[<%= $facts['ipaddress6'] %>]:4567"
 
 # Provider specific configuration options
-wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $facts['ipaddress6'] %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M;<%= $galera_proxysql::files::custom_wsrep_options %>"
+wsrep_provider_options         = "gmcast.listen_addr=tcp://[::]:4567;ist.recv_addr=[<%= $facts['ipaddress6'] %>]:4568; gcache.size=<%= $wsrep_gcache_size %>M;<%= $galera_proxysql::galera::files::custom_wsrep_options %>"
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)

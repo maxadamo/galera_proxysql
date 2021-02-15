@@ -8,6 +8,7 @@
 # the password will be changed only if /root/.my.cnf is available, it the server
 # belonged to a cluster and if the cluster status is 200
 #
+#
 define galera_proxysql::create::root_password(Sensitive $root_pass, Boolean $force_ipv6) {
 
   $root_cnf = '/root/.my.cnf'

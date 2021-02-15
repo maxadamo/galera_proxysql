@@ -1,6 +1,7 @@
-# == Class: galera_proxysql::repo inherits galera
+# == Class: galera_proxysql::galera::repo inherits galera
 #
-class galera_proxysql::repo ($http_proxy, $manage_repo, $manage_epel) {
+#
+class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel) {
 
   assert_private("this class should be called only by ${module_name}")
 

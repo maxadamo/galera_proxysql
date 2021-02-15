@@ -1,6 +1,6 @@
 # == Class: galera_proxysql::params
 #
-# Galera Parameters
+# Galera ProxySQL Parameters
 #
 class galera_proxysql::params {
 

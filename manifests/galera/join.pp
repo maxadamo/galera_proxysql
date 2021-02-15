@@ -1,8 +1,9 @@
-# == Class: galera_proxysql::join
+# == Class: galera_proxysql::galera::join
 #
-# This Class manages services
+# This Class run exec resources to try to join, or bootstrap the cluster
 #
-class galera_proxysql::join (
+#
+class galera_proxysql::galera::join (
   $percona_major_version,
   Sensitive $monitor_password,
   Sensitive $root_password,
@@ -52,7 +53,7 @@ class galera_proxysql::join (
         creates => $joined_file,
         returns => [0,1],
         require => $require,
-        before  => Class['galera_proxysql::sys_user'];
+        before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
       }
     }
   }
@@ -65,12 +66,12 @@ class galera_proxysql::join (
         creates => $joined_file,
         returns => [0,1],
         require => $require,
-        before  => Class['galera_proxysql::sys_user'];
+        before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
       }
     }
   }
 
-  class { 'galera_proxysql::sys_user':
+  class { 'galera_proxysql::galera::sys_users_internal_wrapper':
     galera_hosts     => $galera_hosts,
     proxysql_hosts   => $proxysql_hosts,
     proxysql_vip     => $proxysql_vip,

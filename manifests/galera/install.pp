@@ -1,8 +1,9 @@
-# == Class: galera_proxysql::install
+# == Class: galera_proxysql::galera::install
 #
 # This Class installs all the packages
 #
-class galera_proxysql::install (
+#
+class galera_proxysql::galera::install (
   $percona_major_version,
   $percona_minor_version,
   $manage_epel,
