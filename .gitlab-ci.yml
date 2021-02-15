@@ -14,7 +14,6 @@ revision_check:
   script:
     - . ./spec/git-rev-count.sh ${CI_PROJECT_NAME} ${CI_COMMIT_REF_NAME}
   only:
-    - test
     - uat
     - production
   tags:
@@ -38,7 +37,7 @@ litmus_test_galera:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
@@ -54,7 +53,7 @@ test_proxysql:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
