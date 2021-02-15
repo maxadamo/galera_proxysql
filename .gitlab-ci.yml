@@ -1,5 +1,6 @@
 ---
 stages:
+  - revision_check
   - syntax
   - litmus_test_galera
   - litmus_test_proxysql
