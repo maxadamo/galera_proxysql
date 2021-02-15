@@ -16,7 +16,7 @@ run_validation:
     - shared-runner
 
 litmus_test_galera:
-  stage: litmus_test_galera_proxysql
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
