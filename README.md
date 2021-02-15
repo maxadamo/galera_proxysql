@@ -119,7 +119,7 @@ class { 'firewall': ensure_v6 => stopped; }
 
 ### SSL
 
-This module offloads and enables SSL by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you may now SSL usage is optional on the client side, unless otherwise configured on a per use basis.
+This module offloads and enables SSL by default (SSL between ProxySQL and backend is in the [ToDo](#todo) list). As you probably know SSL usage is optional on the client side, unless otherwise configured on a per user basis.
 
 You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificate will be different on each node of the cluster and you'll have to sync it manually.
 
@@ -227,3 +227,4 @@ Feel free to make pull requests and/or open issues on [my GitHub Repository](htt
 
 * Upgrade to Percona 8.x
 * Optional setting to enable SSL between ProxySQL and backends
+* allow more customizations on proxysql.cnf. Right now `max_writers 1` in combination with `writer is also reader` is being used.
