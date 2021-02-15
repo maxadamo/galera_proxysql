@@ -2,6 +2,13 @@
 2.1.0 / 2021-02-15
 ==================
 
+  * bump new version
+  * fixed typos in README
+  * fixing gitlab-ci stage name
+
+2.1.0 / 2021-02-15
+==================
+
   * added new checks for Litmus
   * reorganized module structure
 # Changelog
