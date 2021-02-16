@@ -156,3 +156,6 @@ wsrep_sst_method               = xtrabackup-v2
 # --members - comma-separated list of members
 # --index   - index of this node in the list
 #wsrep_notify_cmd               =
+
+# we temporarily disable traffic encryption
+pxc_encrypt_cluster_traffic    = OFF
