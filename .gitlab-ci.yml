@@ -39,7 +39,7 @@ test_galera57:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
@@ -55,7 +55,7 @@ test_galera80:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
@@ -71,7 +71,7 @@ test_proxysql57:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
@@ -87,7 +87,7 @@ test_proxysql80:
   after_script:
     - pdk bundle exec rake litmus:tear_down
   only:
-    #- test
+    - test
     - master
   tags:
     - shared-runner
