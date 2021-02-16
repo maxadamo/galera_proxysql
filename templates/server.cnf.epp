@@ -123,6 +123,10 @@ wsrep_convert_LOCK_to_trx      = 0
 
 # retry autoinc insert, which failed for duplicate key error
 wsrep_drupal_282555_workaround = 0
+
+# SST authentication string. This will be used to send SST to joining nodes.
+# Depends on SST method. For mysqldump method it is root:<root password>
+wsrep_sst_auth                 = sstuser:<%= $sst_password.unwrap %>
 <% } -%>
 
 # how many times to retry deadlocked autocommits
@@ -140,10 +144,6 @@ wsrep_causal_reads             = 0
 # State Snapshot Transfer method
 # ClusterControl currently DOES NOT support wsrep_sst_method=mysqldump
 wsrep_sst_method               = xtrabackup-v2
-
-# SST authentication string. This will be used to send SST to joining nodes.
-# Depends on SST method. For mysqldump method it is root:<root password>
-wsrep_sst_auth                 = sstuser:<%= $sst_password.unwrap %>
 
 # Protocol version to use
 #wsrep_protocol_version         =
