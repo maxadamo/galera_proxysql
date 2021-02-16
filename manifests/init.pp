@@ -262,8 +262,7 @@ class galera_proxysql (
       vg_name          => $vg_name,
       lv_size          => $lv_size,
       cluster_pkg_name => $cluster_pkg_name;
-    'galera_proxysql::galera::services':
-      percona_major_version => $percona_major_version;
+    'galera_proxysql::galera::services':;
     'mysql::client':
       package_name => $client_pkg_name;
   }

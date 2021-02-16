@@ -3,7 +3,7 @@
 # This Class manages services
 #
 #
-class galera_proxysql::galera::services ($percona_major_version) {
+class galera_proxysql::galera::services {
 
   assert_private("this class should be called only by ${module_name}")
 
@@ -22,13 +22,12 @@ class galera_proxysql::galera::services ($percona_major_version) {
     ];
   }
 
-  if ($percona_major_version == '80') {
-    # on Perconsa 57 mysql and mysql@bootstrap are mutually exclusive
-    service { 'mysql':
-      ensure   => running,
-      provider => 'systemd',
-      enable   => false;
-    }
-  }
+  # mysql and mysql@bootstrap are mutual exclusives.
+  # A proper way to deal with both services must be found.
+  # service { 'mysql':
+  #   ensure   => running,
+  #   provider => 'systemd',
+  #   enable   => false;
+  # }
 
 }
