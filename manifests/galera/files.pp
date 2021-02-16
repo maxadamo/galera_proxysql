@@ -64,8 +64,8 @@ class galera_proxysql::galera::files (
     default:
       ensure  => file,
       mode    => '0644',
-      owner   => 'root',
-      group   => 'root',
+      owner   => root,
+      group   => root,
       require => [
         File['/root/bin'],
         Package[$cluster_pkg_name]
@@ -74,6 +74,8 @@ class galera_proxysql::galera::files (
       source => "puppet:///modules/${module_name}/my.cnf";
     '/etc/my.cnf.d':
       ensure  => directory,
+      group   => mysql,
+      owner   => mysql,
       purge   => true,
       recurse => true,
       force   => true;
@@ -108,10 +110,16 @@ class galera_proxysql::galera::files (
       notify  => Xinetd::Service['galerachk'],
       content => epp("${module_name}/clustercheck.epp");
     '/etc/my.cnf.d/client.cnf':
-      source  => "puppet:///modules/${module_name}/client.cnf";
+      group  => mysql,
+      owner  => mysql,
+      source => "puppet:///modules/${module_name}/client.cnf";
     '/etc/my.cnf.d/mysql-clients.cnf':
+      group   => mysql,
+      owner   => mysql,
       content => epp("${module_name}/mysql-clients.cnf.epp");
     '/etc/my.cnf.d/server.cnf':
+      group   => mysql,
+      owner   => mysql,
       mode    => '0640',
       content => Sensitive(epp("${module_name}/server.cnf.epp", {
         sst_password        => Sensitive($sst_password),
@@ -121,6 +129,8 @@ class galera_proxysql::galera::files (
         wsrep_provider      => $wsrep_provider
       }));
     '/etc/my.cnf.d/mysqld_safe.cnf':
+      group  => mysql,
+      owner  => mysql,
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
   }
 
