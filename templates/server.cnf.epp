@@ -35,7 +35,7 @@ innodb-flush-method            = <%= $galera_proxysql::galera::files::innodb_flu
 <% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
 innodb-locks-unsafe-for-binlog = 1
 <% } -%>
-innodb-autoinc-lock-mode       = 2
+innodb_autoinc_lock_mode       = 2
 innodb-stats-on-metadata       = 0 # avoid statistics update when doing e.g show tables
 binlog_format                  = ROW
 key_buffer_size                = 24M
