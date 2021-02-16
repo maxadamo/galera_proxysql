@@ -57,10 +57,8 @@ except configparser.NoOptionError:
 
 if PERCONA_MAJOR_VERSION in ['56', '57']:
     PKG = 'Percona-XtraDB-Cluster-server-{}'.format(PERCONA_MAJOR_VERSION)
-    SERVICE_NAME = 'mysql@bootstrap.service'
 else:
     PKG = 'percona-xtradb-cluster-full'
-    SERVICE_NAME = 'mysql'
 
 OTHER_NODES = list(GALERA_NODES)
 OTHER_NODES.remove(MYIP)
@@ -103,7 +101,7 @@ def kill_mysql():
     except pysystemd.subprocess.CalledProcessError:
         pass
     try:
-        pysystemd.services(SERVICE_NAME).stop()
+        pysystemd.services('mysql@bootstrap.service').stop()
     except pysystemd.subprocess.CalledProcessError:
         pass
 
@@ -197,7 +195,7 @@ def check_leader(leader=None):
 
 def bootstrap_mysql(boot):
     """bootstrap the cluster"""
-    fnull = open(os.devnull, 'wb')
+    _fnull = open(os.devnull, 'wb')
     kill_mysql()
     if boot == "new":
         if os.path.isfile('/root/.my.cnf'):
@@ -206,7 +204,7 @@ def bootstrap_mysql(boot):
         check_leader()
 
     try:
-        pysystemd.services(SERVICE_NAME).start()
+        pysystemd.services('mysql@bootstrap.service').start()
     except pysystemd.subprocess.CalledProcessError as err:
         print("Error bootstrapping the cluster: {}".format(err))
         os.sys.exit(1)

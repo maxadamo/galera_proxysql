@@ -7,7 +7,6 @@
 <% $wsrep_gcache_size = floor(Float.new($facts['memorysize_mb']) * Float.new($galera_proxysql::galera::files::gcache_size)) -%>
 
 # this is read by the standalone daemon and embedded servers
-[mysqld]
 wsrep_on                       = ON
 wsrep_cluster_address          = "gcomm://<%= $gcomm_list %>"
 
