@@ -3,7 +3,7 @@
 #### Table of Contents
 
 1. [Description](#description)
-1. [WYSIWYG](#wysiwyg)
+1. [WYGIWYS](#wygiwys)
 1. [Setup](#setup)
     * [Beginning with galera_proxysql](#beginning-with-galera_proxysql)
     * [Firewall](#firewall)
@@ -40,9 +40,9 @@ There is not much that you need to learn. SST does not use password anymore with
 
 `percona_major_version` is now mandatory, and it can be either '56', '57' or '80'.
 
-## WYSIWYG
+## WYGIWYS
 
-Architecture Diagram
+What you get is what you see in the Architecture Diagram
 
 you can have more than 3 backends to increase the read speed of the cluster (bearing in mind that it could have side effects on the write speed).
 
