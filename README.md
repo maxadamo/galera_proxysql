@@ -140,7 +140,7 @@ This module offloads and enables SSL by default (SSL between ProxySQL and backen
 
 You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificates will be different on each node of the cluster and you'll have to sync them manually.
 
-Alternatively you can set `manage_ssl` to `true` and use your own certificates. 
+Alternatively you can set `manage_ssl` to `true` and use your own certificates.
 
 SSL Cluster traffic, is enabled by default, but right now I decided turned to turn it off. I'll put something in the [ToDo](#todo) list.
 
@@ -230,12 +230,12 @@ galera_proxysql::create::user { 'whatever_user':
 
 * I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?). If you want Travis, you need your help me.
 
-|  | RedHat/CentOS  |Debian | Ubuntu |
+|  | RedHat/CentOS  |Debian | Ubuntu LTS |
 | :---     |  :---: |  :---: |  :---: |
-| **Percona XtraDB Cluster** | 7 |
+| **Percona XtraDB Cluster** | 7 | 10 | 18.04 / 20.04 |
 | 5.6 / 5.7 / 8.0 | :white_check_mark: **/** :white_check_mark: **/** :white_check_mark: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: |
 | **ProxySQL Galera** |  |
-| 1.x / 2.x | :no_entry_sign: **/** :white_check_mark: | :no_entry_sign: **/** :no_entry_sign: |  :no_entry_sign: **/** :no_entry_sign: | 
+| 1.x / 2.x | :no_entry_sign: **/** :white_check_mark: | :no_entry_sign: **/** :no_entry_sign: |  :no_entry_sign: **/** :no_entry_sign: |
 
 ## Development
 
