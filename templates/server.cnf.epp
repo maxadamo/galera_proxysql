@@ -120,6 +120,9 @@ wsrep_debug                    = 0
 <% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
 # convert locking sessions into transactions
 wsrep_convert_LOCK_to_trx      = 0
+
+# retry autoinc insert, which failed for duplicate key error
+wsrep_drupal_282555_workaround = 0
 <% } -%>
 
 # how many times to retry deadlocked autocommits
@@ -130,9 +133,6 @@ wsrep_auto_increment_control   = 1
 
 # replicate myisam (NOT safe, we use it ONLY for the system tables)
 wsrep_replicate_myisam         = 1 # requires pxc_strict_mode = DISABLED
-
-# retry autoinc insert, which failed for duplicate key error
-wsrep_drupal_282555_workaround = 0
 
 # enable "strictly synchronous" semantics for read operations
 wsrep_causal_reads             = 0
