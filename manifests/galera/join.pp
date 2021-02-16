@@ -4,7 +4,7 @@
 #
 #
 class galera_proxysql::galera::join (
-  $percona_major_version,
+  $cluster_pkg_name,
   Sensitive $monitor_password,
   Sensitive $root_password,
   Sensitive $sst_password,
@@ -30,7 +30,7 @@ class galera_proxysql::galera::join (
   $common_require = [
     File[$file_list],
     File_line['mysql_systemd'],
-    Package[$pip_pkgs + "Percona-XtraDB-Cluster-full-${percona_major_version}"]
+    Package[$pip_pkgs + $cluster_pkg_name]
   ]
 
   if ($manage_lvm) {

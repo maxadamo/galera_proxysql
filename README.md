@@ -221,7 +221,14 @@ galera_proxysql::create::user { 'whatever_user':
 
 * Ubuntu/Debian are still on hold.
 * No changelog is available
-* I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?)
+* I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?). If you want Travis, I need your help help.
+
+|  | RedHat/CentOS  |Debian | Ubuntu |
+| :---     |  :---: |  :---: |  :---: |
+| **Percona XtraDB Cluster** | 7 |
+| 5.6 / 5.7 / 8.0 | :green_circle: **/** :green_circle: **/** :green_circle: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: |
+| **ProxySQL Galera** |  |
+| 1.x / 2.x | :no_entry_sign: **/** :green_circle: | :no_entry_sign: **/** :no_entry_sign: |  :no_entry_sign: **/** :no_entry_sign: | 
 
 ## Development
 

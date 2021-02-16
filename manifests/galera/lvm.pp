@@ -5,7 +5,7 @@ class galera_proxysql::galera::lvm (
   $manage_lvm,
   $lv_size,
   $vg_name,
-  $percona_major_version,
+  $cluster_pkg_name,
 ) {
 
   assert_private("this class should be called only by ${module_name}")
@@ -28,7 +28,7 @@ class galera_proxysql::galera::lvm (
       mode    => '0751',
       owner   => mysql,
       group   => mysql,
-      require => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
+      require => Package[$cluster_pkg_name];
     }
 
     mount { '/var/lib/mysql':

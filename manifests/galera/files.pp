@@ -5,6 +5,7 @@
 #
 class galera_proxysql::galera::files (
   $percona_major_version,
+  $cluster_pkg_name,
   $custom_server_cnf_parameters,
   $custom_client_cnf_parameters,
   $force_ipv6,
@@ -62,7 +63,7 @@ class galera_proxysql::galera::files (
       group   => 'root',
       require => [
         File['/root/bin'],
-        Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]
+        Package[$cluster_pkg_name]
       ];
     '/etc/my.cnf':
       source => "puppet:///modules/${module_name}/my.cnf";
@@ -123,7 +124,7 @@ class galera_proxysql::galera::files (
     default:
       ensure             => present,
       append_on_no_match => false,
-      require            => Package["Percona-XtraDB-Cluster-full-${percona_major_version}"];
+      require            => Package[$cluster_pkg_name,];
     'mysql_systemd':
       path  => '/usr/bin/mysql-systemd',
       line  => '    /usr/sbin/mysqld --initialize-insecure --datadir="$datadir" --user=mysql',

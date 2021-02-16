@@ -125,6 +125,8 @@ class galera_proxysql (
   Boolean $puppet_debug = $galera_proxysql::params::puppet_debug,
 
   # galera parameters
+  Enum['56', '57', '80'] $percona_major_version = $galera_proxysql::params::percona_major_version,
+
   $manage_lvm                   = $galera_proxysql::params::manage_lvm,
   $vg_name                      = $galera_proxysql::params::vg_name,
   $lv_size                      = $galera_proxysql::params::lv_size,
@@ -141,7 +143,6 @@ class galera_proxysql (
   $innodb_io_capacity           = $galera_proxysql::params::innodb_io_capacity,
   $innodb_log_file_size         = $galera_proxysql::params::innodb_log_file_size,
   $logdir                       = $galera_proxysql::params::logdir,
-  $percona_major_version        = $galera_proxysql::params::percona_major_version,
   $percona_minor_version        = $galera_proxysql::params::percona_minor_version,
   $max_connections              = $galera_proxysql::params::max_connections,
   $other_pkgs                   = $galera_proxysql::params::other_pkgs,
@@ -203,9 +204,19 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
+  $cluster_pkg_name = $percona_major_version ? {
+    '80' => 'percona-xtradb-cluster-full',
+    default => "Percona-XtraDB-Cluster-full-${percona_major_version}"
+  }
+  $client_pkg_name = $percona_major_version ? {
+    '80' => 'percona-xtradb-cluster-client',
+    default => "Percona-XtraDB-Cluster-client-${percona_major_version}"
+  }
+
   class {
     'galera_proxysql::galera::files':
       percona_major_version        => $percona_major_version,
+      cluster_pkg_name             => $cluster_pkg_name,
       custom_server_cnf_parameters => $custom_server_cnf_parameters,
       custom_client_cnf_parameters => $custom_client_cnf_parameters,
       force_ipv6                   => $force_ipv6,
@@ -229,28 +240,28 @@ class galera_proxysql (
       tmpdir                       => $tmpdir;
     'galera_proxysql::galera::install':
       manage_epel           => $manage_epel,
-      percona_major_version => $percona_major_version,
+      cluster_pkg_name      => $cluster_pkg_name,
       percona_minor_version => $percona_minor_version;
     'galera_proxysql::galera::join':
-      manage_firewall       => $manage_firewall,
-      percona_major_version => $percona_major_version,
-      monitor_password      => Sensitive($monitor_password),
-      root_password         => Sensitive($root_password),
-      sst_password          => Sensitive($sst_password),
-      galera_hosts          => $galera_hosts,
-      proxysql_hosts        => $proxysql_hosts,
-      proxysql_vip          => $proxysql_vip,
-      manage_lvm            => $manage_lvm,
-      force_ipv6            => $force_ipv6;
+      manage_firewall  => $manage_firewall,
+      cluster_pkg_name => $cluster_pkg_name,
+      monitor_password => Sensitive($monitor_password),
+      root_password    => Sensitive($root_password),
+      sst_password     => Sensitive($sst_password),
+      galera_hosts     => $galera_hosts,
+      proxysql_hosts   => $proxysql_hosts,
+      proxysql_vip     => $proxysql_vip,
+      manage_lvm       => $manage_lvm,
+      force_ipv6       => $force_ipv6;
     'galera_proxysql::galera::repo':
       http_proxy  => $http_proxy,
       manage_repo => $manage_repo,
       manage_epel => $manage_epel;
     'galera_proxysql::galera::lvm':
-      manage_lvm            => $manage_lvm,
-      vg_name               => $vg_name,
-      lv_size               => $lv_size,
-      percona_major_version => $percona_major_version;
+      manage_lvm       => $manage_lvm,
+      vg_name          => $vg_name,
+      lv_size          => $lv_size,
+      cluster_pkg_name => $cluster_pkg_name;
     'galera_proxysql::galera::services':;
     'mysql::client':
       package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";

@@ -4,7 +4,7 @@
 #
 #
 class galera_proxysql::galera::install (
-  $percona_major_version,
+  $cluster_pkg_name,
   $percona_minor_version,
   $manage_epel,
   $other_pkgs = $galera_proxysql::params::other_pkgs,
@@ -28,8 +28,8 @@ class galera_proxysql::galera::install (
     }
   }
 
-  unless defined(Package["Percona-XtraDB-Cluster-full-${percona_major_version}"]) {
-    package { "Percona-XtraDB-Cluster-full-${percona_major_version}":
+  unless defined(Package[$cluster_pkg_name]) {
+    package { $cluster_pkg_name:
       ensure => $percona_minor_version;
     }
   }
