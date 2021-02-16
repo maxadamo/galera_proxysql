@@ -55,6 +55,13 @@ except configparser.NoOptionError:
     print("{}Could not access values in /root/galera_params.ini{}".format(RED, WHITE))
     os.sys.exit(1)
 
+if PERCONA_MAJOR_VERSION in ['56', '57']:
+    PKG = 'Percona-XtraDB-Cluster-server-{}'.format(PERCONA_MAJOR_VERSION)
+    SERVICE_NAME = 'mysql@bootstrap.service'
+else:
+    PKG = 'percona-xtradb-cluster-full'
+    SERVICE_NAME = 'mysql'
+
 OTHER_NODES = list(GALERA_NODES)
 OTHER_NODES.remove(MYIP)
 OTHER_WSREP = []
@@ -96,7 +103,7 @@ def kill_mysql():
     except pysystemd.subprocess.CalledProcessError:
         pass
     try:
-        pysystemd.services('mysql@bootstrap.service').stop()
+        pysystemd.services(SERVICE_NAME).stop()
     except pysystemd.subprocess.CalledProcessError:
         pass
 
@@ -124,11 +131,10 @@ def check_install():
     print("\ndetected {} ...".format(distro.os_release_info()['pretty_name']))
     import rpm
     percona_installed = None
-    pkg = 'Percona-XtraDB-Cluster-server-{}'.format(PERCONA_MAJOR_VERSION)
     rpmts = rpm.TransactionSet()
     rpmmi = rpmts.dbMatch()
     for pkg_set in rpmmi:
-        if pkg_set['name'].decode() == pkg:
+        if pkg_set['name'].decode() == PKG:
             percona_installed = "{}-{}-{}".format(
                 pkg_set['name'].decode(),
                 pkg_set['version'].decode(),
@@ -137,7 +143,7 @@ def check_install():
     if percona_installed:
         print('detected {} ...'.format(percona_installed))
     else:
-        print("{}{} not installed{}".format(RED, pkg, WHITE))
+        print("{}{} not installed{}".format(RED, PKG, WHITE))
         os.sys.exit(1)
 
     return 'percona'
@@ -200,7 +206,7 @@ def bootstrap_mysql(boot):
         check_leader()
 
     try:
-        pysystemd.services('mysql@bootstrap.service').start()
+        pysystemd.services(SERVICE_NAME).start()
     except pysystemd.subprocess.CalledProcessError as err:
         print("Error bootstrapping the cluster: {}".format(err))
         os.sys.exit(1)
