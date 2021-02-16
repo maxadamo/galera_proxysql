@@ -24,7 +24,6 @@ class galera_proxysql::galera::join (
   $file_list = [
     '/usr/bin/galera_wizard.py', '/root/galera_params.ini', '/etc/my.cnf',
     '/root/.my.cnf', '/etc/my.cnf.d/server.cnf', '/etc/my.cnf.d/client.cnf',
-    '/etc/my.cnf.d/wsrep.cnf', '/etc/my.cnf'
   ]
 
   $common_require = [
