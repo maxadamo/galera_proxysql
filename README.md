@@ -19,7 +19,7 @@
 
 The version 3.x.x of this module is a great leap forward. It run Percona 80, 57 and 56 and ProxySQL with SSL support.
 
-If you want to upgrade your database from 57 to 80, you can follow these instructions: [upgrade from Percona 5.7 to 8.0](http://wiki.gant.org/documentation-webpages/sst.html)
+If you want to upgrade your database from 57 to 80, you can follow these instructions: [upgrade Percona from 5.7 to 8.0](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0)
 
 The status of the cluster is checked at run time through by a puppet fact and puppet will attempt to re-join the node in case of disconnection.
 
