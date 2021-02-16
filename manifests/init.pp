@@ -97,7 +97,7 @@
 # [*root_password*] <Sensitive>
 #   MySQL root password
 #
-# [*sst_password*] <Sensitive>
+# [*sst_password*] <Optional[Sensitive]>
 #   SST user password
 #
 # [*thread_cache_size*] <Int>
@@ -109,6 +109,10 @@
 # [*trusted_networks*] <Array>
 #   default: undef => List of IPv4 and/or IPv6 host and or networks.
 #            It's used by iptables to determine from where to allow access to MySQL
+#
+# [*encrypt_cluster_traffic*] <Boolean>
+#   default: undef => If you set it to true, you need to supply your certificates and 
+#            server configuration parameters, using `custom_server_cnf_parameters`
 #
 # === ToDo
 #
@@ -126,34 +130,34 @@ class galera_proxysql (
 
   # galera parameters
   Enum['56', '57', '80'] $percona_major_version = $galera_proxysql::params::percona_major_version,
-
-  $manage_lvm                   = $galera_proxysql::params::manage_lvm,
-  $vg_name                      = $galera_proxysql::params::vg_name,
-  $lv_size                      = $galera_proxysql::params::lv_size,
-  $custom_server_cnf_parameters = $galera_proxysql::params::custom_server_cnf_parameters,
-  $custom_client_cnf_parameters = $galera_proxysql::params::custom_client_cnf_parameters,
-  $custom_wsrep_options         = $galera_proxysql::params::custom_wsrep_options,
-  Boolean $force_ipv6           = $galera_proxysql::params::force_ipv6,
-  $galera_cluster_name          = $galera_proxysql::params::galera_cluster_name,
-  $galera_hosts                 = $galera_proxysql::params::galera_hosts,
-  $gcache_size                  = $galera_proxysql::params::gcache_size,
-  $innodb_buffer_pool_size      = $galera_proxysql::params::innodb_buffer_pool_size,
-  $innodb_buffer_pool_instances = $galera_proxysql::params::innodb_buffer_pool_instances,
-  $innodb_flush_method          = $galera_proxysql::params::innodb_flush_method,
-  $innodb_io_capacity           = $galera_proxysql::params::innodb_io_capacity,
-  $innodb_log_file_size         = $galera_proxysql::params::innodb_log_file_size,
-  $logdir                       = $galera_proxysql::params::logdir,
-  $percona_minor_version        = $galera_proxysql::params::percona_minor_version,
-  $max_connections              = $galera_proxysql::params::max_connections,
-  $other_pkgs                   = $galera_proxysql::params::other_pkgs,
-  $query_cache_size             = $galera_proxysql::params::query_cache_size,
-  $query_cache_type             = $galera_proxysql::params::query_cache_type,
-  $thread_cache_size            = $galera_proxysql::params::thread_cache_size,
-  $tmpdir                       = $galera_proxysql::params::tmpdir,
-  $trusted_networks             = $galera_proxysql::params::trusted_networks,
-  Sensitive $monitor_password   = $galera_proxysql::params::monitor_password,
-  Sensitive $sst_password       = $galera_proxysql::params::sst_password,
-  Sensitive $root_password      = $galera_proxysql::params::root_password,
+  Boolean $encrypt_cluster_traffic  = $galera_proxysql::params::encrypt_cluster_traffic,  # Percona 80 only
+  $manage_lvm                       = $galera_proxysql::params::manage_lvm,
+  $vg_name                          = $galera_proxysql::params::vg_name,
+  $lv_size                          = $galera_proxysql::params::lv_size,
+  $custom_server_cnf_parameters     = $galera_proxysql::params::custom_server_cnf_parameters,
+  $custom_client_cnf_parameters     = $galera_proxysql::params::custom_client_cnf_parameters,
+  $custom_wsrep_options             = $galera_proxysql::params::custom_wsrep_options,
+  Boolean $force_ipv6               = $galera_proxysql::params::force_ipv6,
+  $galera_cluster_name              = $galera_proxysql::params::galera_cluster_name,
+  $galera_hosts                     = $galera_proxysql::params::galera_hosts,
+  $gcache_size                      = $galera_proxysql::params::gcache_size,
+  $innodb_buffer_pool_size          = $galera_proxysql::params::innodb_buffer_pool_size,
+  $innodb_buffer_pool_instances     = $galera_proxysql::params::innodb_buffer_pool_instances,
+  $innodb_flush_method              = $galera_proxysql::params::innodb_flush_method,
+  $innodb_io_capacity               = $galera_proxysql::params::innodb_io_capacity,
+  $innodb_log_file_size             = $galera_proxysql::params::innodb_log_file_size,
+  $logdir                           = $galera_proxysql::params::logdir,
+  $percona_minor_version            = $galera_proxysql::params::percona_minor_version,
+  $max_connections                  = $galera_proxysql::params::max_connections,
+  $other_pkgs                       = $galera_proxysql::params::other_pkgs,
+  $query_cache_size                 = $galera_proxysql::params::query_cache_size,
+  $query_cache_type                 = $galera_proxysql::params::query_cache_type,
+  $thread_cache_size                = $galera_proxysql::params::thread_cache_size,
+  $tmpdir                           = $galera_proxysql::params::tmpdir,
+  $trusted_networks                 = $galera_proxysql::params::trusted_networks,
+  Sensitive $monitor_password       = $galera_proxysql::params::monitor_password,
+  Optional[Sensitive] $sst_password = $galera_proxysql::params::sst_password,
+  Sensitive $root_password          = $galera_proxysql::params::root_password,
 
   # proxysql parameters
   $proxysql_version                     = $galera_proxysql::params::proxysql_version,
@@ -175,6 +179,11 @@ class galera_proxysql (
 
   if $facts['osfamily'] != 'RedHat' { fail("${facts['operatingsystem']} not yet supported") }
 
+  $gcc_exists = find_file('/usr/bin/gcc')
+  unless $gcc_exists  {
+    fail('please install gcc (it is needed to install a PIP module)')
+  }
+
   if $puppet_debug {
     # checking cluster status through the facter galera_status
     if $facts['galera_status'] == '200' {
@@ -187,10 +196,27 @@ class galera_proxysql (
     notify { 'Cluster status': message => $msg; }
   }
 
+  if $percona_major_version in ['56', '57'] {
+    if $encrypt_cluster_traffic {
+      fail('Please do not use $encrypt_cluster_traffic with Percona 56 and 57')
+    }
+    if !$sst_password {
+      fail('$sst password is mandatory with Percona 56 and 57')
+    }
+  } elsif $percona_major_version == '80' {
+    if $sst_password {
+      fail('$sst password is supported only with Percona 56 and 57')
+    }
+    if $encrypt_cluster_traffic and !$custom_server_cnf_parameters {
+      # It requires further investigation
+      fail('If you want to encrypt your traffic you need to supply the necessary parameters through $custom_server_cnf_parameters')
+    }
+  }
+
   $cluster_size = length(keys($galera_hosts))
   $cluster_size_odd = (($cluster_size % 2) == 1)
 
-  #if $cluster_size+0 < 3 { fail('a cluster must have at least 3 nodes') }
+  if $cluster_size == 1 { fail('I cowardly refuse to create one cluster only with one node') }
   unless $cluster_size_odd { fail('the number of nodes in the cluster must be odd') }
 
   if $manage_lvm and $lv_size == undef { fail('manage_lvm is true but lv_size is undef') }
@@ -211,6 +237,10 @@ class galera_proxysql (
   $client_pkg_name = $percona_major_version ? {
     '80' => 'percona-xtradb-cluster-client',
     default => "Percona-XtraDB-Cluster-client-${percona_major_version}"
+  }
+  $devel_pkg_name = $percona_major_version ? {
+    '80' => 'percona-xtradb-cluster-devel',
+    default => "Percona-XtraDB-Cluster-devel-${percona_major_version}"
   }
 
   class {
@@ -235,28 +265,31 @@ class galera_proxysql (
       query_cache_type             => $query_cache_type,
       monitor_password             => Sensitive($monitor_password),
       root_password                => Sensitive($root_password),
-      sst_password                 => Sensitive($sst_password),
+      sst_password                 => $sst_password,
       thread_cache_size            => $thread_cache_size,
       tmpdir                       => $tmpdir;
     'galera_proxysql::galera::install':
       manage_epel           => $manage_epel,
       cluster_pkg_name      => $cluster_pkg_name,
+      devel_pkg_name        => $devel_pkg_name,
       percona_minor_version => $percona_minor_version;
     'galera_proxysql::galera::join':
-      manage_firewall  => $manage_firewall,
-      cluster_pkg_name => $cluster_pkg_name,
-      monitor_password => Sensitive($monitor_password),
-      root_password    => Sensitive($root_password),
-      sst_password     => Sensitive($sst_password),
-      galera_hosts     => $galera_hosts,
-      proxysql_hosts   => $proxysql_hosts,
-      proxysql_vip     => $proxysql_vip,
-      manage_lvm       => $manage_lvm,
-      force_ipv6       => $force_ipv6;
+      percona_major_version => $percona_major_version,
+      manage_firewall       => $manage_firewall,
+      cluster_pkg_name      => $cluster_pkg_name,
+      monitor_password      => Sensitive($monitor_password),
+      root_password         => Sensitive($root_password),
+      sst_password          => $sst_password,
+      galera_hosts          => $galera_hosts,
+      proxysql_hosts        => $proxysql_hosts,
+      proxysql_vip          => $proxysql_vip,
+      manage_lvm            => $manage_lvm,
+      force_ipv6            => $force_ipv6;
     'galera_proxysql::galera::repo':
-      http_proxy  => $http_proxy,
-      manage_repo => $manage_repo,
-      manage_epel => $manage_epel;
+      percona_major_version => $percona_major_version,
+      http_proxy            => $http_proxy,
+      manage_repo           => $manage_repo,
+      manage_epel           => $manage_epel;
     'galera_proxysql::galera::lvm':
       manage_lvm       => $manage_lvm,
       vg_name          => $vg_name,

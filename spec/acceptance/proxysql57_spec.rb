@@ -1,5 +1,5 @@
 require 'spec_helper_acceptance'
-describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
+describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MAJOR'] == '57' do
   before(:all) do
     # due to class containment issue yumrepo might not be executed in advance
     preamble = <<-MANIFEST
@@ -56,21 +56,20 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' do
         $proxysql_hosts = lookup('galera_proxysql::proxysql_hosts')
         $proxysql_vip = lookup('galera_proxysql::proxysql_vip')
         $trusted_networks = lookup('galera_proxysql::trusted_networks')
-        $root_password = Sensitive(lookup('galera_proxysql::root_password'))
-        $sst_password = Sensitive(lookup('galera_proxysql::sst_password'))
         $monitor_password = Sensitive(lookup('galera_proxysql::monitor_password'))
 
         class { 'firewall': ensure_v6 => stopped; }
         -> class { 'galera_proxysql::proxysql::proxysql':
-          manage_ssl                 => false,
-          manage_firewall            => true,
-          proxysql_port              => 3310,
-          trusted_networks           => $trusted_networks,
-          monitor_password           => $monitor_password,
-          proxysql_hosts             => $proxysql_hosts,
-          proxysql_vip               => $proxysql_vip,
-          galera_hosts               => $galera_hosts,
-          manage_repo                => false;
+          percona_major_version => '57',
+          manage_ssl            => false,
+          manage_firewall       => true,
+          proxysql_port         => 3310,
+          trusted_networks      => $trusted_networks,
+          monitor_password      => $monitor_password,
+          proxysql_hosts        => $proxysql_hosts,
+          proxysql_vip          => $proxysql_vip,
+          galera_hosts          => $galera_hosts,
+          manage_repo           => false;
         }
         -> galera_proxysql::create::user {
           default:

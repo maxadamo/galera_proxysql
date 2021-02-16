@@ -67,27 +67,27 @@ class galera_proxysql::proxysql::proxysql (
   Optional[Stdlib::Filesource] $ssl_key_source_path  = $galera_proxysql::params::ssl_key_source_path,
 
   # PRoxySQL general settings
-  Optional[String] $keepalived_sysconf_options = $galera_proxysql::params::keepalived_sysconf_options,
-  $proxysql_users                    = undef,  # users are now created through galera_proxysql::create::user
-  Stdlib::Port $proxysql_port        = $galera_proxysql::params::proxysql_port,
-  Stdlib::Port $proxysql_admin_port  = $galera_proxysql::params::proxysql_admin_port,
-  String $percona_major_version      = $galera_proxysql::params::percona_major_version,
-  Boolean $force_ipv6                = $galera_proxysql::params::force_ipv6,
-  Hash $galera_hosts                 = $galera_proxysql::params::galera_hosts,
-  Boolean $manage_repo               = $galera_proxysql::params::manage_repo,
-  Hash $proxysql_hosts               = $galera_proxysql::params::proxysql_hosts,
-  Hash $proxysql_vip                 = $galera_proxysql::params::proxysql_vip,
-  Array $trusted_networks            = $galera_proxysql::params::trusted_networks,
-  String $network_interface          = $galera_proxysql::params::network_interface,
-  String $proxysql_package           = $galera_proxysql::params::proxysql_package,
-  String $proxysql_version           = $galera_proxysql::params::proxysql_version,
-  String $proxysql_mysql_version     = $galera_proxysql::params::proxysql_mysql_version,
-  $http_proxy                        = $galera_proxysql::params::http_proxy,
-  Boolean $manage_firewall           = $galera_proxysql::params::manage_firewall,
+  Optional[String] $keepalived_sysconf_options  = $galera_proxysql::params::keepalived_sysconf_options,
+  $proxysql_users                               = undef,  # users are now created through galera_proxysql::create::user
+  Stdlib::Port $proxysql_port                   = $galera_proxysql::params::proxysql_port,
+  Stdlib::Port $proxysql_admin_port             = $galera_proxysql::params::proxysql_admin_port,
+  Enum['56', '57', '80'] $percona_major_version = $galera_proxysql::params::percona_major_version,
+  Boolean $force_ipv6                           = $galera_proxysql::params::force_ipv6,
+  Hash $galera_hosts                            = $galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo                          = $galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts                          = $galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip                            = $galera_proxysql::params::proxysql_vip,
+  Array $trusted_networks                       = $galera_proxysql::params::trusted_networks,
+  String $network_interface                     = $galera_proxysql::params::network_interface,
+  String $proxysql_package                      = $galera_proxysql::params::proxysql_package,
+  String $proxysql_version                      = $galera_proxysql::params::proxysql_version,
+  String $proxysql_mysql_version                = $galera_proxysql::params::proxysql_mysql_version,
+  $http_proxy                                   = $galera_proxysql::params::http_proxy,
+  Boolean $manage_firewall                      = $galera_proxysql::params::manage_firewall,
 
   # Passwords
-  Sensitive $monitor_password        = $galera_proxysql::params::monitor_password,
-  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
+  Sensitive $monitor_password                   = $galera_proxysql::params::monitor_password,
+  Sensitive $proxysql_admin_password            = $galera_proxysql::params::proxysql_admin_password,
 
 ) inherits galera_proxysql::params {
 
@@ -119,6 +119,15 @@ class galera_proxysql::proxysql::proxysql (
     $ipv6_true = undef
   }
 
+  $cluster_shared_pkg_name = $percona_major_version ? {
+    '80' => 'percona-xtradb-cluster-shared-compat',
+    default => "Percona-XtraDB-Cluster-shared-compat-${percona_major_version}"
+  }
+  $client_pkg_name = $percona_major_version ? {
+    '80' => 'percona-xtradb-cluster-client',
+    default => "Percona-XtraDB-Cluster-client-${percona_major_version}"
+  }
+
   $list_top = "    {
         address = \""
   $list_bottom = "\"
@@ -141,8 +150,9 @@ class galera_proxysql::proxysql::proxysql (
 
   class {
     'galera_proxysql::proxysql::repo':
-      http_proxy  => $http_proxy,
-      manage_repo => $manage_repo;
+      percona_major_version => $percona_major_version,
+      http_proxy            => $http_proxy,
+      manage_repo           => $manage_repo;
     'galera_proxysql::proxysql::service':
       proxysql_package => $proxysql_package;
     'galera_proxysql::proxysql::keepalived':
@@ -152,7 +162,7 @@ class galera_proxysql::proxysql::proxysql (
       keepalived_sysconf_options => $keepalived_sysconf_options,
       proxysql_vip               => $proxysql_vip;
     'mysql::client':
-      package_name => "Percona-XtraDB-Cluster-client-${percona_major_version}";
+      package_name => $client_pkg_name;
   }
 
   if $manage_firewall {
@@ -181,7 +191,7 @@ class galera_proxysql::proxysql::proxysql (
   }
 
   package {
-    "Percona-XtraDB-Cluster-shared-compat-${percona_major_version}":
+    $cluster_shared_pkg_name:
       ensure  => installed,
       require => Class['galera_proxysql::proxysql::repo'],
       before  => [Class['mysql::client'], Package['keepalived']];

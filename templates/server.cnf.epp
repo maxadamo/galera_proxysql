@@ -32,11 +32,13 @@ innodb-buffer-pool-instances   = <%= $galera_proxysql::galera::files::innodb_buf
 innodb-log-files-in-group      = 2
 innodb-thread-concurrency      = 0
 innodb-flush-method            = <%= $galera_proxysql::galera::files::innodb_flush_method %>
-<% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
-innodb-locks-unsafe-for-binlog = 1
-<% } -%>
 innodb_autoinc_lock_mode       = 2
 innodb-stats-on-metadata       = 0 # avoid statistics update when doing e.g show tables
+<% if $galera_proxysql::galera::files::percona_major_version in ['56', '57'] { -%>
+innodb-locks-unsafe-for-binlog = 1
+query-cache-type               = <%= $galera_proxysql::galera::files::query_cache_type %>
+query-cache-size               = <%= $galera_proxysql::galera::files::query_cache_size %>
+<% } -%>
 binlog_format                  = ROW
 key_buffer_size                = 24M
 tmp_table_size                 = 64M
@@ -46,17 +48,12 @@ memlock                        = 0
 sysdate-is-now                 = 1
 max-connections                = <%= $galera_proxysql::galera::files::max_connections %>
 thread-cache-size              = <%= $galera_proxysql::galera::files::thread_cache_size %>
-<% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
-query-cache-type               = <%= $galera_proxysql::galera::files::query_cache_type %>
-query-cache-size               = <%= $galera_proxysql::galera::files::query_cache_size %>
-<% } -%>
 table-open_cache               = 1024
 lower-case-table-names         = 0
 <%= $galera_proxysql::galera::files::custom_server_cnf_parameters %>
 
 
-#
-# These groups are read by Percona server.
+# These parameters are used by wsrep provider
 # Use it for options that only the server (but not clients) should see
 #
 # See the examples of server my.cnf files in /usr/share/mysql/
@@ -117,7 +114,7 @@ wsrep_max_ws_size              = "1G"
 # to enable debug level logging, set this to 1
 wsrep_debug                    = 0
 
-<% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
+<% if $galera_proxysql::galera::files::percona_major_version in ['56', '57'] { -%>
 # convert locking sessions into transactions
 wsrep_convert_LOCK_to_trx      = 0
 
@@ -157,5 +154,7 @@ wsrep_sst_method               = xtrabackup-v2
 # --index   - index of this node in the list
 #wsrep_notify_cmd               =
 
-# temporarily disabling traffic encryption
+<% if $galera_proxysql::galera::files::percona_major_version == '80' { -%>
+# disabling Cluster traffic encryption
 pxc_encrypt_cluster_traffic    = OFF
+<% } -%>

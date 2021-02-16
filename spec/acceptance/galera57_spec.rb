@@ -1,5 +1,5 @@
 require 'spec_helper_acceptance'
-describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' do
+describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJOR'] == '57' do
   before(:all) do
     # due to class containment issue yumrepo might not be executed in advance
     preamble = <<-MANIFEST
@@ -32,6 +32,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' do
         require => Class['epel'],
         path => '/usr/bin:/usr/sbin';
       }
+      -> package { 'gcc': ensure => present }
     MANIFEST
 
     apply_manifest(preamble)
@@ -66,21 +67,21 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' do
         $proxysql_vip = lookup('galera_proxysql::proxysql_vip')
         $trusted_networks = lookup('galera_proxysql::trusted_networks')
         $root_password = Sensitive(lookup('galera_proxysql::root_password'))
-        $sst_password = Sensitive(lookup('galera_proxysql::sst_password'))
         $monitor_password = Sensitive(lookup('galera_proxysql::monitor_password'))
 
         class { 'firewall': ensure_v6 => stopped; }
         -> class { 'galera_proxysql':
-          root_password    => $root_password,
-          sst_password     => $sst_password,
-          monitor_password => $monitor_password,
-          galera_hosts     => $galera_hosts,
-          proxysql_hosts   => $proxysql_hosts,
-          proxysql_vip     => $proxysql_vip,
-          proxysql_port    => 3310,
-          manage_firewall  => true,
-          manage_repo      => true,
-          manage_lvm       => false;
+          root_password         => $root_password,
+          percona_major_version => '57',
+          sst_password          => Sensitive('sst_pass'),
+          monitor_password      => $monitor_password,
+          galera_hosts          => $galera_hosts,
+          proxysql_hosts        => $proxysql_hosts,
+          proxysql_vip          => $proxysql_vip,
+          proxysql_port         => 3310,
+          manage_firewall       => true,
+          manage_repo           => true,
+          manage_lvm            => false;
         }
         -> galera_proxysql::create::user {
           default:

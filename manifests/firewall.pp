@@ -14,6 +14,10 @@ class galera_proxysql::firewall (
 
   assert_private("this class should be called only by ${module_name}")
 
+  unless defined(Class['firewall']) {
+    fail("if you want to use the Firewall from ${module_name}, you need to load the firewall class in advance")
+  }
+
   unless ($proxysql_port) {
     notify { 'using default port 3306 for ProxySQL':
       message => 'using default port 3306 for ProxySQL. TO SUPPRESS THIS WARNING force the parameter $proxysql_port, even for 3306'

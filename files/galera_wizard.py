@@ -254,8 +254,8 @@ def checkhost(sqlhost, ipv6):
         cnx_sqlhost = None
         try:
             cnx_sqlhost = MySQLdb.connect(
-                user='sstuser',
-                passwd=CREDENTIALS["sstuser"],
+                user='monitor',
+                passwd=CREDENTIALS["monitor"],
                 unix_socket='/var/lib/mysql/mysql.sock',
                 host=sqlhost)
         except Exception:
@@ -290,8 +290,8 @@ def checkwsrep(sqlhost, ipv6):
         wsrep_status = 0
         try:
             cnx_sqlhost = MySQLdb.connect(
-                user='sstuser',
-                passwd=CREDENTIALS["sstuser"],
+                user='monitor',
+                passwd=CREDENTIALS["monitor"],
                 unix_socket='/var/lib/mysql/mysql.sock',
                 host=sqlhost
             )
@@ -405,10 +405,7 @@ def create_monitor_table():
 
 def drop_anonymous():
     """drop anonymous user"""
-    all_localhosts = [
-        "localhost", "127.0.0.1", "::1",
-        MYIP
-    ]
+    all_localhosts = ["localhost", "127.0.0.1", "::1", MYIP]
     cnx_local = MySQLdb.connect(
         user='root',
         passwd=CREDENTIALS["root"],
@@ -426,11 +423,12 @@ def drop_anonymous():
 
 
 def create_users(thisuser):
-    """create users root, monitor and sst and delete anonymous"""
-    cnx_local = MySQLdb.connect(user='root',
-                                passwd=CREDENTIALS["root"],
-                                unix_socket='/var/lib/mysql/mysql.sock',
-                                host='localhost')
+    """create system users and delete anonymous"""
+    cnx_local = MySQLdb.connect(
+        user='root',
+        passwd=CREDENTIALS["root"],
+        unix_socket='/var/lib/mysql/mysql.sock',
+        host='localhost')
     cursor = cnx_local.cursor()
     print("Creating user: {}".format(thisuser))
     if thisuser == 'sstuser':
@@ -446,18 +444,14 @@ def create_users(thisuser):
                     """.format(thisuser, onthishost, CREDENTIALS[thisuser]))
             except Exception as err:
                 print("Unable to create user {} on {}: {}".format(
-                    thisuser,
-                    onthishost,
-                    err))
+                    thisuser, onthishost, err))
             try:
                 cursor.execute("""
                     GRANT ALL PRIVILEGES ON *.* TO '{}'@'{}' WITH GRANT OPTION
                     """.format(thisuser, onthishost))
             except Exception as err:
                 print("Unable to set permission for {} at {}: {}".format(
-                    thisuser,
-                    onthishost,
-                    err))
+                    thisuser, onthishost, err))
                 os.sys.exit()
             try:
                 cursor.execute("""
@@ -465,9 +459,7 @@ def create_users(thisuser):
                     """.format(thisuser, onthishost, CREDENTIALS[thisuser]))
             except Exception as err:
                 print("Unable to set password for {} on {}: {}".format(
-                    thisuser,
-                    onthishost,
-                    err))
+                    thisuser, onthishost, err))
                 os.sys.exit()
     else:
         for thishost in GALERA_NODES:
@@ -477,8 +469,7 @@ def create_users(thisuser):
                     """.format(thisuser, thishost, CREDENTIALS[thisuser]))
             except Exception:
                 print("Unable to create user {} on {}".format(
-                    thisuser,
-                    thishost))
+                    thisuser, thishost))
             try:
                 cursor.execute("""
                         GRANT {} TO '{}'@'{}'
@@ -580,7 +571,7 @@ class Cluster:
         print("CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL ) " \
               "ENGINE=InnoDB DEFAULT CHARSET=utf8;")
         print('INSERT INTO test.monitor SET id=("placeholder");')
-        for thisuser in ['root', 'sstuser', 'monitor']:
+        for thisuser in list(dict.keys(CREDENTIALS)):
             print("\n# define user {}".format(thisuser))
             if thisuser == "root":
                 for onthishost in ["localhost", "127.0.0.1", "::1"]:

@@ -7,6 +7,7 @@ class galera_proxysql::galera::install (
   $cluster_pkg_name,
   $percona_minor_version,
   $manage_epel,
+  $devel_pkg_name,
   $other_pkgs = $galera_proxysql::params::other_pkgs,
   $pip_pkgs = $galera_proxysql::params::pip_pkgs
 ) {
@@ -19,7 +20,9 @@ class galera_proxysql::galera::install (
     $require_epel = undef
   }
 
-  $other_pkgs.each | $pkg | {
+  $percona_pkgs = $other_pkgs + $devel_pkg_name
+
+  $percona_pkgs.each | $pkg | {
     unless defined(Package[$pkg]) {
       package { $pkg:
         require => $require_epel,

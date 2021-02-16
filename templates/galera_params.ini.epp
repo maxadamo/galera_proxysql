@@ -5,7 +5,9 @@ GALERA_NODES = [
     ]
 CREDENTIALS = {
     "root": "<%= $root_password.unwrap %>",
+<% if $galera_proxysql::galera::files::percona_major_version in ['56', '57'] { -%>
     "sstuser": "<%= $sst_password.unwrap %>",
+<% } -%>
     "monitor": "<%= $monitor_password.unwrap %>"
     }
 MYIP = "<%= $myip %>"

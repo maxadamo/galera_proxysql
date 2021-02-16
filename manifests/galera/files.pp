@@ -24,7 +24,7 @@ class galera_proxysql::galera::files (
   $query_cache_type,
   Sensitive $monitor_password,
   Sensitive $root_password,
-  Sensitive $sst_password,
+  Optional[Sensitive] $sst_password,
   $thread_cache_size,
   $tmpdir
 ) {
@@ -90,13 +90,13 @@ class galera_proxysql::galera::files (
     '/root/galera_params.ini':
       mode    => '0660',
       content => Sensitive(epp("${module_name}/galera_params.ini.epp", {
-        'myip'                  => $myip,
-        'galera_joined_list'    => $galera_joined_list,
-        'force_ipv6'            => $force_ipv6,
-        'root_password'         => Sensitive($root_password),
-        'sst_password'          => Sensitive($sst_password),
-        'monitor_password'      => Sensitive($monitor_password),
-        'percona_major_version' => $percona_major_version
+        myip                  => $myip,
+        galera_joined_list    => $galera_joined_list,
+        force_ipv6            => $force_ipv6,
+        root_password         => Sensitive($root_password),
+        monitor_password      => Sensitive($monitor_password),
+        sst_password          => $sst_password,
+        percona_major_version => $percona_major_version
       })),
       notify  => Xinetd::Service['galerachk'];
     '/etc/xinetd.d/mysqlchk':
@@ -122,7 +122,7 @@ class galera_proxysql::galera::files (
       owner   => mysql,
       mode    => '0640',
       content => Sensitive(epp("${module_name}/server.cnf.epp", {
-        sst_password        => Sensitive($sst_password),
+        sst_password        => $sst_password,
         force_ipv6          => $force_ipv6,
         gcomm_list          => $gcomm_list,
         galera_cluster_name => $galera_cluster_name,

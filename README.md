@@ -17,9 +17,11 @@
 
 ## Description
 
-The version 2.x.x of this module is a great leap forward. There is fully working unit test, and the modules sets up and bootstrap Galera cluster and ProxySQL with SSL support.
+The version 3.x.x of this module is a great leap forward. It run Percona 80, 57 and 56 and ProxySQL with SSL support.
 
-The status of the cluster is checked at run time through the fact `galera_status` and puppet will attempt to re-join the node in case of disconnection.
+If you want to upgrade your database from 57 to 80, you can follow these instructions: [upgrade from Percona 5.7 to 8.0](http://wiki.gant.org/documentation-webpages/sst.html)
+
+The status of the cluster is checked at run time through by a puppet fact and puppet will attempt to re-join the node in case of disconnection.
 
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
 
@@ -30,9 +32,13 @@ ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floa
 
 Initial State Snapshot Transfer is supported only through Percona XtraBackup (on average DBs I see no reason to use `mysqldump` or `rsync` since the donor would be unavailable during the transfer: see [Galera Documentation](http://galeracluster.com/documentation-webpages/sst.html)).
 
-Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove XtraBackup scripts from this module.
+Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove any XtraBackup script from this module.
 
-**When bootstrapping**, avoid running puppet on all the nodes at same time. You need to bootstrap one node first and then you can join the other nodes (i.e.: you better run puppet on one node at time).
+There is not much that you need to learn. SST does not use password anymore with Percona 8.0
+
+**When bootstrapping**, avoid running puppet on all the nodes at the same time. You need to bootstrap one node first and then you can join the other nodes (i.e.: you better run puppet on one node at time).
+
+`percona_major_version` is now mandatory, and it can be either '56', '57' or '80'.
 
 ## WYSIWYG
 
@@ -52,17 +58,17 @@ To setup Galera:
 
 ```puppet
 class { 'galera_proxysql':
-  root_password    => Sensitive($root_password),
-  sst_password     => Sensitive($sst_password),
-  monitor_password => Sensitive($monitor_password),
-  proxysql_hosts   => $proxysql_hosts,
-  proxysql_vip     => $proxysql_vip,
-  galera_hosts     => $galera_hosts,
-  proxysql_port    => 3306,
-  trusted_networks => $trusted_networks,
-  manage_lvm       => true,
-  vg_name          => 'rootvg',
-  lv_size          => $lv_size;
+  percona_major_version => '80',
+  root_password         => Sensitive($root_password),
+  monitor_password      => Sensitive($monitor_password),
+  proxysql_hosts        => $proxysql_hosts,
+  proxysql_vip          => $proxysql_vip,
+  galera_hosts          => $galera_hosts,
+  proxysql_port         => 3306,
+  trusted_networks      => $trusted_networks,
+  manage_lvm            => true,
+  vg_name               => 'rootvg',
+  lv_size               => $lv_size;
 }
 ```
 
@@ -72,15 +78,16 @@ To setup ProxySQL:
 
 ```puppet
 class { 'galera_proxysql::proxysql::proxysql':
-  manage_ssl           => true,
-  ssl_cert_source_path => "puppet:///modules/my_module/${facts['domain']}.crt",
-  ssl_ca_source_path   => '/etc/pki/tls/certs/COMODO_OV.crt',
-  ssl_key_source_path  => "/etc/pki/tls/private/${facts['domain']}.key",
-  monitor_password     => Sensitive($monitor_password),
-  trusted_networks     => $trusted_networks,
-  proxysql_hosts       => $proxysql_hosts,
-  proxysql_vip         => $proxysql_vip,
-  galera_hosts         => $galera_hosts;
+  percona_major_version => '80',
+  manage_ssl            => true,
+  ssl_cert_source_path  => "puppet:///modules/my_module/${facts['domain']}.crt",
+  ssl_ca_source_path    => '/etc/pki/tls/certs/COMODO_OV.crt',
+  ssl_key_source_path   => "/etc/pki/tls/private/${facts['domain']}.key",
+  monitor_password      => Sensitive($monitor_password),
+  trusted_networks      => $trusted_networks,
+  proxysql_hosts        => $proxysql_hosts,
+  proxysql_vip          => $proxysql_vip,
+  galera_hosts          => $galera_hosts;
 }
 ```
 
@@ -109,11 +116,11 @@ Author: Massimiliano Adamo <maxadamo@gmail.com>
 
 ### Firewall
 
-This module includes optional settings for iptables.
+This module includes optional settings for iptables. You can turn the settings on, settin `manage_firewall` to `true`.
 
-There are few assumptions if you set `manage_firewall` to `true`:
+There are few assumptions with the firewall:
 
-1. The first assumption is that the traffic was closed by iptables between your servers, and this module, will open the ports used by Galera and ProxySQL. If this was not the case, you don't to manage the fiirewall.
+1. The first assumption is that the traffic was closed by iptables between your servers, and this module, will open the ports used by Galera and ProxySQL. If this was not the case, you don't to need to manage the fiirewall.
 
 2. The other assumption is that you have already included the firewall module for your servers.
 
@@ -125,7 +132,7 @@ include firewall
 
 ```puppet
 class { 'firewall': ensure_v6 => stopped; }
- ```
+```
 
 ### SSL
 
@@ -133,7 +140,9 @@ This module offloads and enables SSL by default (SSL between ProxySQL and backen
 
 You may let proxySQL use its own self-signed certificate, but **beware** that in this case the certificates will be different on each node of the cluster and you'll have to sync them manually.
 
-Alternatively you can set `manage_ssl` to `true` and use your own certificates.
+Alternatively you can set `manage_ssl` to `true` and use your own certificates. 
+
+SSL Cluster traffic, is enabled by default, but right now I decided turned to turn it off. I'll put something in the [ToDo](#todo) list.
 
 ## Usage
 
@@ -219,16 +228,14 @@ galera_proxysql::create::user { 'whatever_user':
 
 ## Limitations
 
-* Ubuntu/Debian are still on hold.
-* No changelog is available
-* I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?). If you want Travis, I need your help help.
+* I run PDK and Litmus on my own Gitlab instance (even if I use the public Gitlab it would require Docker on Docker. Will it work?). If you want Travis, you need your help me.
 
 |  | RedHat/CentOS  |Debian | Ubuntu |
 | :---     |  :---: |  :---: |  :---: |
 | **Percona XtraDB Cluster** | 7 |
-| 5.6 / 5.7 / 8.0 | :green_circle: **/** :green_circle: **/** :green_circle: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: |
+| 5.6 / 5.7 / 8.0 | :white_check_mark: **/** :white_check_mark: **/** :white_check_mark: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: | :no_entry_sign: **/** :no_entry_sign: **/** :no_entry_sign: |
 | **ProxySQL Galera** |  |
-| 1.x / 2.x | :no_entry_sign: **/** :green_circle: | :no_entry_sign: **/** :no_entry_sign: |  :no_entry_sign: **/** :no_entry_sign: | 
+| 1.x / 2.x | :no_entry_sign: **/** :white_check_mark: | :no_entry_sign: **/** :no_entry_sign: |  :no_entry_sign: **/** :no_entry_sign: | 
 
 ## Development
 
@@ -242,6 +249,6 @@ Feel free to make pull requests and/or open issues on [my GitHub Repository](htt
 
 ## ToDo
 
-* Upgrade to Percona 8.x
+* optional setting to enable SSL cluster traffic
 * Optional setting to enable SSL between ProxySQL and backends
 * allow more customizations on proxysql.cnf. Right now `max_writers 1` in combination with `writer is also reader` is being used.

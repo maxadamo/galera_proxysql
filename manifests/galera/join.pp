@@ -5,16 +5,18 @@
 #
 class galera_proxysql::galera::join (
   $cluster_pkg_name,
+  $percona_major_version,
   Sensitive $monitor_password,
   Sensitive $root_password,
-  Sensitive $sst_password,
+  Optional[Sensitive] $sst_password,
   $galera_hosts,
   $proxysql_hosts,
   $proxysql_vip,
   $manage_lvm,
   $manage_firewall,
   $force_ipv6,
-  $pip_pkgs = $galera_proxysql::params::pip_pkgs
+  $pip_pkgs = $galera_proxysql::params::pip_pkgs,
+  $it_ran_already = $galera_proxysql::params::it_ran_already
 ) {
 
   assert_private("this class should be called only by ${module_name}")
@@ -45,7 +47,7 @@ class galera_proxysql::galera::join (
   }
 
   # galera never ran here: we try to bootstrap or join as new
-  if $facts['galera_never_ran'] {
+  if !$it_ran_already {
     unless defined(Exec['bootstrap_or_join']) {
       exec { 'bootstrap_or_join':
         command => '/usr/bin/galera_wizard.py -bn -f || /usr/bin/galera_wizard.py -jn -f',
@@ -57,9 +59,9 @@ class galera_proxysql::galera::join (
     }
   }
 
-  # galera has run already: we try to bootstrap or join as existing
-  if (!$facts['galera_never_ran'] and $facts['galera_status'] != '200') {
-    unless defined(Exec['bootstrap_or_join']) {
+  # galera has run already but it's down: we try to bootstrap or join as existing
+  if ($it_ran_already and $facts['galera_status'] != '200') {
+    unless defined(Exec['bootstrap_existing_or_join_existing']) {
       exec { 'bootstrap_existing_or_join_existing':
         command => '/usr/bin/galera_wizard.py -be -f || /usr/bin/galera_wizard.py -je -f',
         creates => $joined_file,
@@ -71,13 +73,14 @@ class galera_proxysql::galera::join (
   }
 
   class { 'galera_proxysql::galera::sys_users_internal_wrapper':
-    galera_hosts     => $galera_hosts,
-    proxysql_hosts   => $proxysql_hosts,
-    proxysql_vip     => $proxysql_vip,
-    sst_password     => $sst_password,
-    root_password    => $root_password,
-    monitor_password => $monitor_password,
-    force_ipv6       => $force_ipv6;
+    percona_major_version => $percona_major_version,
+    galera_hosts          => $galera_hosts,
+    proxysql_hosts        => $proxysql_hosts,
+    proxysql_vip          => $proxysql_vip,
+    sst_password          => $sst_password,
+    root_password         => $root_password,
+    monitor_password      => $monitor_password,
+    force_ipv6            => $force_ipv6;
   }
 
 }

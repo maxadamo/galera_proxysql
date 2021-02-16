@@ -1,6 +1,5 @@
 ---
 galera_proxysql::root_password: '33'
-galera_proxysql::sst_password: 'sst_pass'
 galera_proxysql::monitor_password: 'monitor_pass'
 lookup_options:
   '^galera_proxysql::(.*)_password$':
