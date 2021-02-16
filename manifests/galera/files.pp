@@ -48,6 +48,11 @@ class galera_proxysql::galera::files (
     $gcomm_list = join($transformed_data, ',')
   }
 
+  $wsrep_provider = $percona_major_version ? {
+    '80' => '/usr/lib64/galera4/libgalera_smm.so',
+    default => '/usr/lib64/galera3/libgalera_smm.so',
+  }
+
   unless defined( File['/root/bin'] ) {
     file { '/root/bin':
       ensure => directory,
@@ -111,10 +116,11 @@ class galera_proxysql::galera::files (
     '/etc/my.cnf.d/wsrep.cnf':
       mode    => '0640',
       content => Sensitive(epp("${module_name}/wsrep.cnf.epp", {
-        'sst_password'        => Sensitive($sst_password),
-        'force_ipv6'          => $force_ipv6,
-        'gcomm_list'          => $gcomm_list,
-        'galera_cluster_name' => $galera_cluster_name
+        sst_password        => Sensitive($sst_password),
+        force_ipv6          => $force_ipv6,
+        gcomm_list          => $gcomm_list,
+        galera_cluster_name => $galera_cluster_name,
+        wsrep_provider      => $wsrep_provider
       }));
     '/etc/my.cnf.d/mysqld_safe.cnf':
       source => "puppet:///modules/${module_name}/mysqld_safe.cnf";
