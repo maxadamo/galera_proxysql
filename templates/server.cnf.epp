@@ -32,7 +32,9 @@ innodb-buffer-pool-instances   = <%= $galera_proxysql::galera::files::innodb_buf
 innodb-log-files-in-group      = 2
 innodb-thread-concurrency      = 0
 innodb-flush-method            = <%= $galera_proxysql::galera::files::innodb_flush_method %>
+<% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
 innodb-locks-unsafe-for-binlog = 1
+<% } -%>
 innodb-autoinc-lock-mode       = 2
 innodb-stats-on-metadata       = 0 # avoid statistics update when doing e.g show tables
 binlog_format                  = ROW
@@ -44,8 +46,10 @@ memlock                        = 0
 sysdate-is-now                 = 1
 max-connections                = <%= $galera_proxysql::galera::files::max_connections %>
 thread-cache-size              = <%= $galera_proxysql::galera::files::thread_cache_size %>
+<% if $galera_proxysql::galera::files::percona_major_version == '56' or $galera_proxysql::galera::files::percona_major_version == '57' { -%>
 query-cache-type               = <%= $galera_proxysql::galera::files::query_cache_type %>
 query-cache-size               = <%= $galera_proxysql::galera::files::query_cache_size %>
+<% } -%>
 table-open_cache               = 1024
 lower-case-table-names         = 0
 <%= $galera_proxysql::galera::files::custom_server_cnf_parameters %>
