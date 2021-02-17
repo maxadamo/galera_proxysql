@@ -10,7 +10,7 @@ class galera_proxysql::proxysql::service ($proxysql_package) {
   assert_private("this class should be called only by ${module_name}")
 
   file { '/lib/systemd/system/proxysql.service':
-    ensure  => purged,
+    ensure  => absent,
     require => Package[$proxysql_package];
   }
   -> systemd::unit_file { 'proxysql.service':
