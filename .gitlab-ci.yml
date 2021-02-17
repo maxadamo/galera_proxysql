@@ -19,7 +19,7 @@ revision_check:
     - uat
     - production
   tags:
-    - shared-runner-1
+    - gitlab-runner01-shell01
 
 run_validation:
   stage: syntax
@@ -42,7 +42,7 @@ test_galera57:
     - test
     - master
   tags:
-    - shared-runner-3
+    - gitlab-runner01-shell01
 
 test_galera80:
   stage: litmus_test_galera80
@@ -58,7 +58,7 @@ test_galera80:
     - test
     - master
   tags:
-    - shared-runner-4
+    - gitlab-runner01-shell02
 
 test_proxysql57:
   stage: litmus_test_proxysql57
@@ -74,7 +74,7 @@ test_proxysql57:
     - test
     - master
   tags:
-    - shared-runner-5
+    - gitlab-runner02-shell01
 
 test_proxysql80:
   stage: litmus_test_proxysql80
@@ -90,7 +90,7 @@ test_proxysql80:
     - test
     - master
   tags:
-    - shared-runner
+    - gitlab-runner02-shell02
 
 job_deploy:
   stage: g10k_deploy
@@ -98,4 +98,4 @@ job_deploy:
   script:
     - /home/gitlab-runner/bin/ci2puppet.sh ${CI_PROJECT_NAME} ${CI_COMMIT_REF_NAME}
   tags:
-    - shared-runner
+    - gitlab-runner01-shell01
