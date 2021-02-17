@@ -19,14 +19,14 @@ revision_check:
     - uat
     - production
   tags:
-    - shared-runner
+    - shared-runner-1
 
 run_validation:
   stage: syntax
   script:
     - pdk validate metadata,puppet,ruby,yaml --parallel
   tags:
-    - shared-runner
+    - shared-runner-2
 
 test_galera57:
   stage: litmus_test_galera57
@@ -42,7 +42,7 @@ test_galera57:
     - test
     - master
   tags:
-    - shared-runner
+    - shared-runner-3
 
 test_galera80:
   stage: litmus_test_galera80
@@ -58,7 +58,7 @@ test_galera80:
     - test
     - master
   tags:
-    - shared-runner
+    - shared-runner-4
 
 test_proxysql57:
   stage: litmus_test_proxysql57
@@ -74,7 +74,7 @@ test_proxysql57:
     - test
     - master
   tags:
-    - shared-runner
+    - shared-runner-5
 
 test_proxysql80:
   stage: litmus_test_proxysql80
