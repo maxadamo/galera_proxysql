@@ -8,32 +8,22 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
         ensure => present,
         source => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY';
       }
-      -> yumrepo {
-        default:
-          enabled    => '1',
-          gpgcheck   => '1',
-          mirrorlist => absent,
-          gpgkey     => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY',
-          require    => Rpmkey['8507EFA5'];
-        'percona-pxc57':
-          baseurl => 'http://repo.percona.com/pxc-57/yum/release/7/RPMS/x86_64/',
-          descr   => 'Percona-PXC57';
-        'percona-pxb':
-          baseurl => 'http://repo.percona.com/pxb-24/yum/release/7/RPMS/x86_64/',
-          descr   => 'Percona-ExtraBackup';
-        'percona-pt':
-          baseurl => 'http://repo.percona.com/pt/yum/release/7/RPMS/x86_64/',
-          descr   => 'Percona-Toolkit';
-        'percona-prel':
-          baseurl => 'http://repo.percona.com/prel/yum/release/7/RPMS/noarch/',
-          descr   => 'Percona-Release';
+      -> yumrepo { 'percona':
+        enabled    => '1',
+        gpgcheck   => '1',
+        proxy      => $http_proxy,
+        mirrorlist => absent,
+        gpgkey     => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY',
+        require    => Rpmkey['8507EFA5'],
+        baseurl    => 'https://repo.percona.com/percona/yum/release/$releasever/RPMS/$basearch',
+        descr      => 'Percona';
       }
-      -> exec { 'rm -rf /var/cache/yum; echo deltarpm=0 >>/etc/yum.conf; yum check-update || true':
+      -> exec { 'rm -rf /var/cache/yum; yum check-update || true':
         provider => shell,
         require  => Class['epel'],
         path     => '/usr/bin:/usr/sbin';
       }
-      -> package { ['gcc', 'deltarpm']: ensure => present }
+      -> package { ['gcc']: ensure => present }
     MANIFEST
 
     apply_manifest(preamble)

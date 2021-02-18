@@ -11,26 +11,15 @@ class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel, $p
       source => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY';
     }
     if $percona_major_version in ['56', '57'] {
-      yumrepo {
-        default:
-          enabled    => '1',
-          gpgcheck   => '1',
-          proxy      => $http_proxy,
-          mirrorlist => absent,
-          gpgkey     => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY',
-          require    => Rpmkey['8507EFA5'];
-        'percona-pxc57':
-          baseurl => 'http://repo.percona.com/pxc-57/yum/release/$releasever/RPMS/$basearch',
-          descr   => 'Percona-PXC57';
-        'percona-pxb':
-          baseurl => 'http://repo.percona.com/pxb-24/yum/release/$releasever/RPMS/$basearch',
-          descr   => 'Percona-ExtraBackup';
-        'percona-pt':
-          baseurl => 'http://repo.percona.com/pt/yum/release/$releasever/RPMS/$basearch',
-          descr   => 'Percona-Toolkit';
-        'percona-prel':
-          baseurl => 'http://repo.percona.com/prel/yum/release/$releasever/RPMS/noarch',
-          descr   => 'Percona-Release';
+      yumrepo { 'percona':
+        enabled    => '1',
+        gpgcheck   => '1',
+        proxy      => $http_proxy,
+        mirrorlist => absent,
+        gpgkey     => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY',
+        require    => Rpmkey['8507EFA5'],
+        baseurl    => 'https://repo.percona.com/percona/yum/release/$releasever/RPMS/$basearch',
+        descr      => 'Percona';
       }
     } elsif $percona_major_version == '80' {
       yumrepo { 'percona-pdpxc80':
