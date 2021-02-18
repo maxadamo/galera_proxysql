@@ -28,9 +28,10 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
           baseurl => 'http://repo.percona.com/prel/yum/release/$releasever/RPMS/noarch',
           descr   => 'Percona-Release';
       }
-      -> exec { 'yum check-update || true':
-        require => Class['epel'],
-        path => '/usr/bin:/usr/sbin';
+      -> exec { 'rm -rf /var/cache/yum; echo deltarpm=0 >>/etc/yum.conf; yum check-update || true':
+        provider => shell,
+        require  => Class['epel'],
+        path     => '/usr/bin:/usr/sbin';
       }
       -> package { ['gcc', 'deltarpm']: ensure => present }
     MANIFEST
