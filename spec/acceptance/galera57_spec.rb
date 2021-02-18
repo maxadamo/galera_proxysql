@@ -16,16 +16,16 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
           gpgkey     => 'https://repo.percona.com/percona/yum/PERCONA-PACKAGING-KEY',
           require    => Rpmkey['8507EFA5'];
         'percona-pxc57':
-          baseurl => 'http://repo.percona.com/pxc-57/yum/release/$releasever/RPMS/$basearch',
+          baseurl => 'http://repo.percona.com/pxc-57/yum/release/7/RPMS/x86_64/',
           descr   => 'Percona-PXC57';
         'percona-pxb':
-          baseurl => 'http://repo.percona.com/pxb-24/yum/release/$releasever/RPMS/$basearch',
+          baseurl => 'http://repo.percona.com/pxb-24/yum/release/7/RPMS/x86_64/',
           descr   => 'Percona-ExtraBackup';
         'percona-pt':
-          baseurl => 'http://repo.percona.com/pt/yum/release/$releasever/RPMS/$basearch',
+          baseurl => 'http://repo.percona.com/pt/yum/release/7/RPMS/x86_64/',
           descr   => 'Percona-Toolkit';
         'percona-prel':
-          baseurl => 'http://repo.percona.com/prel/yum/release/$releasever/RPMS/noarch',
+          baseurl => 'http://repo.percona.com/prel/yum/release/7/RPMS/noarch/',
           descr   => 'Percona-Release';
       }
       -> exec { 'rm -rf /var/cache/yum; echo deltarpm=0 >>/etc/yum.conf; yum check-update || true':
