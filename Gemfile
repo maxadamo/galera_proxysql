@@ -28,6 +28,7 @@ group :development do
   gem "puppet-module-posix-dev-r#{minor_version}", '~> 0.4',     require: false, platforms: [:ruby]
   gem "puppet-module-win-default-r#{minor_version}", '~> 0.4',   require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "puppet-module-win-dev-r#{minor_version}", '~> 0.4',       require: false, platforms: [:mswin, :mingw, :x64_mingw]
+  gem "net-ssh", '~> 5.2',                                       require: false
 end
 
 puppet_version = ENV['PUPPET_GEM_VERSION']
@@ -69,6 +70,4 @@ extra_gemfiles.each do |gemfile|
     eval(File.read(gemfile), binding)
   end
 end
-
-gem 'net-ssh', '~> 5.2'
 # vim: syntax=ruby

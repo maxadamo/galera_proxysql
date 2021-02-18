@@ -5,6 +5,9 @@ spec/spec_helper.rb:
   unmanaged: true
 .travis.yml:
   unmanaged: true
-Gemfile:
-  unmanaged: true
 mock_with: ':rspec'
+Gemfile:
+  required:
+    ':development':
+      - gem: 'net-ssh'
+        version: '~> 5.2'
