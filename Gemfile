@@ -69,4 +69,6 @@ extra_gemfiles.each do |gemfile|
     eval(File.read(gemfile), binding)
   end
 end
+
+gem 'net-ssh', '~> 5.2'
 # vim: syntax=ruby
