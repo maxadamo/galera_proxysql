@@ -22,7 +22,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
         require => Class['epel'],
         path => '/usr/bin:/usr/sbin';
       }
-      -> package { 'gcc': ensure => present }
+      -> package { ['gcc', 'deltarpm']: ensure => present }
     MANIFEST
 
     apply_manifest(preamble)
