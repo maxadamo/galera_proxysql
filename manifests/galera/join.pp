@@ -46,7 +46,7 @@ class galera_proxysql::galera::join (
   # galera never ran on this host: we try to bootstrap or join as NEW
   if ($facts['galera_never_ran']) {
     unless defined(Exec['bootstrap_or_join']) {
-      notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
+      notify { 'Trying to bootstrap a new cluster or to join a new cluster...':; }
       exec { 'bootstrap_or_join':
         command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
         path    => '/usr/bin:/usr/sbin',
@@ -61,9 +61,9 @@ class galera_proxysql::galera::join (
   # in the past galera has run already but now it's down: we try to bootstrap or join as EXISTING
   if (!$facts['galera_never_ran'] and $facts['galera_status'] != '200') {
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
-      notify { 'Trying to bootstrap an existing cluster or joing and existing cluster...':; }
+      notify { 'Trying to bootstrap an existing cluster or to join and existing cluster...':; }
       exec { 'bootstrap_existing_or_join_existing':
-        command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-existing --force',
+        command => 'galera_wizard.py --bootstrap-existing --force || galera_wizard.py --join-existing --force',
         path    => '/usr/bin:/usr/sbin',
         creates => $joined_file,
         returns => [0,1],
