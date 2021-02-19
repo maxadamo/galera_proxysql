@@ -46,9 +46,12 @@ class galera_proxysql::galera::join (
     $require = $lvm_require
   }
 
+  $galera_never_ran = find_file('/var/lib/mysql/grastate.dat')
+
   # galera never ran on this host: we try to bootstrap or join as NEW
-  unless find_file('/var/lib/mysql/grastate.dat') {
+  unless ($galera_never_ran) {
     unless defined(Exec['bootstrap_or_join']) {
+      notify { "find_file is ${galera_never_ran}": }
       notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
       exec { 'bootstrap_or_join':
         command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
