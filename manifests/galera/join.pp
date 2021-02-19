@@ -75,14 +75,14 @@ class galera_proxysql::galera::join (
   }
 
 
-  if ($facts['galera_is_bootstrap']) {
+  if $facts['galera_is_bootstrap'] == true {
     notify { 'it is bootstrap MODE':; }
   } else {
     notify { 'it is NOT bootstrapt':; }
   }
 
   # try to change from mysql@bootstrap to mysql
-  if ($facts['galera_is_bootstrap'] and $facts['galera_status'] == '200') {
+  if $facts['galera_is_bootstrap'] == true and $facts['galera_status'] == '200' {
     exec { 'revert_mysql_boostrap_mode':
       command => 'galera_wizard.py --join-existing',
       path    => '/usr/bin:/usr/sbin',
