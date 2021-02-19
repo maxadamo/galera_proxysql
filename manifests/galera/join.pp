@@ -46,9 +46,10 @@ class galera_proxysql::galera::join (
     $require = $lvm_require
   }
 
-  # galera never ran here: we try to bootstrap or join as new
+  # galera never ran on this host: we try to bootstrap or join as NEW
   if !$it_ran_already {
     unless defined(Exec['bootstrap_or_join']) {
+      notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
       exec { 'bootstrap_or_join':
         command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
         path    => '/usr/bin:/usr/sbin',
@@ -60,9 +61,10 @@ class galera_proxysql::galera::join (
     }
   }
 
-  # galera has run already but it's down: we try to bootstrap or join as existing
+  # in the past galera has run already but now it's down: we try to bootstrap or join as EXISTING
   if ($it_ran_already and $facts['galera_status'] != '200') {
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
+      notify { 'Trying to bootstrap an existing cluster or joing and existing cluster...':; }
       exec { 'bootstrap_existing_or_join_existing':
         command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-existing --force',
         path    => '/usr/bin:/usr/sbin',
@@ -81,12 +83,12 @@ class galera_proxysql::galera::join (
     notify { 'it is NOT bootstrapt':; }
   }
 
-  # try to change from mysql@bootstrap to mysql
-  if $facts['galera_is_bootstrap'] == true and $facts['galera_status'] == '200' {
+  # galera is up but mysql@bootstrap is running instead of mysql
+  if ($facts['galera_is_bootstrap'] == true and $facts['galera_status'] == '200') {
+    notify { 'Galera is in bootstrap mode':; }
     exec { 'revert_mysql_boostrap_mode':
       command => 'galera_wizard.py --join-existing',
       path    => '/usr/bin:/usr/sbin',
-      creates => $joined_file,
       returns => [0,1],
       require => $require,
       before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
