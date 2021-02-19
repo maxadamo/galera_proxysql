@@ -38,6 +38,11 @@ import ping3
 import distro
 import MySQLdb
 import pysystemd
+try:
+    import rpm
+except ModuleNotFoundError:
+    print("Unable to import rpm. Is this system CentOS/RedHat?")
+    os.sys.exit(1)
 
 FORCE = False
 RED = '\033[91m'
@@ -127,7 +132,6 @@ def check_install():
         print("{} is not supported".format(distro.os_release_info()['id']))
         os.sys.exit(1)
     print("\ndetected {} ...".format(distro.os_release_info()['pretty_name']))
-    import rpm
     percona_installed = None
     rpmts = rpm.TransactionSet()
     rpmmi = rpmts.dbMatch()
@@ -221,13 +225,13 @@ def bootstrap_mysql(boot):
                 ALTER USER 'root'@'localhost' IDENTIFIED BY '{}'
                 """.format(CREDENTIALS["root"]))
             cnx_local_test.commit()
-        except Exception as err:
+        except Exception as err:  #pylint: disable=W0703
             print("Could not set password for root: {}".format(err))
             os.sys.exit(1)
         try:
             cursor.execute("""FLUSH PRIVILEGES""")
             cnx_local_test.commit()
-        except Exception as err:
+        except Exception as err: #pylint: disable=W0703
             print("Could not flush privileges: {}".format(err))
             os.sys.exit(1)
         restore_mycnf()
@@ -258,7 +262,7 @@ def checkhost(sqlhost, ipv6):
                 passwd=CREDENTIALS["monitor"],
                 unix_socket='/var/lib/mysql/mysql.sock',
                 host=sqlhost)
-        except Exception:
+        except Exception:  #pylint: disable=W0703
             print("{}Skipping {}: socket is down{}".format(
                 YELLOW, sqlhostname, WHITE))
             OTHER_WSREP.remove(sqlhost)
@@ -297,7 +301,7 @@ def checkwsrep(sqlhost, ipv6):
             )
             cursor = cnx_sqlhost.cursor()
             wsrep_status = cursor.execute("""show variables LIKE 'wsrep_on'""")
-        except Exception:
+        except Exception:  #pylint: disable=W0703
             pass
         finally:
             if cnx_sqlhost:
@@ -312,19 +316,19 @@ def checkwsrep(sqlhost, ipv6):
 
 def try_joining(how, datadirectory):
     """If we have nodes try Joining the cluster"""
-    kill_mysql()
     if how == "new":
         if os.path.isfile('/root/.my.cnf'):
             os.rename('/root/.my.cnf', '/root/.my.cnf.bak')
 
     if not LASTCHECK_NODES:
-        print("{}There are no nodes available in the Cluster{}".format(
+        print("\n{}There are no nodes available in the Cluster{}".format(
             RED, WHITE))
         print("\nEither:")
         print("- None of the hosts has the value 'wsrep_ready' to 'ON'")
         print("- None of the hosts is running the MySQL process\n")
         os.sys.exit(1)
     else:
+        kill_mysql()
         try:
             pysystemd.services('mysql.service').start()
         except pysystemd.subprocess.CalledProcessError as err:
@@ -363,7 +367,7 @@ def create_monitor_table():
         cursor.execute("""
                     CREATE DATABASE IF NOT EXISTS `test`
                     """)
-    except Exception as err:
+    except Exception as err:  #pylint: disable=W0703
         print("Could not create database test: {}".format(err))
         os.sys.exit(1)
     else:
@@ -385,7 +389,7 @@ def create_monitor_table():
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
                     """)
         cnx_local_test.commit()
-    except Exception as err:
+    except Exception as err:  #pylint: disable=W0703
         print("Could not create test table: {}".format(err))
         os.sys.exit(1)
     else:
@@ -396,7 +400,7 @@ def create_monitor_table():
                     INSERT INTO test.monitor SET id=("placeholder");
                     """)
         cnx_local_test.commit()
-    except Exception as err:
+    except Exception as err:  #pylint: disable=W0703
         print("Unable to write to test table: {}".format(err))
     finally:
         if cnx_local_test:
@@ -415,7 +419,7 @@ def drop_anonymous():
     for onthishost in all_localhosts:
         try:
             cursor.execute("""DROP USER ''@'{}'""".format(onthishost))
-        except Exception:
+        except Exception:  #pylint: disable=W0703
             pass
     if cnx_local:
         cursor.execute("""FLUSH PRIVILEGES""")
@@ -442,14 +446,14 @@ def create_users(thisuser):
                 cursor.execute("""
                     CREATE USER IF NOT EXISTS '{}'@'{}' IDENTIFIED BY '{}'
                     """.format(thisuser, onthishost, CREDENTIALS[thisuser]))
-            except Exception as err:
+            except Exception as err:  #pylint: disable=W0703
                 print("Unable to create user {} on {}: {}".format(
                     thisuser, onthishost, err))
             try:
                 cursor.execute("""
                     GRANT ALL PRIVILEGES ON *.* TO '{}'@'{}' WITH GRANT OPTION
                     """.format(thisuser, onthishost))
-            except Exception as err:
+            except Exception as err:  #pylint: disable=W0703
                 print("Unable to set permission for {} at {}: {}".format(
                     thisuser, onthishost, err))
                 os.sys.exit()
@@ -457,7 +461,7 @@ def create_users(thisuser):
                 cursor.execute("""
                     set PASSWORD for '{}'@'{}' = '{}'
                     """.format(thisuser, onthishost, CREDENTIALS[thisuser]))
-            except Exception as err:
+            except Exception as err:  #pylint: disable=W0703
                 print("Unable to set password for {} on {}: {}".format(
                     thisuser, onthishost, err))
                 os.sys.exit()
@@ -467,14 +471,14 @@ def create_users(thisuser):
                 cursor.execute("""
                     CREATE USER '{}'@'{}' IDENTIFIED BY '{}'
                     """.format(thisuser, thishost, CREDENTIALS[thisuser]))
-            except Exception:
+            except Exception:  #pylint: disable=W0703
                 print("Unable to create user {} on {}".format(
                     thisuser, thishost))
             try:
                 cursor.execute("""
                         GRANT {} TO '{}'@'{}'
                         """.format(thisgrant, thisuser, thishost))
-            except Exception as err:
+            except Exception as err:  #pylint: disable=W0703
                 print("Unable to set permission for {} at {}: {}".format(
                     thisuser, thishost, err))
     if cnx_local:
@@ -667,4 +671,4 @@ if __name__ == "__main__":
         for key in list(ARGSDICT.keys()):
             if ARGSDICT[str(key)] is True:
                 if key != 'force':
-                    eval(key)
+                    eval(key)    #pylint: disable=W0123

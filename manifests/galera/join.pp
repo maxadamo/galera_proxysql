@@ -50,7 +50,8 @@ class galera_proxysql::galera::join (
   if !$it_ran_already {
     unless defined(Exec['bootstrap_or_join']) {
       exec { 'bootstrap_or_join':
-        command => '/usr/bin/galera_wizard.py -bn -f || /usr/bin/galera_wizard.py -jn -f',
+        command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
+        path    => '/usr/bin:/usr/sbin',
         creates => $joined_file,
         returns => [0,1],
         require => $require,
@@ -63,12 +64,32 @@ class galera_proxysql::galera::join (
   if ($it_ran_already and $facts['galera_status'] != '200') {
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
       exec { 'bootstrap_existing_or_join_existing':
-        command => '/usr/bin/galera_wizard.py -be -f || /usr/bin/galera_wizard.py -je -f',
+        command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-existing --force',
+        path    => '/usr/bin:/usr/sbin',
         creates => $joined_file,
         returns => [0,1],
         require => $require,
         before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
       }
+    }
+  }
+
+
+  if ($facts['galera_is_bootstrap']) {
+    notify { 'it is bootstrap MODE':; }
+  } else {
+    notify { 'it is NOT bootstrapt':; }
+  }
+
+  # try to change from mysql@bootstrap to mysql
+  if ($facts['galera_is_bootstrap'] and $facts['galera_status'] == '200') {
+    exec { 'revert_mysql_boostrap_mode':
+      command => 'galera_wizard.py --join-existing',
+      path    => '/usr/bin:/usr/sbin',
+      creates => $joined_file,
+      returns => [0,1],
+      require => $require,
+      before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
     }
   }
 
