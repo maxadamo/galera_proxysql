@@ -179,8 +179,7 @@ class galera_proxysql (
 
   if $facts['osfamily'] != 'RedHat' { fail("${facts['operatingsystem']} not yet supported") }
 
-  $gcc_exists = find_file('/usr/bin/gcc')
-  unless $gcc_exists  {
+  unless $facts['gcc_exist']  {
     fail('please install gcc (it is needed to install a PIP module)')
   }
 

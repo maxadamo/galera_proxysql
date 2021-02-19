@@ -12,12 +12,11 @@ class galera_proxysql::galera::sys_users_internal_wrapper (
   $proxysql_vip,
   $force_ipv6,
   $percona_major_version,
-  $joined_exists = $galera_proxysql::params::joined_exists,
 ) {
 
   assert_private("this class should be called only by ${module_name}")
 
-  if ($joined_exists and $facts['galera_status'] == '200') {
+  if ($facts['galera_joined_exist'] and $facts['galera_status'] == '200') {
 
     if $percona_major_version in ['56', '57'] {
       galera_proxysql::create::sys_user { 'sstuser':

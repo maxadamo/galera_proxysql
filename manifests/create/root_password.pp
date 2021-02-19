@@ -12,8 +12,6 @@
 define galera_proxysql::create::root_password(
   Sensitive $root_pass,
   Boolean $force_ipv6,
-  $joined_exists = $galera_proxysql::params::joined_exists,
-  $rootcnf_exist = $galera_proxysql::params::rootcnf_exist
   ) {
 
   $root_cnf = '/root/.my.cnf'
@@ -40,7 +38,7 @@ define galera_proxysql::create::root_password(
       }));
   }
 
-  if ($rootcnf_exist and $joined_exists and $facts['galera_status'] == '200') {
+  if ($facts['galera_rootcnf_exist'] and $facts['galera_joined_exist'] and $facts['galera_status'] == '200') {
     exec { 'change_root_password':
       require => File[
         '/root/bin/new_pw_check.sh', '/root/bin/old_pw_check.sh', '/root/bin/pw_change.sh'

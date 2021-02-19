@@ -43,9 +43,6 @@ class galera_proxysql::params {
   $tmpdir = undef
   $trusted_networks = undef
   $vg_name = undef
-  $joined_exists = find_file('/var/lib/mysql/gvwstate.dat')
-  $rootcnf_exist = find_file('/root/.my.cnf')
-  $it_ran_already = find_file('/var/lib/mysql/grastate.dat')
 
   # proxysql configuration
   $proxysql_package = 'proxysql2'

@@ -16,10 +16,7 @@ class galera_proxysql::galera::join (
   $manage_firewall,
   $force_ipv6,
   $pip_pkgs = $galera_proxysql::params::pip_pkgs,
-  $it_ran_already = $galera_proxysql::params::it_ran_already
 ) {
-
-  assert_private("this class should be called only by ${module_name}")
 
   $joined_file = '/var/lib/mysql/gvwstate.dat'
 
@@ -46,12 +43,9 @@ class galera_proxysql::galera::join (
     $require = $lvm_require
   }
 
-  $galera_never_ran = find_file('/var/lib/mysql/grastate.dat')
-
   # galera never ran on this host: we try to bootstrap or join as NEW
-  unless ($galera_never_ran) {
+  if ($facts['galera_never_ran']) {
     unless defined(Exec['bootstrap_or_join']) {
-      notify { "find_file is ${galera_never_ran}": }
       notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
       exec { 'bootstrap_or_join':
         command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
@@ -65,7 +59,7 @@ class galera_proxysql::galera::join (
   }
 
   # in the past galera has run already but now it's down: we try to bootstrap or join as EXISTING
-  if (find_file('/var/lib/mysql/grastate.dat') and $facts['galera_status'] != '200') {
+  if (!$facts['galera_never_ran'] and $facts['galera_status'] != '200') {
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
       notify { 'Trying to bootstrap an existing cluster or joing and existing cluster...':; }
       exec { 'bootstrap_existing_or_join_existing':
