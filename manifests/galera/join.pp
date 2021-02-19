@@ -81,8 +81,7 @@ class galera_proxysql::galera::join (
       command => 'galera_wizard.py --join-existing',
       path    => '/usr/bin:/usr/sbin',
       returns => [0,1],
-      require => $require,
-      before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
+      require => $require;
     }
   }
 
