@@ -1,8 +1,6 @@
 Facter.add(:galera_is_bootstrap) do
   setcode do
-    begin
-      Facter::Core::Execution.execute('/usr/bin/systemctl status mysql@bootstrap | grep -q running')
-    rescue Facter::Core::Execution::ExecutionFailure
+    if system('/usr/bin/systemctl status mysql@bootstrap')     
       false
     else
       true
