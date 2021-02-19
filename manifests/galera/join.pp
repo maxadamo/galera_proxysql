@@ -47,7 +47,7 @@ class galera_proxysql::galera::join (
   }
 
   # galera never ran on this host: we try to bootstrap or join as NEW
-  unless ($it_ran_already) {
+  unless find_file('/var/lib/mysql/grastate.dat') {
     unless defined(Exec['bootstrap_or_join']) {
       notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
       exec { 'bootstrap_or_join':
@@ -62,7 +62,7 @@ class galera_proxysql::galera::join (
   }
 
   # in the past galera has run already but now it's down: we try to bootstrap or join as EXISTING
-  if ($it_ran_already and $facts['galera_status'] != '200') {
+  if (find_file('/var/lib/mysql/grastate.dat') and $facts['galera_status'] != '200') {
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
       notify { 'Trying to bootstrap an existing cluster or joing and existing cluster...':; }
       exec { 'bootstrap_existing_or_join_existing':
