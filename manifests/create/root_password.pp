@@ -14,6 +14,15 @@ define galera_proxysql::create::root_password(
   Boolean $force_ipv6,
   ) {
 
+  # if I use ALL it keeps changing the permissions
+  $root_privileges = [
+    'ALTER', 'ALTER ROUTINE', 'CREATE', 'CREATE ROLE', 'CREATE ROUTINE', 'CREATE TABLESPACE',
+    'CREATE TEMPORARY TABLES', 'CREATE USER', 'CREATE VIEW', 'DELETE', 'DROP', 'DROP ROLE',
+    'EVENT', 'EXECUTE', 'FILE', 'INDEX', 'INSERT', 'LOCK TABLES', 'PROCESS', 'REFERENCES',
+    'RELOAD', 'REPLICATION CLIENT', 'REPLICATION SLAVE', 'SELECT', 'SHOW DATABASES',
+    'SHOW VIEW', 'SHUTDOWN', 'SUPER', 'TRIGGER', 'UPDATE'
+  ]
+
   $root_cnf = '/root/.my.cnf'
   if ($force_ipv6) {
     $root_host_list = ['127.0.0.1', 'localhost', '::1']
@@ -57,7 +66,7 @@ define galera_proxysql::create::root_password(
       ensure     => present,
       user       => "root@${local_host}",
       table      => '*.*',
-      privileges => ['ALL', 'SUPER'],
+      privileges => $root_privileges,
       require    => File[$root_cnf];
     }
   }
