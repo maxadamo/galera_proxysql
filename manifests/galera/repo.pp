@@ -22,15 +22,9 @@ class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel, $p
         'percona-pxc57':
           baseurl => 'http://repo.percona.com/pxc-57/yum/release/$releasever/RPMS/$basearch',
           descr   => 'Percona-PXC57';
-        'percona-pxb':
-          baseurl => 'http://repo.percona.com/pxb-24/yum/release/$releasever/RPMS/$basearch',
-          descr   => 'Percona-ExtraBackup';
         'percona-pt':
           baseurl => 'http://repo.percona.com/pt/yum/release/$releasever/RPMS/$basearch',
           descr   => 'Percona-Toolkit';
-        'percona-prel':
-          baseurl => 'http://repo.percona.com/prel/yum/release/$releasever/RPMS/noarch',
-          descr   => 'Percona-Release';
       }
     } elsif $percona_major_version == '80' {
       yumrepo { 'percona-pdpxc80':

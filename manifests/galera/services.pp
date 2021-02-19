@@ -22,8 +22,9 @@ class galera_proxysql::galera::services {
     ];
   }
 
-  # mysql and mysql@bootstrap are mutual exclusives.
-  # A proper way to deal with both services must be found.
+  # this service is managed through the script galera-wizard.py
+  # we can have either mysql and mysql@bootstrap and it creates
+  # some problem to handle the service. 
   # service { 'mysql':
   #   ensure   => running,
   #   provider => 'systemd',

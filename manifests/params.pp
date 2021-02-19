@@ -23,8 +23,6 @@ class galera_proxysql::params {
   $innodb_flush_method = 'O_DIRECT'
   $innodb_io_capacity = 200
   $innodb_log_file_size = '512M'
-  $logdir = undef
-  $lv_size = undef
   $percona_major_version = undef
   $percona_minor_version = 'installed'
   $manage_lvm = false
@@ -42,6 +40,10 @@ class galera_proxysql::params {
   $thread_cache_size = 16
   $tmpdir = undef
   $trusted_networks = undef
+
+  # galera optional LVM parameters
+  $logdir = undef
+  $lv_size = undef
   $vg_name = undef
 
   # proxysql configuration

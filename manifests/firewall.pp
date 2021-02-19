@@ -1,6 +1,6 @@
 # == Class: galera_proxysql::firewall
 #
-# sets firewall up to allow comunication within the cluster
+# This is an optional class if you want to set Iptables rules for you Cluster
 #
 #
 class galera_proxysql::firewall (

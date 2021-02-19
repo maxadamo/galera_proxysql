@@ -229,17 +229,17 @@ class galera_proxysql (
     $ipv6_true = undef
   }
 
-  $cluster_pkg_name = $percona_major_version ? {
-    '80' => 'percona-xtradb-cluster-full',
-    default => "Percona-XtraDB-Cluster-full-${percona_major_version}"
-  }
-  $client_pkg_name = $percona_major_version ? {
-    '80' => 'percona-xtradb-cluster-client',
-    default => "Percona-XtraDB-Cluster-client-${percona_major_version}"
-  }
-  $devel_pkg_name = $percona_major_version ? {
-    '80' => 'percona-xtradb-cluster-devel',
-    default => "Percona-XtraDB-Cluster-devel-${percona_major_version}"
+  case $percona_major_version {
+    '80': {
+      $cluster_pkg_name = 'percona-xtradb-cluster-full'
+      $client_pkg_name = 'percona-xtradb-cluster-client'
+      $devel_pkg_name = 'percona-xtradb-cluster-devel'
+    }
+    default: {
+      $cluster_pkg_name = "Percona-XtraDB-Cluster-full-${percona_major_version}"
+      $client_pkg_name = "Percona-XtraDB-Cluster-client-${percona_major_version}"
+      $devel_pkg_name = "Percona-XtraDB-Cluster-devel-${percona_major_version}"
+    }
   }
 
   class {
