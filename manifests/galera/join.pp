@@ -47,7 +47,7 @@ class galera_proxysql::galera::join (
   }
 
   # galera never ran on this host: we try to bootstrap or join as NEW
-  if !$it_ran_already {
+  unless ($it_ran_already) {
     unless defined(Exec['bootstrap_or_join']) {
       notify { 'Trying to bootstrap a new cluster or joing a new cluster...':; }
       exec { 'bootstrap_or_join':
@@ -76,12 +76,6 @@ class galera_proxysql::galera::join (
     }
   }
 
-
-  if $facts['galera_is_bootstrap'] == true {
-    notify { 'it is bootstrap MODE':; }
-  } else {
-    notify { 'it is NOT bootstrapt':; }
-  }
 
   # galera is up but mysql@bootstrap is running instead of mysql
   if ($facts['galera_is_bootstrap'] == true and $facts['galera_status'] == '200') {
