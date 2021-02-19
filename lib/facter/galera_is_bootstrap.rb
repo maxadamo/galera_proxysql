@@ -8,9 +8,9 @@ Facter.add(:galera_is_bootstrap) do
       service_status = 'UP'
     end
     if service_status == 'DOWN'
-      true
-    else
       false
+    else
+      true
     end
   end
 end
