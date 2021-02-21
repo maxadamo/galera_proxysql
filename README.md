@@ -17,11 +17,13 @@
 
 ## Description
 
-The version 3.x.x of this module is a great leap forward. It runs Percona 80, 57 and 56 and ProxySQL 2 with SSL support.
+The version 3.x.x of this module is a great leap forward. It runs Percona 80, 57 and 56 and ProxySQL 2 with SSL support. It requires Puppet 6.x or higher.
 
-If you want to upgrade your database from 57 to 80, you can follow these instructions: [upgrade Percona from 5.7 to 8.0](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0)
+If you want to upgrade your database from 57 to 80, you can read these instructions (along with [Percona official documentation](https://www.percona.com/doc/percona-server/LATEST/upgrading_guide.html)): [upgrade Percona from 5.7 to 8.0](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0).
 
-The status of the cluster is checked at run time through a puppet fact and puppet will attempt to re-join the node in case of disconnection (**if you bring the whole cluster down and you remove /var/lib/mysql/gvwstate.dat from all the servers you have lost your data** because a clean bootstrap will be attempted) .
+The status of the cluster is checked at run time through a puppet fact and puppet will attempt to re-join the node in case of disconnection (**if you bring the whole cluster down and you remove /var/lib/mysql/gvwstate.dat from all the servers you have lost your data** because a clean bootstrap will be attempted).
+
+If there is one node alive in the cluster, puppet will always attempt to revert the service from `mysql@bootstrap` to `mysql`, but it won't succeed, until a 2nd node joins the cluster.
 
 If puppet fails to recover a node you can use the script `galera_wizard.py` provided with this module.
 
@@ -30,11 +32,11 @@ ProxySQL will be set up on 2 nodes (no more, no less) with Keepalived and 1 floa
 * if you want only the Galera cluster you need _at least_ 3 servers and 3 ipv4 (and optionally 3 ipv6)
 * if you want the full stack you need _at least_ 5 servers and 6 IPv4 (and optionally 6 IPv6)
 
-For now this module supports on State Snapshot Transfer, because on average DBs I see no reason to use `mysqldump` or `rsync` (while rsync could be faster, the donor would not be unavailable during the transfer). Please create a PR if you intend to implement other methods. 
+For now this module supports on State Snapshot Transfer, because on average DBs I see no reason to use `mysqldump` or `rsync` (while rsync could be faster, the donor would not be unavailable during the transfer). Please create a PR if you intend to implement other methods.
 
 Xtrabackup is now supported by puppetlabs/mysql `mysql::backup::xtrabackup`, hence I decided to remove any XtraBackup script from this module.
 
-SST does not use password anymore with Percona 8.0. 
+SST does not use password anymore with Percona 8.0 (the next coming version will implement SSL on cluster traffic). 
 
 **When bootstrapping**, avoid running puppet on all the nodes at the same time. You need to bootstrap one node first and then you can join the other nodes (i.e.: you better run puppet on one node at time).
 
@@ -243,7 +245,7 @@ Feel free to make pull requests and/or open issues on [my Gitlab Repository](htt
 
 ## Release Notes
 
-* upgrade to ProxySQL-2
+* upgrade to ProxySQL-2 and Percona 80
 * offloading and enabling SSL on ProxySQL
 * boosted Unit Test
 
