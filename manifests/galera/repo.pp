@@ -5,6 +5,8 @@ class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel, $p
 
   assert_private("this class should be called only by ${module_name}")
 
+  if $manage_epel { include epel }
+
   if $manage_repo {
     rpmkey { '8507EFA5':
       ensure => present,
@@ -22,6 +24,9 @@ class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel, $p
         'percona-pxc57':
           baseurl => 'http://repo.percona.com/pxc-57/yum/release/$releasever/RPMS/$basearch',
           descr   => 'Percona-PXC57';
+        'percona-pxb':
+          baseurl => 'http://repo.percona.com/pxb-24/yum/release/$releasever/RPMS/$basearch',
+          descr   => 'Percona-ExtraBackup';
         'percona-pt':
           baseurl => 'http://repo.percona.com/pt/yum/release/$releasever/RPMS/$basearch',
           descr   => 'Percona-Toolkit';
@@ -38,10 +43,6 @@ class galera_proxysql::galera::repo ($http_proxy, $manage_repo, $manage_epel, $p
         descr      => 'Percona-PDPXC80';
       }
     }
-  }
-
-  if $manage_epel {
-    include epel
   }
 
 }

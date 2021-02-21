@@ -19,21 +19,17 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
           baseurl => 'http://repo.percona.com/pxc-57/yum/release/7/RPMS/x86_64/',
           descr   => 'Percona-PXC57';
         'percona-pxb':
-          baseurl => 'http://repo.percona.com/pxb-24/yum/release/7/RPMS/x86_64/',
+          baseurl => 'http://repo.percona.com/pxb-24/yum/release/$releasever/RPMS/$basearch',
           descr   => 'Percona-ExtraBackup';
         'percona-pt':
           baseurl => 'http://repo.percona.com/pt/yum/release/7/RPMS/x86_64/',
           descr   => 'Percona-Toolkit';
-        'percona-prel':
-          baseurl => 'http://repo.percona.com/prel/yum/release/7/RPMS/noarch/',
-          descr   => 'Percona-Release';
       }
-      -> exec { 'rm -rf /var/cache/yum; yum check-update || true':
+      -> exec { 'yum check-update || true':
         provider => shell,
         require  => Class['epel'],
         path     => '/usr/bin:/usr/sbin';
       }
-      -> package { ['gcc']: ensure => present }
     MANIFEST
 
     apply_manifest(preamble)
@@ -98,7 +94,9 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
             table  => 'test_two.*';
         }
       EOS
-      # Idempotency won't work because the node status in the cluster changes
+      # we are not checking idemptency but we run it 3 times
+      apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
+      apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
       apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
       # apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_changes: true)
     end
@@ -110,11 +108,28 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
       it { is_expected.to be_grouped_into 'root' }
       its(:content) { is_expected.to include '[client]' }
       its(:content) { is_expected.to include 'user=root' }
-      its(:content) { is_expected.to include 'password=33' }
+      its(:content) { is_expected.to include 'password=66' }
     end
 
-    describe command('mysql --defaults-file=/root/.my.cnf -B -e \'select user,host from mysql.user WHERE `user` = "test_one" AND `host` = "localhost"\' | grep -w test_one') do
+    describe service('xinetd') do
+      it { is_expected.to be_enabled }
+      it { is_expected.to be_running }
+    end
+
+    describe service('mysql@bootstrap') do
+      it { is_expected.to be_running }
+    end
+
+    describe file('/etc/services') do
+      its(:content) { is_expected.to include 'galerachk' }
+    end
+
+    describe command('mysql --defaults-file=/root/.my.cnf -NBe \'select user,host from mysql.user WHERE `user` = "test_one" AND `host` = "localhost"\' | grep -w test_one') do
       its(:stdout) { is_expected.to include 'test_one' }
+    end
+
+    describe command('mysql --defaults-file=/root/.my.cnf -NBe \'SHOW STATUS LIKE "wsrep_ready"\' | grep -w ON') do
+      its(:stdout) { is_expected.to include 'ON' }
     end
 
     describe command('/usr/bin/clustercheck') do

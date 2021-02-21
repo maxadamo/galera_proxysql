@@ -18,7 +18,11 @@ class galera_proxysql::galera::services {
     log_on_failure => 'HOST',
     require        => [
       File['/root/.my.cnf', '/etc/sysconfig/clustercheck'],
-      File_line['clustercheck_one', 'clustercheck_two']
+      File_line[
+        "${module_name}_clustercheck_one",
+        "${module_name}_clustercheck_two",
+        "${module_name}_etc_services"
+      ]
     ];
   }
 

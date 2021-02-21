@@ -138,21 +138,26 @@ class galera_proxysql::galera::files (
     default:
       ensure             => present,
       append_on_no_match => false,
-      require            => Package[$cluster_pkg_name,];
+      notify             => Service['xinetd'],
+      require            => Package[$cluster_pkg_name];
     'mysql_systemd':
       path  => '/usr/bin/mysql-systemd',
       line  => '    /usr/sbin/mysqld --initialize-insecure --datadir="$datadir" --user=mysql',
       match => '/usr/sbin/mysqld --initialize --datadir';
-    'clustercheck_one':
-      path   => '/usr/bin/clustercheck',
-      line   => "source /etc/sysconfig/clustercheck\n#MYSQL_USERNAME=\"\${1-clustercheckuser}\"",
-      match  => '^MYSQL_USERNAME=',
-      notify => Xinetd::Service['galerachk'];
-    'clustercheck_two':
-      path   => '/usr/bin/clustercheck',
-      line   => "#MYSQL_PASSWORD=\"\${2-clustercheckpassword!}\"",
-      match  => '^MYSQL_PASSWORD=',
-      notify => Xinetd::Service['galerachk'];
+    "${module_name}_clustercheck_one":
+      path  => '/usr/bin/clustercheck',
+      line  => "source /etc/sysconfig/clustercheck\n#MYSQL_USERNAME=\"\${1-clustercheckuser}\"",
+      match => '^MYSQL_USERNAME=';
+    "${module_name}_clustercheck_two":
+      path  => '/usr/bin/clustercheck',
+      line  => "#MYSQL_PASSWORD=\"\${2-clustercheckpassword!}\"",
+      match => '^MYSQL_PASSWORD=';
+    "${module_name}_etc_services":
+      path               => '/etc/services',
+      line               => 'galerachk       9200/tcp                # Galera check',
+      match              => '^galerachk',
+      append_on_no_match => true,
+      replace            => true;
   }
 
 }

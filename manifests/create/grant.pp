@@ -7,7 +7,7 @@ define galera_proxysql::create::grant (
   $dbuser,
   $source,
   $ensure = present,
-  ) {
+) {
 
   assert_private("this define should be called only by ${module_name}")
 

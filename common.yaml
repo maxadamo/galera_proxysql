@@ -1,19 +1,19 @@
 ---
-galera_proxysql::root_password: '33'
+galera_proxysql::root_password: '66'
 galera_proxysql::monitor_password: 'monitor_pass'
 lookup_options:
   '^galera_proxysql::(.*)_password$':
     convert_to: "Sensitive"
 galera_proxysql::galera_hosts:
   "%{fqdn}":
-    ipv4: '127.0.0.1'
+    ipv4: "%{networking.ip}"
   galera02.example.org:
     ipv4: '192.168.1.11'
   galera03.example.org:
     ipv4: '192.168.1.12'
 galera_proxysql::proxysql_hosts:
   "%{fqdn}":
-    ipv4: '127.0.0.1'
+    ipv4: "%{networking.ip}"
   proxysql02.example.org:
     ipv4: '192.168.1.14'
 galera_proxysql::trusted_networks:

@@ -11,6 +11,7 @@ stages:
 variables:
   CENTOS7_IMAGE: "litmusimage/centos:7"
 
+# we accept commits only from left to right: test, uat, production
 revision_check:
   stage: revision_check
   script:
@@ -28,6 +29,7 @@ run_validation:
   tags:
     - shared-runner-2
 
+# run litmus test on galera 57
 test_galera57:
   stage: litmus_test_galera57
   script:
@@ -44,6 +46,7 @@ test_galera57:
   tags:
     - gitlab-runner02-shell01-tag2
 
+# run litmus test on galera 80
 test_galera80:
   stage: litmus_test_galera80
   script:
@@ -60,6 +63,7 @@ test_galera80:
   tags:
     - gitlab-runner02-shell01-tag1
 
+# run litmus test on ProxySQL on a galera 57 instance
 test_proxysql57:
   stage: litmus_test_proxysql57
   script:
@@ -76,6 +80,7 @@ test_proxysql57:
   tags:
     - gitlab-runner02-shell01-tag1
 
+# run litmus test on ProxySQL on a galera 80 instance
 test_proxysql80:
   stage: litmus_test_proxysql80
   script:
@@ -92,6 +97,7 @@ test_proxysql80:
   tags:
     - gitlab-runner02-shell01-tag2
 
+# this is my internal deployment stuff: it won't work on the cloud
 job_deploy:
   stage: g10k_deploy
   when: on_success

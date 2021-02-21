@@ -179,9 +179,6 @@ class galera_proxysql (
 
   if $facts['osfamily'] != 'RedHat' { fail("${facts['operatingsystem']} not yet supported") }
 
-  unless $facts['galera_gcc_exist']  {
-    fail('please install gcc (it is needed to install a PIP module)')
-  }
 
   if $puppet_debug {
     # checking cluster status through the facter galera_status
@@ -209,6 +206,9 @@ class galera_proxysql (
     if $encrypt_cluster_traffic and !$custom_server_cnf_parameters {
       # It requires further investigation
       fail('If you want to encrypt your traffic you need to supply the necessary parameters through $custom_server_cnf_parameters')
+    }
+    unless $facts['galera_gcc_exist']  {
+      fail('please install gcc (it is required to install mysql PIP package for Percona 80)')
     }
   }
 
@@ -271,6 +271,7 @@ class galera_proxysql (
       manage_epel           => $manage_epel,
       cluster_pkg_name      => $cluster_pkg_name,
       devel_pkg_name        => $devel_pkg_name,
+      percona_major_version => $percona_major_version,
       percona_minor_version => $percona_minor_version;
     'galera_proxysql::galera::join':
       percona_major_version => $percona_major_version,

@@ -14,7 +14,7 @@ fixtures:
       ref: '2.8.0'
     mysql:
       repo: 'puppetlabs/mysql'
-      ref: '10.2.1'
+      ref: '10.9.1'
     rpmkey:
       repo: 'stschulte/rpmkey'
       ref: '1.0.3'

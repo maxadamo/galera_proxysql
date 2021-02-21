@@ -25,14 +25,15 @@ class galera_proxysql::params {
   $innodb_log_file_size = '512M'
   $percona_major_version = undef
   $percona_minor_version = 'installed'
-  $manage_lvm = false
+  $logdir = undef
   $max_connections = 1024
   $monitor_password = undef
   $other_pkgs = [
     'percona-toolkit', 'python36-paramiko', 'python36-pip',
-    'python3-devel', 'python36-rpm', 'qpress', 'nc', 'socat'
+    'python3-devel', 'python36-rpm', 'qpress', 'nc', 'socat',
+    'python36-distro'
   ]
-  $pip_pkgs = ['distro', 'multiping', 'ping3', 'pysystemd', 'mysql']
+  $pip_pkgs = ['multiping', 'ping3', 'pysystemd']
   $query_cache_size = 0
   $query_cache_type = 0
   $root_password = undef
@@ -42,7 +43,7 @@ class galera_proxysql::params {
   $trusted_networks = undef
 
   # galera optional LVM parameters
-  $logdir = undef
+  $manage_lvm = false
   $lv_size = undef
   $vg_name = undef
 

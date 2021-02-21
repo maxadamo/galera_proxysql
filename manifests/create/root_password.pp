@@ -11,17 +11,8 @@
 #
 define galera_proxysql::create::root_password(
   Sensitive $root_pass,
-  Boolean $force_ipv6,
-  ) {
-
-  # if I use ALL it keeps changing the permissions
-  $root_privileges = [
-    'ALTER', 'ALTER ROUTINE', 'CREATE', 'CREATE ROLE', 'CREATE ROUTINE', 'CREATE TABLESPACE',
-    'CREATE TEMPORARY TABLES', 'CREATE USER', 'CREATE VIEW', 'DELETE', 'DROP', 'DROP ROLE',
-    'EVENT', 'EXECUTE', 'FILE', 'INDEX', 'INSERT', 'LOCK TABLES', 'PROCESS', 'REFERENCES',
-    'RELOAD', 'REPLICATION CLIENT', 'REPLICATION SLAVE', 'SELECT', 'SHOW DATABASES',
-    'SHOW VIEW', 'SHUTDOWN', 'SUPER', 'TRIGGER', 'UPDATE'
-  ]
+  Boolean $force_ipv6
+) {
 
   $root_cnf = '/root/.my.cnf'
   if ($force_ipv6) {
@@ -29,6 +20,10 @@ define galera_proxysql::create::root_password(
   } else {
     $root_host_list = ['127.0.0.1', 'localhost']
   }
+
+  # privileges ALL isn't working well with puppetlabs/mysql module on Percona 8
+  # we use a function to apply a workaround (until the fix comes)
+  $root_privileges = galera_proxysql::root_privileges_workaround(['ALL'])
 
   file {
     default:

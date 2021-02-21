@@ -20,7 +20,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       -> exec { 'yum check-update || true':
         path => '/usr/bin:/usr/sbin';
       }
-      -> package { ['gcc', 'deltarpm']: ensure => present }
+      -> package { ['gcc']: ensure => present }
     MANIFEST
 
     apply_manifest(preamble)
@@ -83,7 +83,8 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
         }
       EOS
 
-      # keepalived keeps flapping inside the container it doesn't work idempotently
+      # keepalived keeps flapping inside the container and idempotency will not work
+      apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
       apply_manifest(pp, hiera_config: '/etc/puppetlabs/code/environments/production/modules/galera_proxysql/hiera.yaml', catch_failures: true)
     end
 
@@ -111,6 +112,14 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       its(:content) { is_expected.to include '[client]' }
       its(:content) { is_expected.to include 'user=monitor' }
       its(:content) { is_expected.to include 'password=monitor_pass' }
+    end
+
+    describe port(3306) do
+      it { is_expected.to be_listening.with('tcp') }
+    end
+
+    describe port(3307) do
+      it { is_expected.to be_listening.with('tcp') }
     end
   end
 end

@@ -13,7 +13,7 @@ define galera_proxysql::create::user (
   Enum[
     'present', 'absent',
     present, absent] $ensure    = present,
-  ) {
+) {
 
   if ($proxysql_hosts) {
     $host_hash = deep_merge($galera_hosts, $proxysql_hosts, $proxysql_vip)
