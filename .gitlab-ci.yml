@@ -24,12 +24,13 @@ run_validation:
   script:
     - pdk validate metadata,puppet,ruby,yaml --parallel
   tags:
-    - shared-runner-2
+    - gitlab-runner02-shell01-tag1
 
 # run litmus test on galera 57
 test_galera57:
   stage: litmus_test_galera
   script:
+    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
@@ -47,6 +48,7 @@ test_galera57:
 test_galera80:
   stage: litmus_test_galera
   script:
+    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
