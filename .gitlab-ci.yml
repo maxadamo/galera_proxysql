@@ -41,7 +41,7 @@ test_galera57:
     - test
     - master
   tags:
-    - gitlab-runner02-shell01-tag2
+    - gitlab-runner01-shell01-tag2
 
 # run litmus test on galera 80
 test_galera80:
@@ -58,7 +58,7 @@ test_galera80:
     - test
     - master
   tags:
-    - gitlab-runner02-shell01-tag1
+    - gitlab-runner01-shell01-tag1
 
 # run litmus test on ProxySQL on a galera 57 instance
 test_proxysql57:
