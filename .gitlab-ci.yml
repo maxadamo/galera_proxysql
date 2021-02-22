@@ -2,10 +2,7 @@
 stages:
   - revision_check
   - syntax
-  - litmus_test_galera57
-  - litmus_test_galera80
-  - litmus_test_proxysql57
-  - litmus_test_proxysql80
+  - litmus_test_galera
   - g10k_deploy
 
 variables:
@@ -31,7 +28,7 @@ run_validation:
 
 # run litmus test on galera 57
 test_galera57:
-  stage: litmus_test_galera57
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
@@ -48,7 +45,7 @@ test_galera57:
 
 # run litmus test on galera 80
 test_galera80:
-  stage: litmus_test_galera80
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
@@ -65,7 +62,7 @@ test_galera80:
 
 # run litmus test on ProxySQL on a galera 57 instance
 test_proxysql57:
-  stage: litmus_test_proxysql57
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
@@ -82,7 +79,7 @@ test_proxysql57:
 
 # run litmus test on ProxySQL on a galera 80 instance
 test_proxysql80:
-  stage: litmus_test_proxysql80
+  stage: litmus_test_galera
   script:
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
