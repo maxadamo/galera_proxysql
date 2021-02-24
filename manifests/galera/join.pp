@@ -48,12 +48,13 @@ class galera_proxysql::galera::join (
     unless defined(Exec['bootstrap_or_join']) {
       notify { 'Trying to bootstrap a new cluster or to join a new cluster...':; }
       exec { 'bootstrap_or_join':
-        command => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
-        path    => '/usr/bin:/usr/sbin',
-        creates => $joined_file,
-        returns => [0,1],
-        require => $require,
-        before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
+        command   => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
+        path      => '/usr/bin:/usr/sbin',
+        logoutput => true,
+        creates   => $joined_file,
+        returns   => [0,1],
+        require   => $require,
+        before    => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
       }
     }
   }
@@ -63,12 +64,13 @@ class galera_proxysql::galera::join (
     unless defined(Exec['bootstrap_existing_or_join_existing']) {
       notify { 'Trying to bootstrap an existing cluster or to join and existing cluster...':; }
       exec { 'bootstrap_existing_or_join_existing':
-        command => 'galera_wizard.py --bootstrap-existing --force || galera_wizard.py --join-existing --force',
-        path    => '/usr/bin:/usr/sbin',
-        creates => $joined_file,
-        returns => [0,1],
-        require => $require,
-        before  => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
+        command   => 'galera_wizard.py --bootstrap-existing --force || galera_wizard.py --join-existing --force',
+        path      => '/usr/bin:/usr/sbin',
+        logoutput => true,
+        creates   => $joined_file,
+        returns   => [0,1],
+        require   => $require,
+        before    => Class['galera_proxysql::galera::sys_users_internal_wrapper'];
       }
     }
   }
@@ -77,11 +79,12 @@ class galera_proxysql::galera::join (
   # galera is up but mysql@bootstrap is running instead of mysql
   if ($facts['galera_is_bootstrap'] == true and $facts['galera_status'] == '200') {
     notify { 'Galera is in bootstrap mode':; }
-    exec { 'revert_mysql_boostrap_mode':
-      command => 'galera_wizard.py --join-existing',
-      path    => '/usr/bin:/usr/sbin',
-      returns => [0,1],
-      require => $require;
+    exec { 'try_revert_mysql_boostrap_mode':
+      command   => 'galera_wizard.py --join-existing',
+      path      => '/usr/bin:/usr/sbin',
+      logoutput => true,
+      returns   => [0,1],
+      require   => $require;
     }
   }
 

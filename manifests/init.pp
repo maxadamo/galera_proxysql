@@ -8,115 +8,115 @@
 #
 # === Parameters & Variables
 #
-# [*puppet_debug*] <Bool>
-#   default: false (whether to print or not cluster status)
+# *puppet_debug* <Bool>
+#   default: false => whether to print or not cluster status)
 #
-# [*custom_server_cnf_parameters*] <String>
-#   default: undef (it can be a multiline string with custom values to add to server.cnf)
+# *custom_server_cnf_parameters* <String>
+#   default: undef => it can be a multiline string with custom values to add to server.cnf)
 #
-# [*custom_client_cnf_parameters*] <String>
-#   default: undef (it can be a multiline string with custom values to add to mysql-client.cnf under section [mysql])
+# *custom_client_cnf_parameters* <String>
+#   default: undef => it can be a multiline string with custom values to add to mysql-client.cnf under section [mysql])
 #
-# [*force_ipv6*] <Bool>
-#   default: false (whether to use IPv6 on cluster communication)
+# *force_ipv6* <Bool>
+#   default: false => whether to use IPv6 on cluster communication)
 #
-# [*galera_cluster_name*] <String>
+# *galera_cluster_name* <String>
 #   default: ${::environment}_galera
 #
-# [*galera_hosts*] <Hash>
+# *galera_hosts* <Hash>
 #   list of hosts, ipv4 (optionally ipv6) belonging to the cluster: not less than 3, not even.
 #   check examples on README.md
 #
-# [*custom_wsrep_options*] <String-number>
+# *custom_wsrep_options* <String-number>
 #   default: '' => a semi-colon separate list of values (see Galera Cluster documentation)
 #
-# [*gcache_size*] <String-number>
+# *gcache_size* <String-number>
 #   default: 0.15 => 15% of memory is assigned to this MySQL parameter
 #
-# [*innodb_buffer_pool_size*] <String-number>
+# *innodb_buffer_pool_size* <String-number>
 #   default: 0.7 => 70% of memory is assigned to this MySQL parameter
 #
-# [*http_proxy*] <String>
-#   default: undef  http proxy used for instance by gpg key
+# *http_proxy* <String>
+#   default: undef => http proxy used for instance by gpg key
 #   Example: 'http://proxy.example.net:8080'
 #
-# [*innodb_buffer_pool_instances*] <String-number>
+# *innodb_buffer_pool_instances* <String-number>
 #   default: 1
 #
-# [*innodb_flush_method*] <String>
+# *innodb_flush_method* <String>
 #   default: O_DIRECT
 #
-# [*innodb_io_capacity*] <Int>
+# *innodb_io_capacity* <Int>
 #   default: 200
 #
-# [*innodb_log_file_size*] <String>
+# *innodb_log_file_size* <String>
 #   default: 512M
 #
-# [*logdir*] <String>
+# *logdir* <String>
 #   default: undef
 #
-# [*lv_size*] <String-number>
+# *lv_size* <String-number>
 #   default: undef => number of GB. It requires that 'manage_lvm' is set to true
 #
-# [*manage_firewall*] <Bool>
+# *manage_firewall* <Bool>
 #   default: false => It requires puppetlabs/firewall
 #
-# [*manage_lvm*] <Bool>
+# *manage_lvm* <Bool>
 #   default: false => creates and mount a volume on /var/lib/mysql. I encourage its use.
 #
-# [*manage_repo*] <Bool>
+# *manage_repo* <Bool>
 #   default: true => please check repo.pp to understand what repos are neeeded
 #
-# [*manage_epel*] <Bool>
+# *manage_epel* <Bool>
 #   default: true => whether to handle EPEL within this module
 #
-# [*galera_version*] <String>
+# *galera_version* <String>
 #   default: latest
 #
-# [*max_connections*] <Int>
+# *max_connections* <Int>
 #   default: 1024
 #
-# [*proxysql_hosts*] <Hash>
+# *proxysql_hosts* <Hash>
 #   list of hosts, ipv4 (optionally ipv6) belonging to proxysql cluster.
 #   Currently only 2 hosts are supported. Check examples on README.md
 #   This parameter is needed in the Galera cluster as well, to setup The
 #   users privileges in the database and the firewall rules
 #
-# [*proxysql_vip*] <Hash>
+# *proxysql_vip* <Hash>
 #   host, ipv4 (optionally ipv6) for the VIP
 #
-# [*proxysql_admin_password*] <Sensitive>
+# *proxysql_admin_password* <Sensitive>
 #   proxysql user password
 #
-# [*monitor_password*] <Sensitive>
+# *monitor_password* <Sensitive>
 #   galera and proxysql monitor password
 #
-# [*other_pkgs*] <Array>
+# *other_pkgs* <Array>
 #   list of packages needed by Percona Cluster
 #
-# [*root_password*] <Sensitive>
+# *root_password* <Sensitive>
 #   MySQL root password
 #
-# [*sst_password*] <Optional[Sensitive]>
+# *sst_password* <Optional[Sensitive]>
 #   SST user password
 #
-# [*thread_cache_size*] <Int>
+# *thread_cache_size* <Int>
 #   default: 16
 #
-# [*tmpdir*] <String>
+# *tmpdir* <String>
 #   default: undef
 #
-# [*trusted_networks*] <Array>
+# *trusted_networks* <Array>
 #   default: undef => List of IPv4 and/or IPv6 host and or networks.
 #            It's used by iptables to determine from where to allow access to MySQL
 #
-# [*encrypt_cluster_traffic*] <Boolean>
+# *encrypt_cluster_traffic* <Boolean>
 #   default: undef => If you set it to true, you need to supply your certificates and 
 #            server configuration parameters, using `custom_server_cnf_parameters`
 #
 # === ToDo
 #
-# - Upgrade to Percona 8.x
+# - enables SSL in the backend
 #
 # === Authors
 #

@@ -4,20 +4,14 @@
 1. This script will either:
   - bootstrap a new or an existing cluster
   - join/rejoin an existing cluster
-2. Requirements (normally installed thru puppet):
-  - yum install python-argparse MySQL-python
+  - ensure that the service is up (bringing down mysql@bootstrap when possible)
+2. Requirements (normally installed through puppet):
+  - RPMs: gcc, python36-paramiko, python36-pip, python3-devel, python36-rpm,  python36-distro
+  - PIPs: multiping, ping3, pysystemd, mysqlclient
 3. Avoid joining all nodes at once
-4. The paramter file contains credentials and will be stored inside /root/
+4. The paramter file contains credentials and it will be stored as /root/galera_params.ini
 
-Bugs & Workarounds:
-1.  We have a bug in Innobackupex:
-      - https://bugs.launchpad.net/percona-xtrabackup/+bug/1272329
-    Which is fixed here:
-      - https://jira.percona.com/browse/PXB-907
-
-TODO: (see TODO.txt)
-
-Author: Massimiliano Adamo <massimiliano.adamo@gant.org>
+Author: Massimiliano Adamo <massimiliano.adamo@geant.org>
 '''
 import subprocess
 import argparse
@@ -42,7 +36,6 @@ try:
     import rpm
 except ModuleNotFoundError:
     print("Unable to import rpm. Is this system CentOS/RedHat?")
-    os.sys.exit(1)
 
 FORCE = False
 RED = '\033[91m'
@@ -93,7 +86,7 @@ def reverse_lookup(ip_address):
     try:
         resolved_hostname = socket.gethostbyaddr(ip_address)[0]
     except socket.herror:
-        resolved_hostname = "{} [could not resolve IP to hostname]".format(ip_address)
+        resolved_hostname = "{} [unknown_hostname]".format(ip_address)
 
     return resolved_hostname
 
@@ -111,8 +104,7 @@ def kill_mysql():
         pass
 
     mysqlproc = subprocess.Popen(
-        ['pgrep', '-f', 'mysqld'],
-        stdout=subprocess.PIPE)
+        ['pgrep', '-f', 'mysqld'], stdout=subprocess.PIPE)
     out, _ = mysqlproc.communicate()
     for pid in out.splitlines():
         os.kill(int(pid), signal.SIGKILL)
@@ -166,8 +158,7 @@ def initialize_mysql(datadirectory):
     fnull = open(os.devnull, 'wb')
     clean_dir(datadirectory)
     initialize = subprocess.Popen([
-        '/usr/sbin/mysqld',
-        '--initialize-insecure',
+        '/usr/sbin/mysqld', '--initialize-insecure',
         '--datadir={}'.format(datadirectory),
         '--user=mysql'], stdout=fnull)
     _, __ = initialize.communicate()
@@ -190,8 +181,9 @@ def check_leader(leader=None):
         print('It may not be safe to bootstrap the cluster from this node.')
         print('It was not the last one to leave the cluster and may not' \
             ' contain all the updates.')
-        print('To force cluster bootstrap with this node, edit the ' \
-            '{} file manually and set safe_to_bootstrap to 1'.format(
+        print('If the nodes crashed you may need to force cluster bootstrap')
+        print('To force cluster bootstrap with from node, you need to edit the file ' \
+            '{} and set safe_to_bootstrap to 1'.format(
                 grastate_dat))
 
         os.sys.exit(1)
@@ -212,7 +204,7 @@ def bootstrap_mysql(boot):
     except pysystemd.subprocess.CalledProcessError as err:
         print("Error bootstrapping the cluster: {}".format(err))
         os.sys.exit(1)
-    print('\nsuccessfully bootstrapped the cluster\n')
+    print('\n{}cluster has been successfully bootstrapped{}'.format(GREEN, WHITE))
     if boot == "new":
         cnx_local_test = MySQLdb.connect(
             user='root',
@@ -322,7 +314,7 @@ def try_joining(how, datadirectory):
 
     if not LASTCHECK_NODES:
         print("\n{}There are no nodes available in the Cluster{}".format(
-            RED, WHITE))
+            YELLOW, WHITE))
         print("\nEither:")
         print("- None of the hosts has the value 'wsrep_ready' to 'ON'")
         print("- None of the hosts is running the MySQL process\n")
