@@ -1,4 +1,46 @@
 
+3.1.1 / 2021-02-25
+==================
+
+  * not deleting data when the script is unattended
+  * code refactoring
+  * trying to  installation
+  * split taks on different runners
+  * trying to parallelize all the test
+  * bump version 3.1.0
+  * changes to README
+  * fixed root privileges
+  * code refactoring
+  * remove package deltarpm
+  * make rubocop happy
+  * test again idempotency
+  * remove idempotency from test
+  * fix typo in exec script
+  * root privileges keep looping
+  * fxi wrong fact name
+  * enabling old custom facts
+  * minor
+  * try to fix find_file functino
+  * redirect fact output
+  * fixing fact
+  * fixing fact
+  * trying ps
+  * minor change to test bootstratp
+  * we do not check joined file to fix bootstrap service
+  * flipped around false and true
+  * facts is false not undef
+  * try to revert galera bootstrap status
+  * Revert "test new repository"
+  * test new repository
+  * minor
+  * could not install package with yum
+  * installing deltarpm inside docker
+  * fixing Gemfile
+  * pinning net-ssh gem on PDK
+  * fix tag names
+  * testing parallel run
+  * fix type for ensure in file
+
 3.0.0 / 2021-02-17
 ==================
 
