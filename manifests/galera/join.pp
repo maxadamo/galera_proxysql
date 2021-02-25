@@ -48,7 +48,7 @@ class galera_proxysql::galera::join (
     unless defined(Exec['bootstrap_or_join']) {
       notify { 'Trying to bootstrap a new cluster or to join a new cluster...':; }
       exec { 'bootstrap_or_join':
-        command   => 'galera_wizard.py --bootstrap-new --force || galera_wizard.py --join-new --force',
+        command   => 'galera_wizard.py --bootstrap-new --force --puppet || galera_wizard.py --join-new --force',
         path      => '/usr/bin:/usr/sbin',
         logoutput => true,
         creates   => $joined_file,

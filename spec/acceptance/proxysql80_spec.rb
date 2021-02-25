@@ -20,7 +20,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       -> exec { 'yum check-update || true':
         path => '/usr/bin:/usr/sbin';
       }
-      -> package { ['gcc']: ensure => present }
     MANIFEST
 
     apply_manifest(preamble)

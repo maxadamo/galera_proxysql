@@ -37,7 +37,7 @@ try:
 except ModuleNotFoundError:
     print("Unable to import rpm. Is this system CentOS/RedHat?")
 
-FORCE = False
+FORCE = UNATTENDED = False
 RED = '\033[91m'
 GREEN = '\033[92m'
 YELLOW = '\033[93m'
@@ -125,7 +125,7 @@ def check_install():
         os.sys.exit(1)
     print("\ndetected {} ...".format(distro.os_release_info()['pretty_name']))
     percona_installed = None
-    rpmts = rpm.TransactionSet()
+    rpmts = rpm.TransactionSet()  #pylint: disable=E1101
     rpmmi = rpmts.dbMatch()
     for pkg_set in rpmmi:
         if pkg_set['name'].decode() == PKG:
@@ -153,10 +153,11 @@ def clean_dir(clean_directory):
             os.unlink(fileitem)
 
 
-def initialize_mysql(datadirectory):
+def initialize_mysql(datadirectory, unattended=None):
     """initialize mysql default schemas"""
     fnull = open(os.devnull, 'wb')
-    clean_dir(datadirectory)
+    if not unattended:
+        clean_dir(datadirectory)
     initialize = subprocess.Popen([
         '/usr/sbin/mysqld', '--initialize-insecure',
         '--datadir={}'.format(datadirectory),
@@ -181,8 +182,8 @@ def check_leader(leader=None):
         print('It may not be safe to bootstrap the cluster from this node.')
         print('It was not the last one to leave the cluster and may not' \
             ' contain all the updates.')
-        print('If the nodes crashed you may need to force cluster bootstrap')
-        print('To force cluster bootstrap with from node, you need to edit the file ' \
+        print('If the nodes crashed you may need to force a cluster bootstrap')
+        print('To force cluster bootstrap from one node, you need to edit the file ' \
             '{} and set safe_to_bootstrap to 1'.format(
                 grastate_dat))
 
@@ -206,10 +207,17 @@ def bootstrap_mysql(boot):
         os.sys.exit(1)
     print('\n{}cluster has been successfully bootstrapped{}'.format(GREEN, WHITE))
     if boot == "new":
-        cnx_local_test = MySQLdb.connect(
-            user='root',
-            host='localhost',
-            unix_socket='/var/lib/mysql/mysql.sock')
+        try:
+            cnx_local_test = MySQLdb.connect(
+                user='root',
+                host='localhost',
+                unix_socket='/var/lib/mysql/mysql.sock')
+        except Exception:  #pylint: disable=W0703
+            cnx_local_test = MySQLdb.connect(
+                user='root',
+                passwd=CREDENTIALS["root"],
+                host='localhost',
+                unix_socket='/var/lib/mysql/mysql.sock')
         cursor = cnx_local_test.cursor()
 
         try:
@@ -423,8 +431,7 @@ def create_users(thisuser):
     cnx_local = MySQLdb.connect(
         user='root',
         passwd=CREDENTIALS["root"],
-        unix_socket='/var/lib/mysql/mysql.sock',
-        host='localhost')
+        unix_socket='/var/lib/mysql/mysql.sock')
     cursor = cnx_local.cursor()
     print("Creating user: {}".format(thisuser))
     if thisuser == 'sstuser':
@@ -461,7 +468,7 @@ def create_users(thisuser):
         for thishost in GALERA_NODES:
             try:
                 cursor.execute("""
-                    CREATE USER '{}'@'{}' IDENTIFIED BY '{}'
+                    CREATE USER IF NOT EXISTS '{}'@'{}' IDENTIFIED BY '{}'
                     """.format(thisuser, thishost, CREDENTIALS[thisuser]))
             except Exception:  #pylint: disable=W0703
                 print("Unable to create user {} on {}".format(
@@ -473,6 +480,7 @@ def create_users(thisuser):
             except Exception as err:  #pylint: disable=W0703
                 print("Unable to set permission for {} at {}: {}".format(
                     thisuser, thishost, err))
+
     if cnx_local:
         cursor.execute("""FLUSH PRIVILEGES""")
         cnx_local.close()
@@ -494,6 +502,7 @@ class Cluster:
         self.ipv6 = ipv6
         self.datadir = datadir
         self.force = FORCE
+        self.unattended = UNATTENDED
         os.chown(self.datadir, pwd.getpwnam("mysql").pw_uid,
                  grp.getgrnam("mysql").gr_gid)
 
@@ -513,8 +522,7 @@ class Cluster:
         else:
             if self.mode == "new" and not self.force:
                 ask('\nThis operation will destroy the local data')
-                clean_dir(self.datadir)
-                initialize_mysql(self.datadir)
+                initialize_mysql(self.datadir, self.unattended)
             bootstrap_mysql(self.mode)
             if self.mode == "new":
                 create_monitor_table()
@@ -557,35 +565,36 @@ class Cluster:
                 checkwsrep(wsrephost, self.ipv6)
         print('')
 
-    def show_statements(self):
-        """Show SQL statements to create all stuff"""
-        os.system('clear')
-        GALERA_NODES.append("localhost")
-        print("\n# remove anonymous user\nDROP USER ''@'localhost'")
-        print("DROP USER ''@'{}'".format(MYIP))
-        print("\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;")
-        print("CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL ) " \
-              "ENGINE=InnoDB DEFAULT CHARSET=utf8;")
-        print('INSERT INTO test.monitor SET id=("placeholder");')
-        for thisuser in list(dict.keys(CREDENTIALS)):
-            print("\n# define user {}".format(thisuser))
-            if thisuser == "root":
-                for onthishost in ["localhost", "127.0.0.1", "::1"]:
-                    print("set PASSWORD for 'root'@'{}' = '{}'".format(
-                        onthishost, CREDENTIALS[thisuser]))
-            for thishost in GALERA_NODES:
-                if thisuser != "root":
-                    print("CREATE USER \'{}\'@\'{}\' IDENTIFIED BY \'{}\';".format(
-                        thisuser, thishost, CREDENTIALS[thisuser]))
-            for thishost in GALERA_NODES:
-                if thisuser == "sstuser":
-                    thisgrant = "PROCESS, SELECT, RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.*"
-                elif thisuser == "monitor":
-                    thisgrant = "UPDATE ON test.monitor"
-                if thisuser != "root":
-                    print("GRANT {} TO '{}'@'{}';".format(
-                        thisgrant, thisuser, thishost))
-        print("")
+
+def show_statements():
+    """Show SQL statements to create all stuff"""
+    os.system('clear')
+    GALERA_NODES.append("localhost")
+    print("\n# remove anonymous user\nDROP USER ''@'localhost'")
+    print("DROP USER ''@'{}'".format(MYIP))
+    print("\n# create monitor table\nCREATE DATABASE IF NOT EXIST `test`;")
+    print("CREATE TABLE IF NOT EXISTS `test`.`monitor` ( `id` varchar(255) DEFAULT NULL ) " \
+          "ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+    print('INSERT INTO test.monitor SET id=("placeholder");')
+    for thisuser in list(dict.keys(CREDENTIALS)):
+        print("\n# define user {}".format(thisuser))
+        if thisuser == "root":
+            for onthishost in ["localhost", "127.0.0.1", "::1"]:
+                print("set PASSWORD for 'root'@'{}' = '{}'".format(
+                    onthishost, CREDENTIALS[thisuser]))
+        for thishost in GALERA_NODES:
+            if thisuser != "root":
+                print("CREATE USER \'{}\'@\'{}\' IDENTIFIED BY \'{}\';".format(
+                    thisuser, thishost, CREDENTIALS[thisuser]))
+        for thishost in GALERA_NODES:
+            if thisuser == "sstuser":
+                thisgrant = "PROCESS, SELECT, RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.*"
+            elif thisuser == "monitor":
+                thisgrant = "UPDATE ON test.monitor"
+            if thisuser != "root":
+                print("GRANT {} TO '{}'@'{}';".format(
+                    thisgrant, thisuser, thishost))
+    print("")
 
 
 def parse(ipv6):
@@ -605,7 +614,7 @@ def parse(ipv6):
         dest='Cluster(None, None, {}).checkonly()'.format(ipv6), required=False)
     parser.add_argument(
         '-dr', '--dry-run', help='print SQL statements', action='store_true',
-        dest='Cluster(None, None, {}).show_statements()'.format(ipv6), required=False)
+        dest='show_statements()', required=False)
     parser.add_argument(
         '-je', '--join-existing', help='join existing Cluster', action='store_true',
         dest='Cluster("existing", "existing", {}).joincluster()'.format(ipv6), required=False)
@@ -620,13 +629,15 @@ def parse(ipv6):
         dest='Cluster(None, "new", {}).createcluster()'.format(ipv6), required=False)
     parser.add_argument('-f', '--force', action='store_true',
                         help='force bootstrap-new or join-new Cluster', required=False)
+    parser.add_argument('-p', '--puppet', action='store_true',
+                        help='it means unattended: the data will not be deleted', required=False)
 
     return parser.parse_args()
 
 
 # Here we Go.
 if __name__ == "__main__":
-    filterwarnings('ignore', category=MySQLdb.Warning)
+    filterwarnings('ignore', category=MySQLdb.Warning)  #pylint: disable=E1101
     try:
         _ = pwd.getpwnam("mysql").pw_uid
     except KeyError:
@@ -654,6 +665,8 @@ if __name__ == "__main__":
     ARGSDICT = vars(ARGS)
     if ARGS.force:
         FORCE = True
+    if ARGS.puppet:
+        UNATTENDED = True
 
     check_install()
 
@@ -662,5 +675,6 @@ if __name__ == "__main__":
     else:
         for key in list(ARGSDICT.keys()):
             if ARGSDICT[str(key)] is True:
-                if key != 'force':
+                if key not in ['force', 'puppet']:
+                    print(key)
                     eval(key)  #pylint: disable=W0123
