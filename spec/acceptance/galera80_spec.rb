@@ -112,6 +112,10 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
       it { is_expected.to be_running }
     end
 
+    describe service('iptables') do
+      it { is_expected.to be_running }
+    end
+
     describe file('/etc/services') do
       its(:content) { is_expected.to include 'galerachk' }
     end

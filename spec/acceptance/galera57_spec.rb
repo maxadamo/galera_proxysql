@@ -120,6 +120,10 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
       it { is_expected.to be_running }
     end
 
+    describe service('iptables') do
+      it { is_expected.to be_running }
+    end
+
     describe file('/etc/services') do
       its(:content) { is_expected.to include 'galerachk' }
     end
@@ -135,5 +139,6 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
     describe command('/usr/bin/clustercheck') do
       its(:stdout) { is_expected.to include 'Cluster Node is synced' }
     end
+
   end
 end

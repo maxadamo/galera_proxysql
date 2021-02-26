@@ -30,7 +30,6 @@ run_validation:
 test_galera57:
   stage: litmus_test_galera
   script:
-    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
@@ -48,7 +47,6 @@ test_galera57:
 test_galera80:
   stage: litmus_test_galera
   script:
-    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
@@ -60,12 +58,13 @@ test_galera80:
     - test
     - master
   tags:
-    - gitlab-runner01-shell01-tag1
+    - gitlab-runner02-shell01-tag1
 
 # run litmus test on ProxySQL on a galera 57 instance
 test_proxysql57:
   stage: litmus_test_galera
   script:
+    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'
@@ -77,12 +76,13 @@ test_proxysql57:
     - test
     - master
   tags:
-    - gitlab-runner02-shell01-tag1
+    - gitlab-runner01-shell01-tag1
 
 # run litmus test on ProxySQL on a galera 80 instance
 test_proxysql80:
   stage: litmus_test_galera
   script:
+    - sleep 30
     - pdk bundle exec rake spec_prep
     - pdk bundle exec rake "litmus:provision[docker, ${CENTOS7_IMAGE}]"
     - pdk bundle exec rake 'litmus:install_agent[puppet7]'

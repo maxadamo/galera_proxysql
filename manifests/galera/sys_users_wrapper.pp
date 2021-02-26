@@ -1,4 +1,4 @@
-# == Class: galera_proxysql::galera::sys_users_internal_wrapper
+# == Class: galera_proxysql::galera::sys_users_wrapper
 #
 # This Class manages system users
 #

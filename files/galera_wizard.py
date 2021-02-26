@@ -627,8 +627,9 @@ def parse(ipv6):
     parser.add_argument(
         '-bn', '--bootstrap-new', action='store_true', help='bootstrap new Cluster',
         dest='Cluster(None, "new", {}).createcluster()'.format(ipv6), required=False)
-    parser.add_argument('-f', '--force', action='store_true',
-                        help='force bootstrap-new or join-new Cluster', required=False)
+    parser.add_argument('-nc', '--no-confirm', action='store_true',
+                        help='skip user confirmation to bootstrap-new or join-new Cluster',
+                        dest='force', required=False)
     parser.add_argument('-p', '--puppet', action='store_true',
                         help='it means unattended: the data will not be deleted', required=False)
 
@@ -676,5 +677,4 @@ if __name__ == "__main__":
         for key in list(ARGSDICT.keys()):
             if ARGSDICT[str(key)] is True:
                 if key not in ['force', 'puppet']:
-                    print(key)
                     eval(key)  #pylint: disable=W0123

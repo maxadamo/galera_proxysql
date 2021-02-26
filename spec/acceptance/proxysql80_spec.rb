@@ -113,6 +113,15 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       its(:content) { is_expected.to include 'password=monitor_pass' }
     end
 
+    describe service('proxysql') do
+      it { is_expected.to be_enabled }
+      it { is_expected.to be_running }
+    end
+
+    describe service('keepalived') do
+      it { is_expected.to be_enabled }
+    end
+
     describe port(3307) do
       it { is_expected.to be_listening.with('tcp') }
     end

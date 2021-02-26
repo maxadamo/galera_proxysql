@@ -17,7 +17,11 @@
 
 ## Description
 
-The version 3.x.x of this module is a great leap forward. It runs Percona 80, 57 and 56 and ProxySQL 2 with SSL support. It requires Puppet 6.x or higher.
+The version 3.x.x of this module is a great leap forward.
+
+* it runs Percona 80, 57 and 56
+* it runs ProxySQL 2 with SSL support
+* it requires Puppet 6.x or higher
 
 If you want to upgrade your database from 57 to 80, you can read these instructions (along with [Percona official documentation](https://www.percona.com/doc/percona-server/LATEST/upgrading_guide.html)): [upgrade Percona from 5.7 to 8.0](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0).
 
