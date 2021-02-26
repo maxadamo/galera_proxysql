@@ -139,6 +139,5 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
     describe command('/usr/bin/clustercheck') do
       its(:stdout) { is_expected.to include 'Cluster Node is synced' }
     end
-
   end
 end
