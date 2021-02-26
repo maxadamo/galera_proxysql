@@ -99,6 +99,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       it { is_expected.to be_mode 640 }
       it { is_expected.to be_owned_by 'proxysql' }
       it { is_expected.to be_grouped_into 'proxysql' }
+      # rubocop:disable RepeatedDescription
       its(:content) { is_expected.to include 'username = "monitor", password = "monitor_pass"' }
       its(:content) { is_expected.to include 'username = "test_two", password = "test_two_pass",' }
     end
@@ -111,6 +112,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       its(:content) { is_expected.to include '[client]' }
       its(:content) { is_expected.to include 'user=monitor' }
       its(:content) { is_expected.to include 'password=monitor_pass' }
+      # rubocop:enable RepeatedDescription
     end
 
     describe service('proxysql') do

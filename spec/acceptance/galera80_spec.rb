@@ -98,9 +98,11 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'galera' && ENV['MAJO
       it { is_expected.to be_mode 660 }
       it { is_expected.to be_owned_by 'root' }
       it { is_expected.to be_grouped_into 'root' }
+      # rubocop:disable RepeatedDescription
       its(:content) { is_expected.to include '[client]' }
       its(:content) { is_expected.to include 'user=root' }
       its(:content) { is_expected.to include 'password=66' }
+      # rubocop:enable RepeatedDescription
     end
 
     describe service('xinetd') do
