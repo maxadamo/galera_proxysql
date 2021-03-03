@@ -23,7 +23,7 @@ The version 3.x.x of this module is a great leap forward.
 * it runs ProxySQL 2 with SSL support
 * it requires Puppet 6.x or higher
 
-If you want to upgrade your database from 57 to 80, you can read these instructions (along with [Percona official documentation](https://www.percona.com/doc/percona-server/LATEST/upgrading_guide.html)): [upgrade Percona from 5.7 to 8.0](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0).
+If you want to upgrade your database from 57 to 80, you can read these instructions (along with [Percona official documentation](https://www.percona.com/doc/percona-server/LATEST/upgrading_guide.html)): [upgrade Percona from 5.7 to 8.0](https://gitlab.com/maxadamo/galera-proxysql/-/wikis/upgrade-Percona-from-5.7-to-8.0).
 
 The status of the cluster is checked at run time through a puppet fact and puppet will attempt to re-join the node in case of disconnection (**if you bring the whole cluster down and you remove /var/lib/mysql/gvwstate.dat from all the servers you have lost your data** because a clean bootstrap will be attempted).
 
@@ -52,7 +52,7 @@ What you get is what you see in the Architecture Diagram
 
 you can have more than 3 backends to increase the read speed of the cluster (bearing in mind that it could have side effects on the write speed).
 
-![Screenshot N/A](https://filesender.geant.org/pub/galera_proxysql.png  "Architecture Diagram")
+![Screenshot N/A](https://filesender.com/pub/galera_proxysql.png  "Architecture Diagram")
 
 ## Setup
 
@@ -245,7 +245,7 @@ galera_proxysql::create::user { 'whatever_user':
 
 ## Development
 
-Feel free to make pull requests and/or open issues on [my Gitlab Repository](https://gitlab.geant.org/massimiliano.adamo/galera-proxysql)
+Feel free to make pull requests and/or open issues on [my Gitlab Repository](https://gitlab.com/maxadamo/galera-proxysql)
 
 ## Release Notes
 
