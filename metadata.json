@@ -1,11 +1,11 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
   "source": "https://gitlab.com/maxadamo/galera_proxysql",
-  "project_page": "https://gitlab.com/maxadamo/galera_proxysql/-/wikis/home",
+  "project_page": "https://gitlab.com/maxadamo/galera_proxysql",
   "issues_url": "https://gitlab.com/maxadamo/galera_proxysql/-/issues",
   "dependencies": [
     {
