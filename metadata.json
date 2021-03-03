@@ -1,12 +1,12 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
-  "source": "https://gitlab.com/maxadamo/galera-proxysql",
-  "project_page": "https://gitlab.com/maxadamo/galera-proxysql/-/wikis/home",
-  "issues_url": "https://gitlab.com/maxadamo/galera-proxysql/-/issues",
+  "source": "https://gitlab.com/maxadamo/galera_proxysql",
+  "project_page": "https://gitlab.com/maxadamo/galera_proxysql/-/wikis/home",
+  "issues_url": "https://gitlab.com/maxadamo/galera_proxysql/-/issues",
   "dependencies": [
     {
       "name": "camptocamp-systemd",
