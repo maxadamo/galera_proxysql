@@ -52,7 +52,7 @@ What you get is what you see in the Architecture Diagram
 
 you can have more than 3 backends to increase the read speed of the cluster (bearing in mind that it could have side effects on the write speed).
 
-![Screenshot N/A](https://filesender.com/pub/galera_proxysql.png  "Architecture Diagram")
+![Screenshot N/A](https://filesender.geant.org/pub/galera_proxysql.png  "Architecture Diagram")
 
 ## Setup
 
