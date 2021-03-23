@@ -1,4 +1,10 @@
 
+3.2.0 / 2021-03-23
+==================
+
+  * allow keepalived master to take over
+  * fix keepalived priority
+
 3.1.7 / 2021-03-23
 ==================
 
