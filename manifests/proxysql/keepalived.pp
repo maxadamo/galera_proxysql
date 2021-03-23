@@ -14,17 +14,14 @@ class galera_proxysql::proxysql::keepalived (
   $vip_key = keys($proxysql_vip)[0]
   $proxysql_key_first = keys($proxysql_hosts)[0]
   $proxysql_key_second = keys($proxysql_hosts)[1]
-  $peer_ip = $facts['fqdn'] ? {
-    $proxysql_key_first  => $proxysql_hosts[$proxysql_key_second]['ipv4'],
-    $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
-  }
-
-  if has_key($proxysql_hosts[$facts['fqdn']], 'state') and $proxysql_hosts[$facts['fqdn']['state']] == 'MASTER' {
-    $state = $proxysql_hosts[$facts['fqdn']]['state']
+  if $facts['fqdn'] == $proxysql_key_first {
     $priority = 100
+    $state = 'MASTER'
+    $peer_ip = $proxysql_hosts[$proxysql_key_second]['ipv4']
   } else {
-    $state = 'BACKUP'
     $priority = 99
+    $state = 'BACKUP'
+    $peer_ip = $proxysql_hosts[$proxysql_key_first]['ipv4']
   }
 
   class { 'keepalived': sysconf_options => $keepalived_sysconf_options; }
