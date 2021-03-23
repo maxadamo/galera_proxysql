@@ -84,6 +84,7 @@ class galera_proxysql::proxysql::proxysql (
   String $proxysql_mysql_version                = $galera_proxysql::params::proxysql_mysql_version,
   $http_proxy                                   = $galera_proxysql::params::http_proxy,
   Boolean $manage_firewall                      = $galera_proxysql::params::manage_firewall,
+  Integer $set_query_lock_on_hostgroup          = $galera_proxysql::params::set_query_lock_on_hostgroup,
 
   # Passwords
   Sensitive $monitor_password                   = $galera_proxysql::params::monitor_password,
@@ -252,12 +253,13 @@ class galera_proxysql::proxysql::proxysql (
     'proxysql_cnf_header':
       target  => '/etc/proxysql.cnf',
       content => epp("${module_name}/proxysql_header.cnf.epp", {
-        proxysql_port           => $proxysql_port,
-        proxysql_admin_port     => $proxysql_admin_port,
-        proxysql_admin_password => Sensitive($proxysql_admin_password),
-        proxysql_mysql_version  => $proxysql_mysql_version,
-        monitor_password        => Sensitive($monitor_password),
-        server_list             => $server_list
+        proxysql_port               => $proxysql_port,
+        proxysql_admin_port         => $proxysql_admin_port,
+        proxysql_admin_password     => Sensitive($proxysql_admin_password),
+        proxysql_mysql_version      => $proxysql_mysql_version,
+        monitor_password            => Sensitive($monitor_password),
+        server_list                 => $server_list,
+        set_query_lock_on_hostgroup => $set_query_lock_on_hostgroup
       }),
       order   => '1';
     'proxysql_cnf_footer':

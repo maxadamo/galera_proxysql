@@ -59,6 +59,7 @@ class galera_proxysql::params {
   $ssl_ca_source_path = undef
   $ssl_cert_source_path = undef
   $ssl_key_source_path = undef
+  $set_query_lock_on_hostgroup = 0
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
 

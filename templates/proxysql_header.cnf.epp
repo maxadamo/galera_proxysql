@@ -24,6 +24,7 @@ mysql_variables=
     have_ssl=true
     threads=<%= $facts['processorcount'] %>
     max_connections=2048
+    set_query_lock_on_hostgroup=<%= $set_query_lock_on_hostgroup %>
     default_query_delay=0
     default_query_timeout=36000000
     have_compress=true

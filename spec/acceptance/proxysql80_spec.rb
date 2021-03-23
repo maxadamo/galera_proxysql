@@ -102,6 +102,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       # rubocop:disable RepeatedDescription
       its(:content) { is_expected.to include 'username = "monitor", password = "monitor_pass"' }
       its(:content) { is_expected.to include 'username = "test_two", password = "test_two_pass",' }
+      its(:content) { is_expected.to include 'set_query_lock_on_hostgroup=0' }
     end
 
     describe file('/root/.my.cnf') do
