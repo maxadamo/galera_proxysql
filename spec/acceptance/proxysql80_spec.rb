@@ -56,16 +56,17 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
 
         class { 'firewall': ensure_v6 => stopped; }
         -> class { 'galera_proxysql::proxysql::proxysql':
-          percona_major_version => '80',
-          manage_ssl            => false,
-          manage_firewall       => true,
-          proxysql_port         => 3310,
-          trusted_networks      => $trusted_networks,
-          monitor_password      => $monitor_password,
-          proxysql_hosts        => $proxysql_hosts,
-          proxysql_vip          => $proxysql_vip,
-          galera_hosts          => $galera_hosts,
-          manage_repo           => false;
+          percona_major_version       => '80',
+          manage_ssl                  => false,
+          manage_firewall             => true,
+          proxysql_port               => 3310,
+          set_query_lock_on_hostgroup => 1,
+          trusted_networks            => $trusted_networks,
+          monitor_password            => $monitor_password,
+          proxysql_hosts              => $proxysql_hosts,
+          proxysql_vip                => $proxysql_vip,
+          galera_hosts                => $galera_hosts,
+          manage_repo                 => false;
         }
         -> galera_proxysql::create::user {
           default:
@@ -102,7 +103,7 @@ describe 'galera_proxysql class:', if: ENV['HOST_TYPE'] == 'proxysql' && ENV['MA
       # rubocop:disable RepeatedDescription
       its(:content) { is_expected.to include 'username = "monitor", password = "monitor_pass"' }
       its(:content) { is_expected.to include 'username = "test_two", password = "test_two_pass",' }
-      its(:content) { is_expected.to include 'set_query_lock_on_hostgroup=0' }
+      its(:content) { is_expected.to include 'set_query_lock_on_hostgroup=1' }
     end
 
     describe file('/root/.my.cnf') do
