@@ -19,16 +19,12 @@ class galera_proxysql::proxysql::keepalived (
     $proxysql_key_second => $proxysql_hosts[$proxysql_key_first]['ipv4'],
   }
 
-  if has_key($proxysql_hosts[$facts['fqdn']], 'priority') {
-    $priority = $proxysql_hosts[$facts['fqdn']]['priority']
-  } else {
-    $priority = 100
-  }
-
-  if has_key($proxysql_hosts[$facts['fqdn']], 'state') {
+  if has_key($proxysql_hosts[$facts['fqdn']], 'state') and $proxysql_hosts[$facts['fqdn']['state']] == 'MASTER' {
     $state = $proxysql_hosts[$facts['fqdn']]['state']
+    $priority = 100
   } else {
     $state = 'BACKUP'
+    $priority = 99
   }
 
   class { 'keepalived': sysconf_options => $keepalived_sysconf_options; }
@@ -37,8 +33,10 @@ class galera_proxysql::proxysql::keepalived (
 
   keepalived::vrrp::script { 'check_proxysql':
     script   => 'killall -0 proxysql',
-    interval => 2,
-    weight   => 2;
+    weight   => 2,  # integer added/removed to/from priority
+    rise     => 1,  # required number of OK
+    fall     => 1,  # required number of KO
+    interval => 2;
   }
 
   if ($use_ipv6) {
