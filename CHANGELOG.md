@@ -1,4 +1,12 @@
 
+3.2.1 / 2021-03-27
+==================
+
+  * bump new version
+  * Merge branch 'test'
+  * update template with new parameter
+  * allow setting customer params for proxysql users
+
 3.2.0 / 2021-03-23
 ==================
 
