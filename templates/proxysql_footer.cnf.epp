@@ -25,19 +25,3 @@ mysql_query_rules =
         apply=1
     }
 )
-
-# we have set "writer is also reader", we have also set "max_writers 1", hence we check hostgroup 10 only
-scheduler=
-(
-    {
-        id=1
-        active=1
-        interval_ms=10000
-        filename="/usr/bin/proxysql_galera_checker"
-        arg1="10"
-        arg2="10"
-        arg3="1"
-        arg4="1"
-        arg5="/var/lib/proxysql/proxysql_galera_checker.log"
-    }
-)
