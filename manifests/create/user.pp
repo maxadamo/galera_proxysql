@@ -113,8 +113,9 @@ define galera_proxysql::create::user (
       concat::fragment { "proxysql_cnf_fragment_${dbuser}_${dbpass}":
         target  => '/etc/proxysql.cnf',
         content => epp("${module_name}/proxysql_user.cnf.epp", {
-          dbuser => $dbuser,
-          dbpass => $dbpass
+          dbuser                    => $dbuser,
+          dbpass                    => $dbpass,
+          proxysql_extra_parameters => $proxysql_extra_parameters
         }),
         order   => $concat_order;
       }
