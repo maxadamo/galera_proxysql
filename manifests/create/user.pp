@@ -13,6 +13,7 @@ define galera_proxysql::create::user (
   Enum[
     'present', 'absent',
     present, absent] $ensure    = present,
+  $proxysql_extra_parameters    = undef
 ) {
 
   if ($proxysql_hosts) {
