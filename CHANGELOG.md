@@ -1,4 +1,10 @@
 
+3.3.0 / 2021-03-28
+==================
+
+  * remove stale configuration from proxysql.cnf
+  * remove space strip from template
+
 3.2.1 / 2021-03-27
 ==================
 
