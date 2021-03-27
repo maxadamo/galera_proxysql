@@ -1,1 +1,1 @@
-    { username = "<%= $dbuser -%>", password = "<%= $dbpass.unwrap -%>", default_hostgroup = 10, active = 1<%= $proxysql_extra_parameters -%> },
+    { username = "<%= $dbuser -%>", password = "<%= $dbpass.unwrap -%>", default_hostgroup = 10, active = 1<%= $proxysql_extra_parameters %> },
