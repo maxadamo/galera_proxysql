@@ -51,7 +51,7 @@ class galera_proxysql::params {
   $proxysql_package = 'proxysql2'
   $proxysql_port = 3306
   $proxysql_admin_port = 3307
-  $proxysql_version  = 'latest'
+  $proxysql_version  = $facts['percona_version_facts']
   $proxysql_mysql_version = '5.7.22-22-57'
   $proxysql_vip = undef
   $proxysql_admin_password = Sensitive('admin')
