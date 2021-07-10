@@ -5,7 +5,7 @@
 # None
 #
 #
-class galera_proxysql::proxysql::service ($proxysql_package) {
+class galera_proxysql::proxysql::service ($proxysql_package, $proxysql_logs_destination) {
 
   assert_private("this class should be called only by ${module_name}")
 
@@ -14,8 +14,10 @@ class galera_proxysql::proxysql::service ($proxysql_package) {
     require => Package[$proxysql_package];
   }
   -> systemd::unit_file { 'proxysql.service':
-    source => "puppet:///modules/${module_name}/proxysql.service",
-    notify => Service['proxysql'];
+    content => epp("${module_name}/proxysql.service.epp", {
+      proxysql_logs_destination => $proxysql_logs_destination
+    }),
+    notify  => Service['proxysql'];
   }
 
   file { '/var/lib/proxysql':

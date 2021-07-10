@@ -15,6 +15,12 @@ PIDFile=/var/run/proxysql/proxysql.pid
 # Use the default user and group
 User=proxysql
 Group=proxysql
+<% if $proxysql_logs_destination == 'syslog' { -%>
+
+# send logs syslog
+StandardOutput=syslog
+StandardError=syslog
+<% } -%>
 
 # Increase file limits
 LimitNOFILE=102400

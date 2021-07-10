@@ -67,28 +67,29 @@ class galera_proxysql::proxysql::proxysql (
   Optional[Stdlib::Filesource] $ssl_key_source_path  = $galera_proxysql::params::ssl_key_source_path,
 
   # PRoxySQL general settings
-  Optional[String] $keepalived_sysconf_options  = $galera_proxysql::params::keepalived_sysconf_options,
-  $proxysql_users                               = undef,  # users are now created through galera_proxysql::create::user
-  Stdlib::Port $proxysql_port                   = $galera_proxysql::params::proxysql_port,
-  Stdlib::Port $proxysql_admin_port             = $galera_proxysql::params::proxysql_admin_port,
-  Enum['56', '57', '80'] $percona_major_version = $galera_proxysql::params::percona_major_version,
-  Boolean $force_ipv6                           = $galera_proxysql::params::force_ipv6,
-  Hash $galera_hosts                            = $galera_proxysql::params::galera_hosts,
-  Boolean $manage_repo                          = $galera_proxysql::params::manage_repo,
-  Hash $proxysql_hosts                          = $galera_proxysql::params::proxysql_hosts,
-  Hash $proxysql_vip                            = $galera_proxysql::params::proxysql_vip,
-  Array $trusted_networks                       = $galera_proxysql::params::trusted_networks,
-  String $network_interface                     = $galera_proxysql::params::network_interface,
-  String $proxysql_package                      = $galera_proxysql::params::proxysql_package,
-  String $proxysql_version                      = $galera_proxysql::params::proxysql_version,
-  String $proxysql_mysql_version                = $galera_proxysql::params::proxysql_mysql_version,
-  $http_proxy                                   = $galera_proxysql::params::http_proxy,
-  Boolean $manage_firewall                      = $galera_proxysql::params::manage_firewall,
-  Integer $set_query_lock_on_hostgroup          = $galera_proxysql::params::set_query_lock_on_hostgroup,
+  Optional[String] $keepalived_sysconf_options         = $galera_proxysql::params::keepalived_sysconf_options,
+  $proxysql_users                                      = undef,  # users are now created through galera_proxysql::create::user
+  Stdlib::Port $proxysql_port                          = $galera_proxysql::params::proxysql_port,
+  Stdlib::Port $proxysql_admin_port                    = $galera_proxysql::params::proxysql_admin_port,
+  Enum['56', '57', '80'] $percona_major_version        = $galera_proxysql::params::percona_major_version,
+  Boolean $force_ipv6                                  = $galera_proxysql::params::force_ipv6,
+  Hash $galera_hosts                                   = $galera_proxysql::params::galera_hosts,
+  Boolean $manage_repo                                 = $galera_proxysql::params::manage_repo,
+  Hash $proxysql_hosts                                 = $galera_proxysql::params::proxysql_hosts,
+  Hash $proxysql_vip                                   = $galera_proxysql::params::proxysql_vip,
+  Array $trusted_networks                              = $galera_proxysql::params::trusted_networks,
+  String $network_interface                            = $galera_proxysql::params::network_interface,
+  String $proxysql_package                             = $galera_proxysql::params::proxysql_package,
+  String $proxysql_version                             = $galera_proxysql::params::proxysql_version,
+  String $proxysql_mysql_version                       = $galera_proxysql::params::proxysql_mysql_version,
+  $http_proxy                                          = $galera_proxysql::params::http_proxy,
+  Boolean $manage_firewall                             = $galera_proxysql::params::manage_firewall,
+  Integer $set_query_lock_on_hostgroup                 = $galera_proxysql::params::set_query_lock_on_hostgroup,
+  Enum['journal', 'syslog'] $proxysql_logs_destination = $galera_proxysql::params::proxysql_logs_destination,
 
   # Passwords
-  Sensitive $monitor_password                   = $galera_proxysql::params::monitor_password,
-  Sensitive $proxysql_admin_password            = $galera_proxysql::params::proxysql_admin_password,
+  Sensitive $monitor_password        = $galera_proxysql::params::monitor_password,
+  Sensitive $proxysql_admin_password = $galera_proxysql::params::proxysql_admin_password,
 
 ) inherits galera_proxysql::params {
 
@@ -155,7 +156,8 @@ class galera_proxysql::proxysql::proxysql (
       http_proxy            => $http_proxy,
       manage_repo           => $manage_repo;
     'galera_proxysql::proxysql::service':
-      proxysql_package => $proxysql_package;
+      proxysql_package         => $proxysql_package,
+      proxysql_logs_destination => $proxysql_logs_destination;
     'galera_proxysql::proxysql::keepalived':
       use_ipv6                   => $ipv6_true,
       proxysql_hosts             => $proxysql_hosts,
