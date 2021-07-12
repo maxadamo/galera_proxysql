@@ -1,13 +1,15 @@
 
-v3.4.0 / 2021-07-12
+3.4.1 / 2021-07-12
 ==================
 
+  * upgrade version in metadata
+  * create new changelog
   * addin quotes to be on the safe side
   * add quotes to be on the safe side
   * allow use hash for custom parameters
   * adding custom variables to proxysql
 
-v3.3.2 / 2021-07-12
+3.3.2 / 2021-07-12
 ===================
 
   * update changelog
@@ -20,28 +22,10 @@ v3.3.2 / 2021-07-12
   * upgrade pdk
   * rename CI file
 
-v3.3.2 / 2021-07-12
-==================
-
-  * updated PDK
-  * Merge branch 'production'
-  * add new versions on metadata.json
-  * set proxysql default version to present
-  * remove warning
-  * allow to send proxysql logs to syslog
-  * upgrade pdk
-  * rename CI file
-
-v3.3.1 / 2021-04-06
+3.3.1 / 2021-04-06
 ===================
 
   * bump version 3.3.1
-  * fix typo
-  * detect Percona version using fact
-
-3.3.1 / 2021-04-06
-==================
-
   * fix typo
   * detect Percona version using fact
 
