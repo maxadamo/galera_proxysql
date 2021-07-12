@@ -53,7 +53,7 @@ lower-case-table-names          = 0
 explicit_defaults_for_timestamp = ON
 <% if $galera_proxysql::galera::files::custom_server_cnf_parameters =~ Hash { -%>
 <% keys($galera_proxysql::galera::files::custom_server_cnf_parameters).each | $item_key | { -%>
-<%= $item_key %> = <%= $galera_proxysql::galera::files::custom_server_cnf_parameters[$item_key] %>
+<%= $item_key %> = "<%= $galera_proxysql::galera::files::custom_server_cnf_parameters[$item_key] %>"
 <% } -%>
 <% } else { -%>
 <%= $galera_proxysql::galera::files::custom_server_cnf_parameters %>
