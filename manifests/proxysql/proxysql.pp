@@ -86,6 +86,7 @@ class galera_proxysql::proxysql::proxysql (
   Boolean $manage_firewall                             = $galera_proxysql::params::manage_firewall,
   Integer $set_query_lock_on_hostgroup                 = $galera_proxysql::params::set_query_lock_on_hostgroup,
   Enum['journal', 'syslog'] $proxysql_logs_destination = $galera_proxysql::params::proxysql_logs_destination,
+  Optional[Hash] $custom_proxysql_variables            = {},
 
   # Passwords
   Sensitive $monitor_password        = $galera_proxysql::params::monitor_password,
@@ -261,7 +262,8 @@ class galera_proxysql::proxysql::proxysql (
         proxysql_mysql_version      => $proxysql_mysql_version,
         monitor_password            => Sensitive($monitor_password),
         server_list                 => $server_list,
-        set_query_lock_on_hostgroup => $set_query_lock_on_hostgroup
+        set_query_lock_on_hostgroup => $set_query_lock_on_hostgroup,
+        custom_proxysql_variables   => $custom_proxysql_variables
       }),
       order   => '1';
     'proxysql_cnf_footer':

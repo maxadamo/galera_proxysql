@@ -50,6 +50,9 @@ mysql_variables=
     commands_stats=true
     sessions_sort=true
     connect_retries_on_failure=10
+<% keys($custom_proxysql_variables).each | $variable_key | { -%>
+    <%= $variable_key %>=<%= $custom_proxysql_variables[$variable_key] %>
+<% } -%>
 }
 
 # defines MySQL Galera hostgroups
