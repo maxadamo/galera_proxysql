@@ -12,8 +12,8 @@ class galera_proxysql::params {
 
   # galera parameters
   $encrypt_cluster_traffic = false # Percona 80
-  $custom_server_cnf_parameters = undef
-  $custom_client_cnf_parameters = undef
+  $custom_server_cnf_parameters = {}
+  $custom_client_cnf_parameters = {}
   $galera_cluster_name = "${::environment}_galera"
   $galera_hosts = undef
   $gcache_size = '0.15'
