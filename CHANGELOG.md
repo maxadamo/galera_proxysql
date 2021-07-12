@@ -1,4 +1,25 @@
 
+v3.4.0 / 2021-07-12
+==================
+
+  * addin quotes to be on the safe side
+  * add quotes to be on the safe side
+  * allow use hash for custom parameters
+  * adding custom variables to proxysql
+
+v3.3.2 / 2021-07-12
+===================
+
+  * update changelog
+  * updated PDK
+  * Merge branch 'production'
+  * add new versions on metadata.json
+  * set proxysql default version to present
+  * remove warning
+  * allow to send proxysql logs to syslog
+  * upgrade pdk
+  * rename CI file
+
 v3.3.2 / 2021-07-12
 ==================
 
