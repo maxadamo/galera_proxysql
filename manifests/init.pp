@@ -179,7 +179,6 @@ class galera_proxysql (
 
   if $facts['osfamily'] != 'RedHat' { fail("${facts['operatingsystem']} not yet supported") }
 
-
   if $puppet_debug {
     # checking cluster status through the facter galera_status
     if $facts['galera_status'] == '200' {

@@ -51,17 +51,18 @@ class galera_proxysql::params {
   $proxysql_package = 'proxysql2'
   $proxysql_port = 3306
   $proxysql_admin_port = 3307
-  $proxysql_version  = 'latest'
+  $proxysql_version  = 'present'
   $proxysql_mysql_version = $facts['percona_version_facts']
   $proxysql_vip = undef
   $proxysql_admin_password = Sensitive('admin')
-  $keepalived_sysconf_options = '-D'
+  $proxysql_logs_destination = 'journal'
   $ssl_ca_source_path = undef
   $ssl_cert_source_path = undef
   $ssl_key_source_path = undef
   $set_query_lock_on_hostgroup = 0
   # proxysql Keepalive configuration
   $network_interface = 'eth0'
+  $keepalived_sysconf_options = '-D'
 
   # Common Parameters
   $http_proxy = absent # example: 'http://proxy.example.net:8080'

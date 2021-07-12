@@ -1,6 +1,6 @@
 {
   "name": "maxadamo-galera_proxysql",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "author": "maxadamo",
   "summary": "Galera and ProxySQL Cluster",
   "license": "GPL-3.0",
@@ -10,7 +10,7 @@
   "dependencies": [
     {
       "name": "camptocamp-systemd",
-      "version_requirement": ">= 2.12.0 <= 2.12.0"
+      "version_requirement": ">= 2.12.0 <= 3.0.0"
     },
     {
       "name": "puppet-epel",
@@ -22,7 +22,7 @@
     },
     {
       "name": "puppetlabs-firewall",
-      "version_requirement": ">= 1.9.0 <= 2.8.0"
+      "version_requirement": ">= 1.9.0 <= 3.0.1"
     },
     {
       "name": "puppetlabs-mysql",
@@ -62,11 +62,11 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.0.0 < 7.4.1"
+      "version_requirement": ">= 6.0.0 < 8.0.0"
     },
     {
       "name": "puppetserver",
-      "version_requirement": ">= 6.0.0 < 7.0.2"
+      "version_requirement": ">= 6.0.0 < 8.0.0"
     }
   ],
   "pdk-version": "2.1.0",
