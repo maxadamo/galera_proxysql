@@ -1,4 +1,23 @@
 
+v3.3.2 / 2021-07-12
+==================
+
+  * updated PDK
+  * Merge branch 'production'
+  * add new versions on metadata.json
+  * set proxysql default version to present
+  * remove warning
+  * allow to send proxysql logs to syslog
+  * upgrade pdk
+  * rename CI file
+
+v3.3.1 / 2021-04-06
+===================
+
+  * bump version 3.3.1
+  * fix typo
+  * detect Percona version using fact
+
 3.3.1 / 2021-04-06
 ==================
 
